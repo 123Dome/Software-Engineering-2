@@ -7,6 +7,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.List;
+
 @Entity
 @Table(name = "gruender", schema = "startupx")
 public class Gruender {
@@ -33,6 +35,9 @@ public class Gruender {
 
     @Column(name = "motivation", length = Integer.MAX_VALUE)
     private String motivation;
+
+    @ManyToMany(mappedBy = "gruenderListe")
+    private List<Startup> startupList;
 
     public Integer getId() {
         return id;

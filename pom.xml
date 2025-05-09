@@ -79,6 +79,17 @@
       <version>5.7.0</version>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <scope>provided</scope>
+      </dependency>
+
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>1.6.3</version>
+    </dependency>
 
   </dependencies>
 
