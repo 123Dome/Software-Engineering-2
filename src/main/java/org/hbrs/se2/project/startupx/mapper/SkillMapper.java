@@ -7,10 +7,9 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface SkillMapper {
-
     SkillMapper INSTANCE = Mappers.getMapper(SkillMapper.class);
 
-    Skill mapToSkill(SkillDTO skillDto);
+    Skill mapToSkill(SkillDTO skillDTO);
 
     SkillDTO mapToSkillDto(Skill skill);
 }

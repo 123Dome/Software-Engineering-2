@@ -7,10 +7,9 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface KommentarMapper {
-
     KommentarMapper INSTANCE = Mappers.getMapper(KommentarMapper.class);
 
     Kommentar mapToKommentar(KommentarDTO kommentarDTO);
 
-    KommentarDTO mapToKommentareDto(Kommentar kommentar);
+    KommentarDTO mapToKommentarDto(Kommentar kommentar);
 }

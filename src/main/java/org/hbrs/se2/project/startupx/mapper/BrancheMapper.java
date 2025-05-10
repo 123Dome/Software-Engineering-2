@@ -7,10 +7,9 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface BrancheMapper {
-
     BrancheMapper INSTANCE = Mappers.getMapper(BrancheMapper.class);
 
-    Branche mapToBranche(BrancheDTO brancheDto);
+    Branche mapToBranche(BrancheDTO brancheDTO);
 
     BrancheDTO mapToBrancheDto(Branche branche);
 }

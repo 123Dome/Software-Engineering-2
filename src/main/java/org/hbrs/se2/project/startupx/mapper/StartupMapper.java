@@ -7,10 +7,9 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface StartupMapper {
-
     StartupMapper INSTANCE = Mappers.getMapper(StartupMapper.class);
 
-    Startup mapToStartup(StartupDTO startupDto);
+    Startup mapToStartup(StartupDTO startupDTO);
 
     StartupDTO mapToStartupDto(Startup startup);
 }

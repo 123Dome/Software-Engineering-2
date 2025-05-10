@@ -7,10 +7,9 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface StellenausschreibungMapper {
-
     StellenausschreibungMapper INSTANCE = Mappers.getMapper(StellenausschreibungMapper.class);
 
-    Stellenausschreibung mapToStellenausschreibung(StellenausschreibungDTO stellenausschreibungDto);
+    Stellenausschreibung mapToStellenausschreibung(StellenausschreibungDTO stellenausschreibungDTO);
 
     StellenausschreibungDTO mapToStellenausschreibungDto(Stellenausschreibung stellenausschreibung);
 }

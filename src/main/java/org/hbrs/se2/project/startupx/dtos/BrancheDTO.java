@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -14,5 +15,5 @@ import java.util.List;
 public class BrancheDTO {
     private Integer id;
     private String bezeichnung;
-    private List<StartupDTO> startupDTOs;
+    private List<StartupDTO> startupDTOs = new ArrayList<>();
 }
