@@ -13,10 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentDTO {
-    private Integer studentId;
-    private UserDTO userDTO;
-    private Integer matrikelNr;
-    private StudiengangDTO studiengangDTO;
+    private Integer id;
+    private UserDTO user;
+    private Integer matrikelnr;
+    private StudiengangDTO studiengang;
     private String steckbrief;
-    private List<SkillDTO> skillDTOs = new ArrayList<>();
+    private List<SkillDTO> skills = new ArrayList<>();
 }

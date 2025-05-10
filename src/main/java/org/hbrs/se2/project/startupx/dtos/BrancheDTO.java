@@ -15,5 +15,5 @@ import java.util.List;
 public class BrancheDTO {
     private Integer id;
     private String bezeichnung;
-    private List<StartupDTO> startupDTOs = new ArrayList<>();
+    private List<StartupDTO> startups = new ArrayList<>();
 }

@@ -16,10 +16,10 @@ import java.util.List;
 public class StartupDTO {
     private Integer id;
     private String name;
-    private BrancheDTO brancheDTO;
+    private BrancheDTO branche;
     private String beschreibung;
     private LocalDate gruendungsdatum;
-    private String anzahlMitarbeiter;
-    private List<KommentarDTO> kommentarDTOs = new ArrayList<>();
-    private List<StellenausschreibungDTO> stellenausschreibungDTOs = new ArrayList<>();
+    private Integer anzahlMitarbeiter;
+    private List<KommentarDTO> kommentare = new ArrayList<>();
+    private List<StellenausschreibungDTO> stellenausschreibungen = new ArrayList<>();
 }

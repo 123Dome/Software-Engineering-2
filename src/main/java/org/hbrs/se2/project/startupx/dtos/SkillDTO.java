@@ -15,6 +15,6 @@ import java.util.List;
 public class SkillDTO {
     private Integer id;
     private String skillName;
-    private List<StellenausschreibungDTO> stellenausschreibungenDTOs = new ArrayList<>();
-    private List<StudentDTO> studentDTOs = new ArrayList<>();
+    private List<StellenausschreibungDTO> stellenausschreibungen = new ArrayList<>();
+    private List<StudentDTO> studenten = new ArrayList<>();
 }

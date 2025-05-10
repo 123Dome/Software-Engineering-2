@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class KommentarDTO {
     private Integer id;
-    private UserDTO userDTO;
-    private StartupDTO startupDTO;
+    private UserDTO user;
+    private StartupDTO startup;
     private String kommentar;
     private LocalDate erstellungsdatum;
     private LocalDate updated;

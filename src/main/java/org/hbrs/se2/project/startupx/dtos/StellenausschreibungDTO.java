@@ -14,9 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 public class StellenausschreibungDTO {
     private Integer id;
-    private StartupDTO startupDTO;
+    private StartupDTO startup;
     private String titel;
     private String beschreibung;
-    private List<SkillDTO> skillDTOs = new ArrayList<>();
-    private List<BewerbungDTO> bewerbungDTOs = new ArrayList<>();
+    private List<SkillDTO> skills = new ArrayList<>();
+    private List<BewerbungDTO> bewerbungen = new ArrayList<>();
 }

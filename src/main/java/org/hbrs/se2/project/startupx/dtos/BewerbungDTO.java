@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BewerbungDTO {
     private Integer id;
-    private StudentDTO studentDTO;
-    private StellenausschreibungDTO stellenausschreibungDTO;
+    private StudentDTO student;
+    private StellenausschreibungDTO stellenausschreibungen;
     private String bewerbungsschreiben;
 }
