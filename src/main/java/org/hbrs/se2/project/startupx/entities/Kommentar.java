@@ -10,10 +10,10 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "kommentare", schema = "startupx")
+@Table(name = "kommentar", schema = "startupx")
 @Getter
 @Setter
-public class Kommentare {
+public class Kommentar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "kommentar_id", nullable = false)

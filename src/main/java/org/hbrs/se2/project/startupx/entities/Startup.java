@@ -47,7 +47,7 @@ public class Startup {
 
     @OneToMany(mappedBy = "startup")
     @OrderBy("erstellungsdatum DESC")
-    private List<Kommentare> kommentare = new ArrayList<>();
+    private List<Kommentar> kommentare = new ArrayList<>();
 
     @OneToMany(mappedBy = "startup")
     private List<Stellenausschreibung> stellenausschreibungen = new ArrayList<>();

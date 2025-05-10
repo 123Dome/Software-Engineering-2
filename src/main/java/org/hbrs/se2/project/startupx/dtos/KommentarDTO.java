@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class KommentareDTO {
+public class KommentarDTO {
 
     private Integer id;
     private User user;

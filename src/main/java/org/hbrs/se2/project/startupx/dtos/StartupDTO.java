@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hbrs.se2.project.startupx.entities.Branche;
-import org.hbrs.se2.project.startupx.entities.Kommentare;
+import org.hbrs.se2.project.startupx.entities.Kommentar;
 import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
 
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ public class StartupDTO {
     private String beschreibung;
     private LocalDate gruendungsdatum;
     private String anzahlMitarbeiter;
-    private List<Kommentare> kommentare;
+    private List<Kommentar> kommentare;
     private List<Stellenausschreibung> stellenausschreibungen;
 
 }

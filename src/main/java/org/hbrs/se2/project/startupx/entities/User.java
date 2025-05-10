@@ -46,7 +46,7 @@ public class User {
     private LocalDate geburtsdatum;
 
     @OneToMany(mappedBy = "user")
-    private Set<Kommentare> kommentare = new LinkedHashSet<>();
+    private Set<Kommentar> kommentare = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<Student> students = new LinkedHashSet<>();
@@ -110,11 +110,11 @@ public class User {
         this.geburtsdatum = geburtsdatum;
     }
 
-    public Set<Kommentare> getKommentare() {
+    public Set<Kommentar> getKommentare() {
         return kommentare;
     }
 
-    public void setKommentare(Set<Kommentare> kommentare) {
+    public void setKommentare(Set<Kommentar> kommentare) {
         this.kommentare = kommentare;
     }
 
