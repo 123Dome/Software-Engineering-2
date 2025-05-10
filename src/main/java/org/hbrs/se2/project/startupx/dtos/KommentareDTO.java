@@ -5,16 +5,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hbrs.se2.project.startupx.entities.Startup;
+import org.hbrs.se2.project.startupx.entities.User;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BrancheDto {
+public class KommentareDTO {
 
     private Integer id;
-    private String bezeichnung;
-    private List<Startup> startups;
+    private User user;
+    private Startup startup;
+    private String kommentar;
+    private LocalDate erstellungsdatum;
+    private LocalDate updated;
+    private Integer bewertung;
 }

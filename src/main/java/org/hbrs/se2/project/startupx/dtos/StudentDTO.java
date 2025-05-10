@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hbrs.se2.project.startupx.entities.Skill;
 import org.hbrs.se2.project.startupx.entities.Studiengang;
 import org.hbrs.se2.project.startupx.entities.User;
 
@@ -21,5 +20,5 @@ public class StudentDTO {
     private Integer matrikelNr;
     private Studiengang studiengang;
     private String steckbrief;
-    private List<SkillDto> skills = new ArrayList<>();
+    private List<SkillDTO> skills = new ArrayList<>();
 }

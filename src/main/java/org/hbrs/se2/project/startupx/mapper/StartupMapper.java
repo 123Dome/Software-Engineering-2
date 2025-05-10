@@ -1,6 +1,6 @@
 package org.hbrs.se2.project.startupx.mapper;
 
-import org.hbrs.se2.project.startupx.dtos.StartupDto;
+import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.entities.Startup;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -10,7 +10,7 @@ public interface StartupMapper {
 
     StartupMapper INSTANCE = Mappers.getMapper(StartupMapper.class);
 
-    Startup mapToStartup(StartupDto startupDto);
+    Startup mapToStartup(StartupDTO startupDto);
 
-    StartupDto mapToStartupDto(Startup startup);
+    StartupDTO mapToStartupDto(Startup startup);
 }

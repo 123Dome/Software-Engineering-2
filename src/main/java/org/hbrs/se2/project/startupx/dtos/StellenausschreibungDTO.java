@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StellenausschreibungDto {
+public class StellenausschreibungDTO {
 
     private Integer id;
     private Startup startup;

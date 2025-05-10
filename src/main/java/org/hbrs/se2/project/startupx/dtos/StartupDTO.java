@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StartupDto {
+public class StartupDTO {
 
     private Integer id;
     private String name;

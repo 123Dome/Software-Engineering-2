@@ -1,6 +1,6 @@
 package org.hbrs.se2.project.startupx.mapper;
 
-import org.hbrs.se2.project.startupx.dtos.KommentareDto;
+import org.hbrs.se2.project.startupx.dtos.KommentareDTO;
 import org.hbrs.se2.project.startupx.entities.Kommentare;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -10,7 +10,7 @@ public interface KommentarMapper {
 
     KommentarMapper INSTANCE = Mappers.getMapper(KommentarMapper.class);
 
-    Kommentare mapToKommentare(KommentareDto kommentareDto);
+    Kommentare mapToKommentare(KommentareDTO kommentareDto);
 
-    KommentareDto mapToKommentareDto(Kommentare kommentare);
+    KommentareDTO mapToKommentareDto(Kommentare kommentare);
 }

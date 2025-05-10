@@ -1,6 +1,6 @@
 package org.hbrs.se2.project.startupx.mapper;
 
-import org.hbrs.se2.project.startupx.dtos.SkillDto;
+import org.hbrs.se2.project.startupx.dtos.SkillDTO;
 import org.hbrs.se2.project.startupx.entities.Skill;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -10,7 +10,7 @@ public interface SkillMapper {
 
     SkillMapper INSTANCE = Mappers.getMapper(SkillMapper.class);
 
-    Skill mapToSkill(SkillDto skillDto);
+    Skill mapToSkill(SkillDTO skillDto);
 
-    SkillDto mapToSkillDto(Skill skill);
+    SkillDTO mapToSkillDto(Skill skill);
 }
