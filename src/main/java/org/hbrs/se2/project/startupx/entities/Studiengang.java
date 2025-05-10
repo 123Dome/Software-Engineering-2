@@ -3,12 +3,16 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "studiengang", schema = "startupx")
+@Setter
+@Getter
 public class Studiengang {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,29 +26,5 @@ public class Studiengang {
 
     @OneToMany(mappedBy = "studiengang")
     private Set<Student> students = new LinkedHashSet<>();
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getStudiengang() {
-        return studiengang;
-    }
-
-    public void setStudiengang(String studiengang) {
-        this.studiengang = studiengang;
-    }
-
-    public Set<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
 
 }

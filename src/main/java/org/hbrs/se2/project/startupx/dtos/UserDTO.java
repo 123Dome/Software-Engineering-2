@@ -21,5 +21,5 @@ public class UserDTO {
     private String nutzername;
     private String email;
     private LocalDate geburtsdatum;
-    private List<RolleDTO> rollen  = new ArrayList<>();
+    private List<RolleDTO> rolleDTOs = new ArrayList<>();
 }

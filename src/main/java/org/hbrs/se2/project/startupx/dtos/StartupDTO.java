@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hbrs.se2.project.startupx.entities.Branche;
-import org.hbrs.se2.project.startupx.entities.Kommentar;
-import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -16,14 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StartupDTO {
-
     private Integer id;
     private String name;
-    private Branche branche;
+    private BrancheDTO brancheDTO;
     private String beschreibung;
     private LocalDate gruendungsdatum;
     private String anzahlMitarbeiter;
-    private List<Kommentar> kommentare;
-    private List<Stellenausschreibung> stellenausschreibungen;
-
+    private List<KommentarDTO> kommentarDTOs = new ArrayList<>();
+    private List<StellenausschreibungDTO> stellenausschreibungDTOs = new ArrayList<>();
 }

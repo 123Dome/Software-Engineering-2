@@ -2,6 +2,8 @@ package org.hbrs.se2.project.startupx.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -10,6 +12,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "student", schema = "startupx")
+@Setter
+@Getter
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,69 +47,5 @@ public class Student {
 
     @ManyToMany
     private Set<Skill> skills = new LinkedHashSet<>();
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public org.hbrs.se2.project.startupx.entities.User getUser() {
-        return user;
-    }
-
-    public void setUser(org.hbrs.se2.project.startupx.entities.User user) {
-        this.user = user;
-    }
-
-    public Integer getMatrikelnr() {
-        return matrikelnr;
-    }
-
-    public void setMatrikelnr(Integer matrikelnr) {
-        this.matrikelnr = matrikelnr;
-    }
-
-    public org.hbrs.se2.project.startupx.entities.Studiengang getStudiengang() {
-        return studiengang;
-    }
-
-    public void setStudiengang(org.hbrs.se2.project.startupx.entities.Studiengang studiengang) {
-        this.studiengang = studiengang;
-    }
-
-    public String getSteckbrief() {
-        return steckbrief;
-    }
-
-    public void setSteckbrief(String steckbrief) {
-        this.steckbrief = steckbrief;
-    }
-
-    public Set<Bewerbung> getBewerbungs() {
-        return bewerbungs;
-    }
-
-    public void setBewerbungs(Set<Bewerbung> bewerbungs) {
-        this.bewerbungs = bewerbungs;
-    }
-
-    public Set<Gruender> getGruenders() {
-        return gruenders;
-    }
-
-    public void setGruenders(Set<Gruender> gruenders) {
-        this.gruenders = gruenders;
-    }
-
-    public Set<Skill> getSkills() {
-        return skills;
-    }
-
-    public void setSkills(Set<Skill> skills) {
-        this.skills = skills;
-    }
 
 }

@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hbrs.se2.project.startupx.entities.Studiengang;
-import org.hbrs.se2.project.startupx.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 public class StudentDTO {
     private Integer studentId;
-    private User user;
+    private UserDTO userDTO;
     private Integer matrikelNr;
-    private Studiengang studiengang;
+    private StudiengangDTO studiengangDTO;
     private String steckbrief;
-    private List<SkillDTO> skills = new ArrayList<>();
+    private List<SkillDTO> skillDTOs = new ArrayList<>();
 }
