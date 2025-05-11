@@ -1,5 +1,7 @@
 package org.hbrs.se2.project.startupx.control;
 
+import org.hbrs.se2.project.startupx.dtos.RolleDTO;
+import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.util.Arrays;
@@ -13,10 +15,10 @@ public class AuthorizationControl {
      * 
      */
     public boolean isUserInRole(UserDTO user , String role  ) {
-        List<RolleDTO> rolleList = user.getRoles();
+        List<RolleDTO> rolleList = user.getRollen();
         // A bit lazy but hey it works ;-)
         for (  RolleDTO rolle : rolleList ) {
-            if ( rolle.getBezeichhnung().equals(role) ) return true;
+            if ( rolle.getBezeichnung().equals(role) ) return true;
         }
         return false;
     }
@@ -27,10 +29,10 @@ public class AuthorizationControl {
      * einem bestimmten Device etc.) angezeigt bekommt
      */
     public boolean isUserisAllowedToAccessThisFeature(UserDTO user , String role , String feature , String[] context  ) {
-        List<RolleDTO> rolleList = user.getRoles();
+        List<RolleDTO> rolleList = user.getRollen();
         // Check, ob ein Benutzer eine Rolle besitzt:
         for (  RolleDTO rolle : rolleList ) {
-            if ( rolle.getBezeichhnung().equals(role) )
+            if ( rolle.getBezeichnung().equals(role) )
                 // Einfache (!) Kontrolle,  ob die Rolle auf ein Feature zugreifen kann
                 if (checkRolleWithFeature(rolle, feature)) {
                     // Check, ob context erfüllt ist, bleibt hier noch aus, kann man nachziehen
