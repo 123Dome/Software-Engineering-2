@@ -2,12 +2,15 @@ package org.hbrs.se2.project.startupx.control;
 
 import org.hbrs.se2.project.startupx.dtos.RolleDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.entities.Rolle;
+import org.hbrs.se2.project.startupx.mapper.RolleMapper;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
-// @Component
+@Component
 public class AuthorizationControl {
 
     /**
@@ -15,7 +18,7 @@ public class AuthorizationControl {
      * 
      */
     public boolean isUserInRole(UserDTO user , String role  ) {
-        List<RolleDTO> rolleList = user.getRollen();
+        Set<RolleDTO> rolleList = user.getRollen();
         // A bit lazy but hey it works ;-)
         for (  RolleDTO rolle : rolleList ) {
             if ( rolle.getBezeichnung().equals(role) ) return true;
@@ -29,12 +32,12 @@ public class AuthorizationControl {
      * einem bestimmten Device etc.) angezeigt bekommt
      */
     public boolean isUserisAllowedToAccessThisFeature(UserDTO user , String role , String feature , String[] context  ) {
-        List<RolleDTO> rolleList = user.getRollen();
+        Set<RolleDTO> rolleList = user.getRollen();
         // Check, ob ein Benutzer eine Rolle besitzt:
         for (  RolleDTO rolle : rolleList ) {
             if ( rolle.getBezeichnung().equals(role) )
                 // Einfache (!) Kontrolle,  ob die Rolle auf ein Feature zugreifen kann
-                if (checkRolleWithFeature(rolle, feature)) {
+                if (checkRolleWithFeature(RolleMapper.INSTANCE.mapToRolle(rolle), feature)) {
                     // Check, ob context erfüllt ist, bleibt hier noch aus, kann man nachziehen
                     return true;
                 }
@@ -43,7 +46,7 @@ public class AuthorizationControl {
         return false;
     }
 
-    private boolean checkRolleWithFeature(RolleDTO rolle, String feature) {
+    private boolean checkRolleWithFeature(Rolle rolle, String feature) {
         String[] rolles = getRollesForFeature(feature);
         if  ( rolles.length == 0 || rolles == null ) return false;
         return Arrays.asList(rolles).contains(rolle);

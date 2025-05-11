@@ -6,7 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,10 +26,10 @@ public class Rolle {
     @Column(name = "bezeichnung", nullable = false)
     private String bezeichnung;
 
-    @ManyToMany
-    @JoinTable(name = "user_zu_rolle",
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_zu_rolle", schema = "startupx",
             joinColumns = @JoinColumn(name = "rolle_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<org.hbrs.se2.project.startupx.entities.User> users = new LinkedHashSet<>();
+    private Set<User> users = new LinkedHashSet<>();
 
 }

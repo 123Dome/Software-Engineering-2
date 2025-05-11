@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,5 +20,5 @@ public class UserDTO {
     private String nutzername;
     private String email;
     private LocalDate geburtsdatum;
-    private List<RolleDTO> rollen = new ArrayList<>();
+    private Set<RolleDTO> rollen;
 }

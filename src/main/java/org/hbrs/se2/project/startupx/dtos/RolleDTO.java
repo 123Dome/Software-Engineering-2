@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hbrs.se2.project.startupx.entities.User;
+
+import java.util.List;
 
 @Getter
 @Setter

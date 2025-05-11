@@ -11,7 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "\"user\"", schema = "startupx")
+@Table(name = "user", schema = "startupx")
 @Setter
 @Getter
 public class User {
@@ -55,7 +55,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Student> students = new LinkedHashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     private Set<Rolle> rollen = new LinkedHashSet<>();
 
 }
