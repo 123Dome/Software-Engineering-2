@@ -3,12 +3,18 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "rolle", schema = "startupx")
+@Setter
+@Getter
 public class Rolle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,34 +26,10 @@ public class Rolle {
     @Column(name = "bezeichnung", nullable = false)
     private String bezeichnung;
 
-    @ManyToMany
-    @JoinTable(name = "user_zu_rolle",
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_zu_rolle", schema = "startupx",
             joinColumns = @JoinColumn(name = "rolle_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<org.hbrs.se2.project.startupx.entities.User> users = new LinkedHashSet<>();
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getBezeichnung() {
-        return bezeichnung;
-    }
-
-    public void setBezeichnung(String bezeichnung) {
-        this.bezeichnung = bezeichnung;
-    }
-
-    public Set<org.hbrs.se2.project.startupx.entities.User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<org.hbrs.se2.project.startupx.entities.User> users) {
-        this.users = users;
-    }
+    private Set<User> users = new LinkedHashSet<>();
 
 }

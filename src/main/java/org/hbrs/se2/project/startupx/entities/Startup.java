@@ -3,17 +3,22 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "startup", schema = "startupx")
+@Getter
+@Setter
 public class Startup {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "startup_id", nullable = false)
@@ -41,73 +46,18 @@ public class Startup {
     private Integer anzahlMitarbeiter;
 
     @OneToMany(mappedBy = "startup")
-    private Set<Kommentare> kommentares = new LinkedHashSet<>();
+    @OrderBy("erstellungsdatum DESC")
+    private List<Kommentar> kommentare = new ArrayList<>();
 
     @OneToMany(mappedBy = "startup")
-    private Set<org.hbrs.se2.project.startupx.entities.Stellenausschreibung> stellenausschreibungs = new LinkedHashSet<>();
+    private List<Stellenausschreibung> stellenausschreibungen = new ArrayList<>();
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Branche getBranche() {
-        return branche;
-    }
-
-    public void setBranche(Branche branche) {
-        this.branche = branche;
-    }
-
-    public String getBeschreibung() {
-        return beschreibung;
-    }
-
-    public void setBeschreibung(String beschreibung) {
-        this.beschreibung = beschreibung;
-    }
-
-    public LocalDate getGruendungsdatum() {
-        return gruendungsdatum;
-    }
-
-    public void setGruendungsdatum(LocalDate gruendungsdatum) {
-        this.gruendungsdatum = gruendungsdatum;
-    }
-
-    public Integer getAnzahlMitarbeiter() {
-        return anzahlMitarbeiter;
-    }
-
-    public void setAnzahlMitarbeiter(Integer anzahlMitarbeiter) {
-        this.anzahlMitarbeiter = anzahlMitarbeiter;
-    }
-
-    public Set<Kommentare> getKommentares() {
-        return kommentares;
-    }
-
-    public void setKommentares(Set<Kommentare> kommentares) {
-        this.kommentares = kommentares;
-    }
-
-    public Set<org.hbrs.se2.project.startupx.entities.Stellenausschreibung> getStellenausschreibungs() {
-        return stellenausschreibungs;
-    }
-
-    public void setStellenausschreibungs(Set<org.hbrs.se2.project.startupx.entities.Stellenausschreibung> stellenausschreibungs) {
-        this.stellenausschreibungs = stellenausschreibungs;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "startup_zu_gruender",
+            joinColumns = @JoinColumn(name = "startup_id"),
+            inverseJoinColumns = @JoinColumn(name = "gruender_id")
+    )
+    private List<Gruender> gruenderListe = new ArrayList<>();
 
 }

@@ -3,13 +3,17 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "\"user\"", schema = "startupx")
+@Table(name = "user", schema = "startupx")
+@Setter
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +32,8 @@ public class User {
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Column(name = "passwort", nullable = false)
+    private String passwort;
 
     @Size(max = 255)
     @NotNull
@@ -46,92 +50,12 @@ public class User {
     private LocalDate geburtsdatum;
 
     @OneToMany(mappedBy = "user")
-    private Set<Kommentare> kommentare = new LinkedHashSet<>();
+    private Set<Kommentar> kommentare = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<Student> students = new LinkedHashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     private Set<Rolle> rollen = new LinkedHashSet<>();
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getVorname() {
-        return vorname;
-    }
-
-    public void setVorname(String vorname) {
-        this.vorname = vorname;
-    }
-
-    public String getNachname() {
-        return nachname;
-    }
-
-    public void setNachname(String nachname) {
-        this.nachname = nachname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getNutzername() {
-        return nutzername;
-    }
-
-    public void setNutzername(String nutzername) {
-        this.nutzername = nutzername;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDate getGeburtsdatum() {
-        return geburtsdatum;
-    }
-
-    public void setGeburtsdatum(LocalDate geburtsdatum) {
-        this.geburtsdatum = geburtsdatum;
-    }
-
-    public Set<Kommentare> getKommentare() {
-        return kommentare;
-    }
-
-    public void setKommentare(Set<Kommentare> kommentare) {
-        this.kommentare = kommentare;
-    }
-
-    public Set<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
-
-    public Set<Rolle> getRollen() {
-        return rollen;
-    }
-
-    public void setRollen(Set<Rolle> rollen) {
-        this.rollen = rollen;
-    }
 
 }

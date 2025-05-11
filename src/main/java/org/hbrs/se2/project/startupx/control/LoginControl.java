@@ -1,6 +1,9 @@
 package org.hbrs.se2.project.startupx.control;
 
 import org.hbrs.se2.project.startupx.control.exception.DatabaseUserException;
+import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.mapper.UserMapper;
+import org.hbrs.se2.project.startupx.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +39,7 @@ public class LoginControl {
     private UserDTO getUserWithJPA( String username , String password ) throws DatabaseUserException {
         UserDTO userTmp;
         try {
-            userTmp = repository.findUserByUseridAndPassword(username, password);
+            userTmp = UserMapper.INSTANCE.mapToUserDTO(repository.findUserByNutzernameAndPasswort(username, password));
         } catch ( org.springframework.dao.DataAccessResourceFailureException e ) {
             // Analyse und Umwandlung der technischen Errors in 'lesbaren' Darstellungen (ToDo!)
            throw new DatabaseUserException("A failure occured while trying to connect to database with JPA");
