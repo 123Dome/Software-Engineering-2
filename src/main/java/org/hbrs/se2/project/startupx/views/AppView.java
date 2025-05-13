@@ -29,7 +29,7 @@ import java.util.Optional;
  * The main view is a top-level placeholder for other views.
  */
 @CssImport("./styles/views/main/main-view.css")
-@Route("main")
+//@Route("main")
 @JsModule("./styles/shared-styles.js")
 public class AppView extends AppLayout implements BeforeEnterObserver {
 
@@ -99,10 +99,17 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         helloUser = new H1();
         topRightPanel.add(helloUser);
 
-        // Logout-Button am rechts-oberen Rand.
         MenuBar bar = new MenuBar();
-        MenuItem item = bar.addItem("Logout" , e -> logoutUser());
+
+        // Profil bearbeiten-Button am rechts-oberen Rand.
+        MenuItem  editProfileButton = bar.addItem("Profil bearbeiten", e -> switchToEditProfile());
+
+        // Logout-Button am rechts-oberen Rand.
+        MenuItem logoutButton = bar.addItem("Logout" , e -> logoutUser());
         topRightPanel.add(bar);
+
+
+
 
         layout.add( topRightPanel );
         return layout;
@@ -113,6 +120,11 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         ui.getSession().close();
         ui.getPage().setLocation("/");
     }
+
+    private void switchToEditProfile(){
+        UI.getCurrent().navigate("EditProfile");
+    }
+
 
     /**
      * Hinzufügen der vertikalen Leiste (Drawer)
@@ -135,7 +147,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         logoLayout.setId("logo");
         logoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         logoLayout.add(new Image("images/logo.png", "HelloCar logo"));
-        logoLayout.add(new H1("HelloCar"));
+        logoLayout.add(new H1("StartUpX"));
 
         // Hinzufügen des Menus inklusive der Tabs
         layout.add(logoLayout, menu);
@@ -167,13 +179,16 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
        // und dem Tabs-Array hinzugefügt. In der Methode createTab wird ein (Key, Value)-Pair übergeben:
         // Key: der sichtbare String des Menu-Items
         // Value: Die UI-Component, die nach dem Klick auf das Menuitem angezeigt wird.
-       Tab[] tabs = new Tab[]{ createTab( "Show Cars", RegistrationView.class) };
+       Tab[] tabs = new Tab[]{ createTab( "Startseite", MainViewDashboard.class)
+               , createTab( "Liste von StartUps", ShowAllStartUpsView.class)
+               , createTab( "Jobbörse", JobListingView.class)
+       };
 
        // Falls er Admin-Rechte hat, sollte der User auch Autos hinzufügen können
        // (Alternative: Verwendung der Methode 'isUserisAllowedToAccessThisFeature')
        if ( this.authorizationControl.isUserInRole( this.getCurrentUser() , Globals.Roles.ADMIN ) ) {
            System.out.println("User is Admin!");
-           tabs = Utils.append( tabs , createTab("Enter Car", RegistrationView.class)  );
+           tabs = Utils.append( tabs , createTab("StartUp erstellen", CreateStartUpView.class));
        }
 
        // ToDo für die Teams: Weitere Tabs aus ihrem Projekt hier einfügen!
@@ -202,7 +217,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         viewTitle.setText(getCurrentPageTitle());
 
         // Setzen des Vornamens von dem aktuell eingeloggten Benutzer
-        helloUser.setText("Hello my dear old friend!! Wie geht's dir, "  + this.getCurrentNameOfUser() );
+        helloUser.setText("Hallo! "  + this.getCurrentNameOfUser() );
 
     }
 
@@ -225,6 +240,8 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     }
 
 
+
+
     @Override
     /**
      * Methode wird vor der eigentlichen Darstellung der UI-Components aufgerufen.
@@ -235,8 +252,14 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
      * Views (hier: ShowCarsView und EnterCarView) ab.
      *
      */
+
+    //Wenn der User nicht eingeloggt ist, soll er die Möglichkeit haben, sich zu Registrieren.
+    //Alle anderen Seiten sind nicht zu erreichen.
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if (getCurrentUser() == null){
+        Class<? extends Component> target = (Class<? extends Component>) beforeEnterEvent.getNavigationTarget();
+
+        // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView navigiert wird
+        if (getCurrentUser() == null && !target.equals(RegistrationView.class)) {
             beforeEnterEvent.rerouteTo(Globals.Pages.LOGIN_VIEW);
         }
 

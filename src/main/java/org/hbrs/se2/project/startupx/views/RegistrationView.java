@@ -20,11 +20,13 @@ import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.entities.User;
 import org.hbrs.se2.project.startupx.util.Globals;
 
-@Route(value = "registration")
+@Route(value = "registration", layout = AppView.class)
 @PageTitle("Registration")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererbung)
 
+
+    //Registrierungsformular
     private TextField nutzername = new TextField("Benutzername");
     private TextField email = new TextField("Email");
     private TextField vorname = new TextField("Vorname");
@@ -37,6 +39,7 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
     private Button cancel = new Button ("Cancel");
     private Button register = new Button("Register");
 
+    //TODO: Muss noch mit dem UserDTO verbunden werden
     private Binder<User> binder = new Binder(User.class);
 
     public RegistrationView() {
