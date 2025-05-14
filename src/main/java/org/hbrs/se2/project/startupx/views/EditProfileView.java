@@ -12,11 +12,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinSession;
-import org.hbrs.se2.project.startupx.control.LoginControl;
+import org.hbrs.se2.project.startupx.control.EditProfilControl;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
-import org.hbrs.se2.project.startupx.entities.User;
-import org.hbrs.se2.project.startupx.repository.UserRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,10 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Profil bearbeiten")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class EditProfileView extends Div{
-
-    private UserRepository userRepository;
-
-
+    @Autowired
+    private EditProfilControl editProfilControl;
 
     private TextField nutzername = new TextField("Benutzername");
     private TextField email = new TextField("Email");
@@ -37,29 +32,27 @@ public class EditProfileView extends Div{
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
 
     //TODO: Daten des Users müssen abgerufen werden und editierbar sein, danach zurückgeschrieben werden
-    public EditProfileView(@Autowired UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public EditProfileView() {
         addClassName("enter-car-view");
 
         UserDTO userDTO = (UserDTO) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
-        User user = userRepository.findUserByNutzername(userDTO.getNutzername());
 
         add(createTitle());
-        setTextFieldWithUserData(user);
+        setTextFieldWithUserData(userDTO);
         add(createFormLayout());
-        add(createSaveButton(user));
+        add(createSaveButton(userDTO));
     }
 
     private Component createTitle() {
         return new H3("Profil bearbeiten");
     }
 
-    private void setTextFieldWithUserData(User user){
-        nutzername.setValue(user.getNutzername());
-        email.setValue(user.getEmail());
-        vorname.setValue(user.getVorname());
-        nachname.setValue(user.getNachname());
-        geburtsdatum.setValue(user.getGeburtsdatum());
+    private void setTextFieldWithUserData(UserDTO userDTO){
+        nutzername.setValue(userDTO.getNutzername());
+        email.setValue(userDTO.getEmail());
+        vorname.setValue(userDTO.getVorname());
+        nachname.setValue(userDTO.getNachname());
+        geburtsdatum.setValue(userDTO.getGeburtsdatum());
     }
 
     private Component createFormLayout() {
@@ -68,21 +61,43 @@ public class EditProfileView extends Div{
         return formLayout;
     }
 
-    private Button createSaveButton (User user) {
+    private Button createSaveButton (UserDTO userDTO) {
         Button saveButton = new Button("Änderungen speichern", e -> {
-            user.setNutzername(nutzername.getValue());
-            user.setEmail(email.getValue());
-            user.setVorname(vorname.getValue());
-            user.setNachname(nachname.getValue());
-            user.setGeburtsdatum(geburtsdatum.getValue());
-
-            userRepository.save(user);
-            Notification.show("Profil aktualisiert");
-
+            if(checkTextfields()){
+                UserDTO newUserDTO = new UserDTO();
+                newUserDTO.setNutzername(nutzername.getValue());
+                newUserDTO.setEmail(email.getValue());
+                newUserDTO.setVorname(vorname.getValue());
+                newUserDTO.setNachname(nachname.getValue());
+                newUserDTO.setGeburtsdatum(geburtsdatum.getValue());
+                if(editProfilControl.updateUser(newUserDTO)){
+                    Notification.show("Profil aktualisiert");
+                }
+            }
+            // TODO: Fehlerausgabe
         });
         return saveButton;
     }
 
-
+    private boolean checkTextfields(){
+        // TODO: Eigene Exceptionklasse erstellen
+        if(nutzername.getValue() == null || nutzername.getValue().isEmpty()){
+            throw new IllegalArgumentException("Nutzername darf nicht leer sein");
+        }
+        if(email.getValue() == null || email.getValue().isEmpty()){
+            // TODO: Prüfung auf richtiges E-Mail Format
+            throw new IllegalArgumentException("Email darf nicht leer sein");
+        }
+        if(vorname.getValue() == null || vorname.getValue().isEmpty()){
+            throw new IllegalArgumentException("Vorname darf nicht leer sein");
+        }
+        if(nachname.getValue() == null || nachname.getValue().isEmpty()){
+            throw new IllegalArgumentException("Nachname darf nicht leer sein");
+        }
+        if(geburtsdatum.getValue() == null){
+            throw new IllegalArgumentException("Geburtsdatum darf nicht leer sein");
+        }
+        return true;
+    }
 
 }
