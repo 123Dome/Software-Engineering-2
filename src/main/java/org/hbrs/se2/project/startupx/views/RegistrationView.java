@@ -6,6 +6,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -33,17 +34,27 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
     private TextField nachname = new TextField("Nachname");
 
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
+
+    private ComboBox<String> studiengang = new ComboBox<>("Wähle einen Studiengang");
+
     private TextField password = new TextField("Passwort");
     private TextField password_confirm = new TextField("Passwort bestätigen");
 
     private Button cancel = new Button ("Cancel");
-    private Button register = new Button("Register");
+    private Button register = new Button("Registrieren");
 
     //TODO: Muss noch mit dem UserDTO verbunden werden
     private Binder<User> binder = new Binder(User.class);
 
     public RegistrationView() {
         addClassName("enter-car-view");
+
+        studiengang.setItems("IT","Jura","BWL");
+
+        studiengang.addValueChangeListener(e -> {
+            String selected = e.getValue();
+            Notification.show("Ausgewählt" + selected);
+        });
 
         add(createTitle());
         add(createFormLayout());
@@ -99,7 +110,7 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername,email, vorname, nachname, geburtsdatum,password,password_confirm);
+        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum, studiengang, password, password_confirm);
         return formLayout;
     }
 

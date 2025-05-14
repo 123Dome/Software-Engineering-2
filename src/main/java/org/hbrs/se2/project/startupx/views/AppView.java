@@ -5,6 +5,7 @@ import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -17,6 +18,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.*;
 import org.hbrs.se2.project.startupx.control.AuthorizationControl;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
@@ -29,6 +31,7 @@ import java.util.Optional;
  * The main view is a top-level placeholder for other views.
  */
 @CssImport("./styles/views/main/main-view.css")
+@CssImport(value = "./styles/views/main/dark-mode.css", themeFor = "vaadin-app-layout")
 //@Route("main")
 @JsModule("./styles/shared-styles.js")
 public class AppView extends AppLayout implements BeforeEnterObserver {
@@ -36,6 +39,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     private Tabs menu;
     private H1 viewTitle;
     private H1 helloUser;
+    private MenuItem profileButton;
 
     private AuthorizationControl authorizationControl;
 
@@ -102,14 +106,24 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         MenuBar bar = new MenuBar();
 
         // Profil bearbeiten-Button am rechts-oberen Rand.
-        MenuItem  editProfileButton = bar.addItem("Profil bearbeiten", e -> switchToEditProfile());
+        profileButton = bar.addItem("Profil", e -> switchToProfile());
 
         // Logout-Button am rechts-oberen Rand.
         MenuItem logoutButton = bar.addItem("Logout" , e -> logoutUser());
         topRightPanel.add(bar);
 
+        //Test zum togglen zwischen Light und Darkmode
+        Button toggleTheme = new Button("Dark Mode an/aus");
+        toggleTheme.addClickListener(e -> {
+            Element body = UI.getCurrent().getElement();
+            if (body.getThemeList().contains("dark")) {
+                body.getThemeList().remove("dark");
+            } else {
+                body.getThemeList().add("dark");
+            }
+        });
 
-
+        topRightPanel.add(toggleTheme);
 
         layout.add( topRightPanel );
         return layout;
@@ -121,7 +135,13 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         ui.getPage().setLocation("/");
     }
 
-    private void switchToEditProfile(){
+    //Navigier zu ProfileView
+    private void switchToProfile(){
+        UI.getCurrent().navigate("userProfile");
+    }
+
+    //Navigiere zu EditProfileView
+    private void switchToEditProfile() {
         UI.getCurrent().navigate("EditProfile");
     }
 
@@ -218,6 +238,16 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
 
         // Setzen des Vornamens von dem aktuell eingeloggten Benutzer
         helloUser.setText("Hallo! "  + this.getCurrentNameOfUser() );
+
+        //Ändert den Button von Profil nach Profil bearbeiten, wenn man sich auf dem eigenen Profil befindet
+        Class<?> currentView = getContent().getClass();
+        if (currentView.equals(ProfileView.class)) {
+            profileButton.setText("Profil bearbeiten");
+            profileButton.getElement().addEventListener("click", e -> switchToEditProfile());
+        } else {
+            profileButton.setText("Profil");
+            profileButton.getElement().addEventListener("click", e -> switchToProfile());
+        }
 
     }
 

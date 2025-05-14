@@ -231,13 +231,13 @@
   "Frontend/generated/jar-resources/virtualListConnector.js",
   "Frontend/styles/shared-styles.js",
   "Frontend/styles/views/entercar/enter-car-view.css",
-  "Frontend/styles/views/main/main-view.css",
-  "Frontend/styles/views/showcars/show-cars-view.css"
+  "Frontend/styles/views/main/dark-mode.css",
+  "Frontend/styles/views/main/main-view.css"
  ],
  "frontendHashes": {
   "styles/views/main/main-view.css": "6fa27862fc9e132f2fca148280cff249c87d513fbbd8d051470de81faec779b8",
+  "styles/views/main/dark-mode.css": "fde32d6cc6b7049ad6d33a7595fb618c921bbe11a8f0a78ef3ec4053130c30bd",
   "styles/views/entercar/enter-car-view.css": "55decd3c08b2ddd5bf356c8a8baeb774a24dc603c1d7a1e1bd79248321f40680",
-  "styles/views/showcars/show-cars-view.css": "04c197a03c73e8e465329961ab3b5d3c1c4efef387c026342d0a0e3fcb6bbb52",
   "styles/shared-styles.js": "6c26270ffcbdcbf543e82ca5534d70043525cad9fcd71299a073b84b74c01a01",
   "buttonFunctions.js": "c852123f9b2c44eb75e555119d3e05a7dbe78b91d0ab616feb9df1654474707d",
   "comboBoxConnector.js": "1d004c3dae9c76f8bcc68678abe1b8f7bdc8b456f5c9c4c7f190df8ed25d66cd",
@@ -260,12 +260,12 @@
  },
  "themeJsonContents": {},
  "entryScripts": [
-  "VAADIN/build/indexhtml-110c1b6e.js"
+  "VAADIN/build/indexhtml-8ff1de2b.js"
  ],
  "webComponents": [],
  "cvdlModules": {},
  "packageJsonHash": "dab916f7568ddf7c1412f4539935b9d88d4892f427f21fb6e65617c49fa18309",
  "indexHtmlGenerated": [
-  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-110c1b6e.js\"></script>"
+  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-8ff1de2b.js\"></script>"
  ]
 }
