@@ -40,10 +40,10 @@ public class Student {
     private String steckbrief;
 
     @OneToMany(mappedBy = "student")
-    private Set<Bewerbung> bewerbungs = new LinkedHashSet<>();
+    private Set<Bewerbung> bewerbungen = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "student")
-    private Set<Gruender> gruenders = new LinkedHashSet<>();
+    @ManyToMany(mappedBy = "studentenListe")
+    private Set<Startup> startups = new LinkedHashSet<>();
 
     @ManyToMany
     private Set<Skill> skills = new LinkedHashSet<>();
