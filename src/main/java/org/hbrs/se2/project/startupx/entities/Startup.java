@@ -54,10 +54,10 @@ public class Startup {
 
     @ManyToMany
     @JoinTable(
-            name = "startup_zu_gruender",
+            name = "startup_zu_student",
             joinColumns = @JoinColumn(name = "startup_id"),
-            inverseJoinColumns = @JoinColumn(name = "gruender_id")
+            inverseJoinColumns = @JoinColumn(name = "student_id")
     )
-    private List<Gruender> gruenderListe = new ArrayList<>();
+    private List<Student> studentenListe = new ArrayList<>();
 
 }
