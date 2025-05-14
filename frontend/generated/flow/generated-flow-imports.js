@@ -4,9 +4,12 @@ import { css, unsafeCSS, registerStyles } from '@vaadin/vaadin-themable-mixin';
 import $cssFromFile_0 from 'Frontend/styles/views/main/main-view.css?inline';
 
 injectGlobalCss($cssFromFile_0.toString(), 'CSSImport end', document);
-import $cssFromFile_1 from 'Frontend/styles/views/entercar/enter-car-view.css?inline';
+import $cssFromFile_1 from 'Frontend/styles/views/main/dark-mode.css?inline';
+const $css_1 = typeof $cssFromFile_1  === 'string' ? unsafeCSS($cssFromFile_1) : $cssFromFile_1;
+registerStyles('vaadin-app-layout', $css_1, {moduleId: 'flow_css_mod_1'});
+import $cssFromFile_2 from 'Frontend/styles/views/entercar/enter-car-view.css?inline';
 
-injectGlobalCss($cssFromFile_1.toString(), 'CSSImport end', document);
+injectGlobalCss($cssFromFile_2.toString(), 'CSSImport end', document);
 import '@vaadin/polymer-legacy-adapter/style-modules.js';
 import '@vaadin/vaadin-lumo-styles/color-global.js';
 import '@vaadin/vaadin-lumo-styles/typography-global.js';

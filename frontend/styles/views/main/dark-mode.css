@@ -1,0 +1,11 @@
+:host(.dark-mode) {
+    --lumo-base-color: #121212;
+    --lumo-primary-color: #bb86fc;
+    --lumo-primary-text-color: #ffffff;
+    --lumo-body-text-color: #e0e0e0;
+    --lumo-contrast: #ffffff;
+    --lumo-border-radius: 0.5em;
+
+    background-color: var(--lumo-base-color);
+    color: var(--lumo-body-text-color);
+}
