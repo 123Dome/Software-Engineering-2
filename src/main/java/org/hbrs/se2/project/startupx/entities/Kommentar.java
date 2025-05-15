@@ -2,8 +2,11 @@ package org.hbrs.se2.project.startupx.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -13,6 +16,9 @@ import java.time.LocalDate;
 @Table(name = "kommentar", schema = "startupx")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class Kommentar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
