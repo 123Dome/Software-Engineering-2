@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,4 +20,5 @@ public class StudentDTO {
     private StudiengangDTO studiengang;
     private String steckbrief;
     private List<SkillDTO> skills = new ArrayList<>();
+    private Set<StartupDTO> startups;
 }

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface StartupRepository extends JpaRepository<Startup, Long> {
+public interface StartupRepository extends JpaRepository<Startup, Integer> {
 
     List<Startup> findByBranche(Branche branche);
 

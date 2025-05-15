@@ -35,7 +35,7 @@ public class ApplicationConfig {
         final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
 
-        em.setPackagesToScan("org.hbrs.se2.project.hellocar.repository");
+        em.setPackagesToScan("org.hbrs.se2.project.startupx.repository");
 
         final HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

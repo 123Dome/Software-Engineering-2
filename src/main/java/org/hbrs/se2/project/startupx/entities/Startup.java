@@ -3,8 +3,11 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,11 +15,15 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "startup", schema = "startupx")
 @Getter
 @Setter
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Startup {
 
     @Id
@@ -47,10 +54,10 @@ public class Startup {
 
     @OneToMany(mappedBy = "startup")
     @OrderBy("erstellungsdatum DESC")
-    private List<Kommentar> kommentare = new ArrayList<>();
+    private List<Kommentar> kommentare;
 
     @OneToMany(mappedBy = "startup")
-    private List<Stellenausschreibung> stellenausschreibungen = new ArrayList<>();
+    private List<Stellenausschreibung> stellenausschreibungen;
 
     @ManyToMany
     @JoinTable(
@@ -58,6 +65,6 @@ public class Startup {
             joinColumns = @JoinColumn(name = "startup_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
-    private List<Student> studentenListe = new ArrayList<>();
+    private Set<Student> studentenListe;
 
 }

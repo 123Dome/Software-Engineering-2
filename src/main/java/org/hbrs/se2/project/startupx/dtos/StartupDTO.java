@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -21,5 +20,6 @@ public class StartupDTO {
     private LocalDate gruendungsdatum;
     private Integer anzahlMitarbeiter;
     private List<KommentarDTO> kommentare = new ArrayList<>();
-    private List<StellenausschreibungDTO> stellenausschreibungen = new ArrayList<>();
+    private List<StellenausschreibungDTO> stellenausschreibungen  = new ArrayList<>();
+    private Set<StudentDTO> studentenListe = new LinkedHashSet<>();
 }
