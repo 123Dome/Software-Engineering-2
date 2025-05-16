@@ -46,4 +46,6 @@ public class Kommentar {
     @Column(name = "bewertung")
     private Integer bewertung;
 
+
+
 }

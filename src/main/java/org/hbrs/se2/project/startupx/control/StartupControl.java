@@ -59,12 +59,22 @@ public class StartupControl {
         Set<Student> studentList = new LinkedHashSet<>();
 
         for(Long studentIds : startupDTO.getStudentenListe()) {
-            studentList.add(studentRepository.findById(studentIds)
-                    .orElseThrow(() -> new EntityNotFoundException("Student mit der ID " + studentIds + " nicht gefunden")));
+            try {
+                studentList.add(studentRepository.findById(studentIds)
+                        .orElseThrow(() -> new EntityNotFoundException("Student mit der ID " + studentIds + " nicht gefunden")));
+            } catch (EntityNotFoundException e) {
+                logger.warn("Student mit der ID " + studentIds + " nicht gefunden");
+            }
         }
 
-        Branche branche = brancheRepository.findById(startupDTO.getBranche())
-                .orElseThrow(() -> new EntityNotFoundException("Branche mit der ID " + startupDTO.getBranche() + " nicht gefunden"));
+        Branche branche = new Branche();
+        try {
+             branche = brancheRepository.findById(startupDTO.getBranche())
+                    .orElseThrow(() -> new EntityNotFoundException("Branche mit der ID " + startupDTO.getBranche() + " nicht gefunden"));
+        } catch (EntityNotFoundException e) {
+            logger.warn("Branche mit der ID " + startupDTO.getBranche() + " nicht gefunden");
+        }
+
 
         Startup startup = Startup.builder()
                 .name(startupDTO.getName())
@@ -76,7 +86,7 @@ public class StartupControl {
                 .build();
 
         Startup savedStartup = startupRepository.save(startup);
-
+        logger.info("Startup gegründet: " + savedStartup);
         return new ResponseEntity<>(StartupMapper.mapToStartupDto(savedStartup), HttpStatus.OK);
     }
 
@@ -89,6 +99,7 @@ public class StartupControl {
             startupDTOList.add(StartupMapper.mapToStartupDto(startup));
         }
 
+        logger.info("StartupDTOList erstellt.");
         return startupDTOList;
     }
 

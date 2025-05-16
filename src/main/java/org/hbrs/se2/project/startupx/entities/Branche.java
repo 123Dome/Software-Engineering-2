@@ -5,10 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "branche", schema = "startupx")
@@ -30,4 +27,23 @@ public class Branche {
 
     @OneToMany(mappedBy = "branche")
     private List<Startup> startups = new ArrayList<>();
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Branche: " + bezeichnung + " (" + id + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Branche branche = (Branche) o;
+        return Objects.equals(id, branche.id);
+    }
+
 }

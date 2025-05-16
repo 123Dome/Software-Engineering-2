@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "stellenausschreibung", schema = "startupx")
@@ -43,4 +44,22 @@ public class Stellenausschreibung {
 
     @OneToMany(mappedBy = "stellenausschreibung")
     private List<Bewerbung> bewerbungen = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Stellenausschreibung: " + titel + " (" + id + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Stellenausschreibung that = (Stellenausschreibung) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
