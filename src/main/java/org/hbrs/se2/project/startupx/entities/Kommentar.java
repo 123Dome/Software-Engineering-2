@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "kommentar", schema = "startupx")
@@ -46,6 +47,22 @@ public class Kommentar {
     @Column(name = "bewertung")
     private Integer bewertung;
 
+    @Override
+    public String toString() {
+        return "Kommentar : " + id;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Kommentar that = (Kommentar) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
 }

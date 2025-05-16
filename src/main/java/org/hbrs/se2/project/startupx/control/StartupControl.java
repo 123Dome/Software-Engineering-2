@@ -12,6 +12,7 @@ import org.hbrs.se2.project.startupx.mapper.StartupMapper;
 import org.hbrs.se2.project.startupx.repository.BrancheRepository;
 import org.hbrs.se2.project.startupx.repository.StartupRepository;
 import org.hbrs.se2.project.startupx.repository.StudentRepository;
+import org.hibernate.sql.ast.tree.expression.Star;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,6 @@ import java.util.Set;
  * @version 1.0
  */
 @Controller
-@RequestMapping("/api/startup")
 public class StartupControl {
 
     private static final Logger logger = LoggerFactory.getLogger(StartupControl.class);
@@ -53,8 +53,7 @@ public class StartupControl {
     private StudentRepository studentRepository;
 
     @Transactional
-    @PostMapping("/createStartup")
-    public ResponseEntity<StartupDTO> createStartup(@RequestBody StartupDTO startupDTO) {
+    public StartupDTO createStartup(StartupDTO startupDTO) {
 
         Set<Student> studentList = new LinkedHashSet<>();
 
@@ -87,10 +86,9 @@ public class StartupControl {
 
         Startup savedStartup = startupRepository.save(startup);
         logger.info("Startup gegründet: " + savedStartup);
-        return new ResponseEntity<>(StartupMapper.mapToStartupDto(savedStartup), HttpStatus.OK);
+        return StartupMapper.mapToStartupDto(savedStartup);
     }
 
-    @GetMapping("/getall")
     public List<StartupDTO> findAll() {
         List<Startup> startupList = startupRepository.findAll();
 
@@ -103,21 +101,9 @@ public class StartupControl {
         return startupDTOList;
     }
 
-    public List<StartupDTO> findByBranche(BrancheDTO brancheDTO) {
+    public List<StartupDTO> findByHavingAnyStellenausschreibungJoin() {
 
-        List<Startup> startupList = startupRepository.findByBranche_Id(brancheDTO.getId());
-
-        List<StartupDTO> startupDTOList = new ArrayList<>();
-        for(Startup startup : startupList) {
-            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
-        }
-
-        return startupDTOList;
-    }
-
-    public List<StartupDTO> findByNameContaining(String nameContaining) {
-
-        List<Startup> startupList = startupRepository.findByNameContaining(nameContaining);
+        List<Startup> startupList = startupRepository.findByHavingAnyStellenausschreibungJoin();
 
         List<StartupDTO> startupDTOList = new ArrayList<>();
 
@@ -125,21 +111,48 @@ public class StartupControl {
             startupDTOList.add(StartupMapper.mapToStartupDto(startup));
         }
 
+        logger.info("Startups mit mind. einer Stellenausschreibung erstellt.");
         return startupDTOList;
     }
 
-    public List<StartupDTO> findByGruendungsdatum(LocalDate gruendungsdatum) {
-
-        List<Startup> startupList = startupRepository.findByGruendungsdatum(gruendungsdatum);
-
-        List<StartupDTO> startupDTOList = new ArrayList<>();
-
-        for(Startup startup : startupList) {
-            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
-        }
-
-        return startupDTOList;
-    }
+//    public List<StartupDTO> findByBranche(BrancheDTO brancheDTO) {
+//
+//        List<Startup> startupList = startupRepository.findByBranche_Id(brancheDTO.getId());
+//
+//        List<StartupDTO> startupDTOList = new ArrayList<>();
+//        for(Startup startup : startupList) {
+//            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+//        }
+//
+//        logger.info("Startups zur Branche " + brancheDTO.getBezeichnung() + " gefunden.");
+//        return startupDTOList;
+//    }
+//
+//    public List<StartupDTO> findByNameContaining(String nameContaining) {
+//
+//        List<Startup> startupList = startupRepository.findByNameContaining(nameContaining);
+//
+//        List<StartupDTO> startupDTOList = new ArrayList<>();
+//
+//        for(Startup startup : startupList) {
+//            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+//        }
+//
+//        return startupDTOList;
+//    }
+//
+//    public List<StartupDTO> findByGruendungsdatum(LocalDate gruendungsdatum) {
+//
+//        List<Startup> startupList = startupRepository.findByGruendungsdatum(gruendungsdatum);
+//
+//        List<StartupDTO> startupDTOList = new ArrayList<>();
+//
+//        for(Startup startup : startupList) {
+//            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+//        }
+//
+//        return startupDTOList;
+//    }
 
     @Transactional
     public StartupDTO updateStartup(StartupDTO startupDTO) {
@@ -150,15 +163,15 @@ public class StartupControl {
         Branche newBranche = brancheRepository.findById(startupDTO.getBranche())
                 .orElseThrow(() -> new EntityNotFoundException("Branche " + startupDTO.getBranche() + " not found"));
 
-
         oldStartup.setName(startupDTO.getName());
         oldStartup.setBranche(newBranche);
         oldStartup.setBeschreibung(startupDTO.getBeschreibung());
         oldStartup.setAnzahlMitarbeiter(startupDTO.getAnzahlMitarbeiter());
 
-        startupRepository.save(oldStartup);
+        Startup savedStartup = startupRepository.save(oldStartup);
 
-        return StartupMapper.mapToStartupDto(oldStartup);
+        logger.info("Startup: " + oldStartup + " aktualisiert");
+        return StartupMapper.mapToStartupDto(savedStartup);
     }
 
     public List<StartupDTO> getStartups(StudentDTO studentDTO) {
@@ -171,6 +184,20 @@ public class StartupControl {
             startupDTOList.add(StartupMapper.mapToStartupDto(startup));
         }
 
+        logger.info("Startups zu User: " + studentDTO + " gefunden.");
         return startupDTOList;
+    }
+
+    @Transactional
+    public boolean deleteStartup(StartupDTO startupDTO) {
+
+        try {
+            startupRepository.deleteById(startupDTO.getId());
+            logger.info("Startup: " + startupDTO + " gelöscht");
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
     }
 }
