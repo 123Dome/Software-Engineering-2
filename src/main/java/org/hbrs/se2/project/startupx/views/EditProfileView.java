@@ -65,11 +65,14 @@ public class EditProfileView extends Div{
         Button saveButton = new Button("Änderungen speichern", e -> {
             if(checkTextfields()){
                 UserDTO newUserDTO = new UserDTO();
+                newUserDTO.setId(userDTO.getId());
+                newUserDTO.setRollen(userDTO.getRollen());
                 newUserDTO.setNutzername(nutzername.getValue());
                 newUserDTO.setEmail(email.getValue());
                 newUserDTO.setVorname(vorname.getValue());
                 newUserDTO.setNachname(nachname.getValue());
                 newUserDTO.setGeburtsdatum(geburtsdatum.getValue());
+                newUserDTO.setPasswort(userDTO.getPasswort());
                 if(editProfilControl.updateUser(newUserDTO)){
                     Notification.show("Profil aktualisiert");
                 }

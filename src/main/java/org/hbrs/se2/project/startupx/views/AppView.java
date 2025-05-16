@@ -43,7 +43,8 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
 
     private AuthorizationControl authorizationControl;
 
-    public AppView() {
+    public AppView(AuthorizationControl authorizationControl) {
+        this.authorizationControl = authorizationControl;
         if (getCurrentUser() == null) {
             System.out.println("LOG: In Constructor of App View - No User given!");
         } else {
@@ -193,7 +194,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
 
     private Component[] createMenuItems() {
        // Abholung der Referenz auf den Authorisierungs-Service
-       authorizationControl = new AuthorizationControl();
+//       authorizationControl = new AuthorizationControl();
 
        // Jeder User sollte Autos sehen können, von daher wird dieser schon mal erzeugt und
        // und dem Tabs-Array hinzugefügt. In der Methode createTab wird ein (Key, Value)-Pair übergeben:

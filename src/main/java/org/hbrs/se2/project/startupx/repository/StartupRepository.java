@@ -3,6 +3,7 @@ package org.hbrs.se2.project.startupx.repository;
 import org.hbrs.se2.project.startupx.entities.Branche;
 import org.hbrs.se2.project.startupx.entities.Startup;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,5 +18,6 @@ public interface StartupRepository extends JpaRepository<Startup, Long> {
 
     List<Startup> findByStudentenListe_Id(Long studentenListeId);
 
-    //TODO: bitte einen SQL-Befehl erstellen, der alle StartUps ausgibt, die mind. 1 Stellenanzeige haben
+    @Query("SELECT DISTINCT s FROM Startup s JOIN s.stellenausschreibungen")
+    List<Startup> findByHavingAnyStellenausschreibungJoin();
 }
