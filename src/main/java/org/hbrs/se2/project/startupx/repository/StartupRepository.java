@@ -16,4 +16,6 @@ public interface StartupRepository extends JpaRepository<Startup, Long> {
     List<Startup> findByGruendungsdatum(LocalDate gruendungsdatum);
 
     List<Startup> findByStudentenListe_Id(Long studentenListeId);
+
+    //TODO: bitte einen SQL-Befehl erstellen, der alle StartUps ausgibt, die mind. 1 Stellenanzeige haben
 }
