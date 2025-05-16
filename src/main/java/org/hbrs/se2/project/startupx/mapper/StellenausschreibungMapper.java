@@ -4,39 +4,44 @@ import org.hbrs.se2.project.startupx.dtos.StellenausschreibungDTO;
 import org.hbrs.se2.project.startupx.entities.Bewerbung;
 import org.hbrs.se2.project.startupx.entities.Skill;
 import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class StellenausschreibungMapper {
 
-    public static StellenausschreibungDTO toDTO(Stellenausschreibung stelle) {
-        if (stelle == null) {
+    public static StellenausschreibungDTO toDTO(Stellenausschreibung stellenausschreibung) {
+        if (stellenausschreibung == null) {
             return null;
         }
 
-        StellenausschreibungDTO stellenausschreibungDTO = new StellenausschreibungDTO();
-        stellenausschreibungDTO.setId(stelle.getId());
-        stellenausschreibungDTO.setTitel(stelle.getTitel());
-        stellenausschreibungDTO.setBeschreibung(stelle.getBeschreibung());
-        stellenausschreibungDTO.setStartup(stelle.getStartup().getId());
+        List<Long> skillIds = new ArrayList<>();
 
-        if (stelle.getSkills() != null) {
-            List<Long> skillIds = stelle.getSkills().stream()
+        List<Long> bewerbungIds = new ArrayList<>();
+
+        if (stellenausschreibung.getSkills() != null) {
+            skillIds = stellenausschreibung.getSkills().stream()
                     .map(Skill::getId)
                     .toList();
-            stellenausschreibungDTO.setSkills(skillIds);
         }
 
-        if (stelle.getBewerbungen() != null) {
-            List<Long> bewerbungIds = stelle.getBewerbungen().stream()
+        if (stellenausschreibung.getBewerbungen() != null) {
+            bewerbungIds = stellenausschreibung.getBewerbungen().stream()
                     .map(Bewerbung::getId)
                     .toList();
-
-            stellenausschreibungDTO.setBewerbungen(bewerbungIds);
         }
+
+        StellenausschreibungDTO stellenausschreibungDTO = StellenausschreibungDTO.builder()
+                .id(stellenausschreibung.getId())
+                .titel(stellenausschreibung.getTitel())
+                .beschreibung(stellenausschreibung.getBeschreibung())
+                .startup(stellenausschreibung.getStartup().getId())
+                .skills(skillIds)
+                .bewerbungen(bewerbungIds)
+                .build();
+
         return stellenausschreibungDTO;
     }
 }

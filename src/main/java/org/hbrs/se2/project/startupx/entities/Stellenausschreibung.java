@@ -3,8 +3,7 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -15,6 +14,9 @@ import java.util.List;
 @Table(name = "stellenausschreibung", schema = "startupx")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Stellenausschreibung {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -8,7 +8,6 @@ import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.entities.Branche;
 import org.hbrs.se2.project.startupx.entities.Startup;
 import org.hbrs.se2.project.startupx.entities.Student;
-import org.hbrs.se2.project.startupx.mapper.BrancheMapper;
 import org.hbrs.se2.project.startupx.mapper.StartupMapper;
 import org.hbrs.se2.project.startupx.repository.BrancheRepository;
 import org.hbrs.se2.project.startupx.repository.StartupRepository;
@@ -81,78 +80,86 @@ public class StartupControl {
         return new ResponseEntity<>(StartupMapper.mapToStartupDto(savedStartup), HttpStatus.OK);
     }
 
-//    @GetMapping("/getall")
-//    public List<StartupDTO> findAll() {
-//        List<Startup> startupList = startupRepository.findAll();
-//
-//        List<StartupDTO> startupDTOList = new ArrayList<>();
-//        for(Startup startup : startupList) {
-//            startupDTOList.add(StartupMapper.INSTANCE.mapToStartupDto(startup));
-//        }
-//
-//        return startupDTOList;
-//    }
-//
-//    public List<StartupDTO> findByBranche(BrancheDTO brancheDTO) {
-//
-//        List<Startup> startupList = startupRepository.findByBranche(BrancheMapper.INSTANCE.mapToBranche(brancheDTO));
-//
-//        List<StartupDTO> startupDTOList = new ArrayList<>();
-//        for(Startup startup : startupList) {
-//            startupDTOList.add(StartupMapper.INSTANCE.mapToStartupDto(startup));
-//        }
-//
-//        return startupDTOList;
-//    }
-//
-//    public List<StartupDTO> findByNameContaining(String nameContaining) {
-//
-//        List<Startup> startupList = startupRepository.findByNameContaining(nameContaining);
-//
-//        List<StartupDTO> startupDTOList = new ArrayList<>();
-//
-//        for(Startup startup : startupList) {
-//            startupDTOList.add(StartupMapper.INSTANCE.mapToStartupDto(startup));
-//        }
-//
-//        return startupDTOList;
-//    }
-//
-//    public List<StartupDTO> findByGruendungsdatum(LocalDate gruendungsdatum) {
-//
-//        List<Startup> startupList = startupRepository.findByGruendungsdatum(gruendungsdatum);
-//
-//        List<StartupDTO> startupDTOList = new ArrayList<>();
-//
-//        for(Startup startup : startupList) {
-//            startupDTOList.add(StartupMapper.INSTANCE.mapToStartupDto(startup));
-//        }
-//
-//        return startupDTOList;
-//    }
-//
-//    @Transactional
-//    public StartupDTO updateStartup(StartupDTO startupDTO) {
-//
-//        Startup oldStartup = startupRepository.findById(startupDTO.getId())
-//                .orElseThrow(() -> new EntityNotFoundException("Startup " + startupDTO.getId() + " not found"));
-//
-//        Branche newBranche = brancheRepository.findById(startupDTO.getBranche())
-//                .orElseThrow(() -> new EntityNotFoundException("Branche " + startupDTO.getBranche() + " not found"));
-//
-//
-//        oldStartup.setName(startupDTO.getName());
-//        oldStartup.setBranche(newBranche);
-//        oldStartup.setBeschreibung(startupDTO.getBeschreibung());
-//        oldStartup.setAnzahlMitarbeiter(startupDTO.getAnzahlMitarbeiter());
-//
-//        startupRepository.save(oldStartup);
-//
-//        return StartupMapper.INSTANCE.mapToStartupDto(oldStartup);
-//    }
-//
-//    public Set<StartupDTO> getStartups(StudentDTO studentDTO) {
-//
-//        return studentDTO.getStartups();
-//    }
+    @GetMapping("/getall")
+    public List<StartupDTO> findAll() {
+        List<Startup> startupList = startupRepository.findAll();
+
+        List<StartupDTO> startupDTOList = new ArrayList<>();
+        for(Startup startup : startupList) {
+            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+        }
+
+        return startupDTOList;
+    }
+
+    public List<StartupDTO> findByBranche(BrancheDTO brancheDTO) {
+
+        List<Startup> startupList = startupRepository.findByBranche_Id(brancheDTO.getId());
+
+        List<StartupDTO> startupDTOList = new ArrayList<>();
+        for(Startup startup : startupList) {
+            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+        }
+
+        return startupDTOList;
+    }
+
+    public List<StartupDTO> findByNameContaining(String nameContaining) {
+
+        List<Startup> startupList = startupRepository.findByNameContaining(nameContaining);
+
+        List<StartupDTO> startupDTOList = new ArrayList<>();
+
+        for(Startup startup : startupList) {
+            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+        }
+
+        return startupDTOList;
+    }
+
+    public List<StartupDTO> findByGruendungsdatum(LocalDate gruendungsdatum) {
+
+        List<Startup> startupList = startupRepository.findByGruendungsdatum(gruendungsdatum);
+
+        List<StartupDTO> startupDTOList = new ArrayList<>();
+
+        for(Startup startup : startupList) {
+            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+        }
+
+        return startupDTOList;
+    }
+
+    @Transactional
+    public StartupDTO updateStartup(StartupDTO startupDTO) {
+
+        Startup oldStartup = startupRepository.findById(startupDTO.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Startup " + startupDTO.getId() + " not found"));
+
+        Branche newBranche = brancheRepository.findById(startupDTO.getBranche())
+                .orElseThrow(() -> new EntityNotFoundException("Branche " + startupDTO.getBranche() + " not found"));
+
+
+        oldStartup.setName(startupDTO.getName());
+        oldStartup.setBranche(newBranche);
+        oldStartup.setBeschreibung(startupDTO.getBeschreibung());
+        oldStartup.setAnzahlMitarbeiter(startupDTO.getAnzahlMitarbeiter());
+
+        startupRepository.save(oldStartup);
+
+        return StartupMapper.mapToStartupDto(oldStartup);
+    }
+
+    public List<StartupDTO> getStartups(StudentDTO studentDTO) {
+
+        List<Startup> startupList = startupRepository.findByStudentenListe_Id(studentDTO.getId());
+
+        List<StartupDTO> startupDTOList = new ArrayList<>();
+
+        for(Startup startup : startupList) {
+            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
+        }
+
+        return startupDTOList;
+    }
 }

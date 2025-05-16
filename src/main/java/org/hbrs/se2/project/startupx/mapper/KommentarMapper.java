@@ -10,16 +10,18 @@ import org.springframework.stereotype.Component;
 public class KommentarMapper {
 
     public static KommentarDTO mapToKommentarDto    (Kommentar kommentar) {
-        if (kommentar == null) return null;
+        if (kommentar == null) {
+            return null;
+        }
 
-        KommentarDTO kommentarDTO = new KommentarDTO();
-        kommentarDTO.setId(kommentar.getId());
-        kommentarDTO.setKommentar(kommentar.getKommentar());
-        kommentarDTO.setErstellungsdatum(kommentar.getErstellungsdatum());
-        kommentarDTO.setUser(kommentar.getUser().getId()); // assuming User is not null
-        kommentarDTO.setBewertung(kommentar.getBewertung());
-        kommentarDTO.setUpdated(kommentar.getUpdated());
-        kommentarDTO.setUpdated(kommentar.getUpdated());
+        KommentarDTO kommentarDTO = KommentarDTO.builder()
+                .id(kommentar.getId())
+                .kommentar(kommentar.getKommentar())
+                .erstellungsdatum(kommentar.getErstellungsdatum())
+                .user(kommentar.getUser().getId())
+                .bewertung(kommentar.getBewertung())
+                .updated(kommentar.getUpdated())
+                .build();
 
         return kommentarDTO;
     }

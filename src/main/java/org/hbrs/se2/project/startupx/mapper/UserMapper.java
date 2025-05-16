@@ -8,6 +8,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,22 +20,28 @@ public class UserMapper {
 
 
     public UserDTO mapToUserDto(User user) {
-        if (user == null) return null;
+        if (user == null) {
+            return null;
+        }
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
-        userDTO.setVorname(user.getVorname());
-        userDTO.setNachname(user.getNachname());
-        userDTO.setPasswort(user.getPasswort());
-        userDTO.setNutzername(user.getNutzername());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setGeburtsdatum(user.getGeburtsdatum());
+        Set<Long> rollenIds = new LinkedHashSet<>();
 
-        userDTO.setRollen(user.getRollen() != null
-                ? user.getRollen().stream()
-                .map(Rolle::getId)
-                .collect(Collectors.toSet())
-                : Set.of());
+        if (user.getRollen() != null) {
+            rollenIds = user.getRollen().stream()
+                    .map(Rolle::getId)
+                    .collect(Collectors.toSet());
+        }
+
+        UserDTO userDTO = UserDTO.builder()
+                .id(user.getId())
+                .vorname(user.getVorname())
+                .nachname(user.getNachname())
+                .passwort(user.getPasswort())
+                .nutzername(user.getNutzername())
+                .email(user.getEmail())
+                .geburtsdatum(user.getGeburtsdatum())
+                .rollen(rollenIds)
+                .build();
 
         return userDTO;
     }

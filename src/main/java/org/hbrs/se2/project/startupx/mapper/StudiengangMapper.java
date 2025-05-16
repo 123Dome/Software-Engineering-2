@@ -8,16 +8,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StudiengangMapper {
-//    StudiengangMapper INSTANCE = Mappers.getMapper(StudiengangMapper.class);
-
-//    Studiengang mapToStudiengang(StudiengangDTO studiengangDTO);
 
     public StudiengangDTO mapToDto(Studiengang studiengang) {
-        if (studiengang == null) return null;
+        if (studiengang == null) {
+            return null;
+        }
 
-        StudiengangDTO studiengangDTO = new StudiengangDTO();
-        studiengangDTO.setId(studiengang.getId());
-        studiengangDTO.setStudiengang(studiengang.getStudiengang());
+        StudiengangDTO studiengangDTO = StudiengangDTO.builder()
+                .id(studiengang.getId())
+                .studiengang(studiengang.getStudiengang())
+                .build();
+
         return studiengangDTO;
     }
 }

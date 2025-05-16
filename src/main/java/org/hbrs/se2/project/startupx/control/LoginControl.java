@@ -14,6 +14,9 @@ public class LoginControl {
     @Autowired
     private UserRepository repository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     private UserDTO userDTO = null;
 
     public boolean authentificate(String username, String password ) throws DatabaseUserException {
@@ -39,7 +42,7 @@ public class LoginControl {
     private UserDTO getUserWithJPA( String username , String password ) throws DatabaseUserException {
         UserDTO userTmp;
         try {
-            userTmp = UserMapper.INSTANCE.mapToUserDTO(repository.findUserByNutzernameAndPasswort(username, password));
+            userTmp = userMapper.mapToUserDto(repository.findUserByNutzernameAndPasswort(username, password));
         } catch ( org.springframework.dao.DataAccessResourceFailureException e ) {
             // Analyse und Umwandlung der technischen Errors in 'lesbaren' Darstellungen (ToDo!)
            throw new DatabaseUserException("A failure occured while trying to connect to database with JPA");

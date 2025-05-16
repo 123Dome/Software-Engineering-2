@@ -3,8 +3,7 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -15,6 +14,9 @@ import java.util.Set;
 @Table(name = "rolle", schema = "startupx")
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Rolle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

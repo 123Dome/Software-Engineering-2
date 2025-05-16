@@ -30,21 +30,21 @@ public class KommentarControl {
 
     @Autowired
     private StartupRepository startupRepository;
-
-    @Transactional
-    public KommentarDTO createKommentar(KommentarDTO kommentarDTO, UserDTO userDTO, StartupDTO startupDTO) {
-
-        User user = userRepository.findById(userDTO.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Branche " + userDTO.getId() + " not found"));
-
-        Startup startup = startupRepository.findById(startupDTO.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Startup " + startupDTO.getId() + " not found"));
-
-        kommentarDTO.setStartup(startupDTO);
-        kommentarDTO.setUser(userDTO);
-
-        kommentarRepository.save(KommentarMapper.INSTANCE.mapToKommentar(kommentarDTO));
-
-        return kommentarDTO;
-    }
+//
+//    @Transactional
+//    public KommentarDTO createKommentar(KommentarDTO kommentarDTO, UserDTO userDTO, StartupDTO startupDTO) {
+//
+//        User user = userRepository.findById(userDTO.getId())
+//                .orElseThrow(() -> new EntityNotFoundException("Branche " + userDTO.getId() + " not found"));
+//
+//        Startup startup = startupRepository.findById(startupDTO.getId())
+//                .orElseThrow(() -> new EntityNotFoundException("Startup " + startupDTO.getId() + " not found"));
+//
+//        kommentarDTO.setStartup(startupDTO);
+//        kommentarDTO.setUser(userDTO);
+//
+//        kommentarRepository.save(KommentarMapper.INSTANCE.mapToKommentar(kommentarDTO));
+//
+//        return kommentarDTO;
+//    }
 }

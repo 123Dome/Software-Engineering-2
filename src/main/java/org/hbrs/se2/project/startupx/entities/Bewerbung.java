@@ -2,6 +2,7 @@ package org.hbrs.se2.project.startupx.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "bewerbung", schema = "startupx")
 @Setter
 @Getter
+@Builder
 public class Bewerbung {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

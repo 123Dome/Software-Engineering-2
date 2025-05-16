@@ -3,8 +3,7 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -14,6 +13,9 @@ import java.util.Set;
 @Table(name = "user", schema = "startupx")
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

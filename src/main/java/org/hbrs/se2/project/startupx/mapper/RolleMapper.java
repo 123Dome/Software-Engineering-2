@@ -10,20 +10,28 @@ import org.springframework.stereotype.Component;
 public class RolleMapper {
 
     public static RolleDTO mapToDto(Rolle rolle) {
-        if (rolle == null) return null;
+        if (rolle == null) {
+            return null;
+        }
 
-        RolleDTO dto = new RolleDTO();
-        dto.setId(rolle.getId());
-        dto.setBezeichnung(rolle.getBezeichnung());
+        RolleDTO dto = RolleDTO.builder()
+                .id(rolle.getId())
+                .bezeichnung(rolle.getBezeichnung())
+                .build();
+
         return dto;
     }
 
-    public Rolle mapToRolle(RolleDTO dto) {
-        if (dto == null) return null;
+    public static Rolle mapToRolle(RolleDTO dto) {
+        if (dto == null) {
+            return null;
+        }
 
-        Rolle rolle = new Rolle();
-        rolle.setId(dto.getId());
-        rolle.setBezeichnung(dto.getBezeichnung());
+        Rolle rolle = Rolle.builder()
+                .id(dto.getId())
+                .bezeichnung(dto.getBezeichnung())
+                .build();
+
         return rolle;
     }
 }

@@ -9,9 +9,11 @@ import java.util.List;
 
 public interface StartupRepository extends JpaRepository<Startup, Long> {
 
-    List<Startup> findByBranche(Branche branche);
+    List<Startup> findByBranche_Id(Long brancheId);
 
     List<Startup> findByNameContaining(String nameContaining);
 
     List<Startup> findByGruendungsdatum(LocalDate gruendungsdatum);
+
+    List<Startup> findByStudentenListe_Id(Long studentenListeId);
 }

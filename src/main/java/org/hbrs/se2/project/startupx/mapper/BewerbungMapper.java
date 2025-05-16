@@ -12,23 +12,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BewerbungMapper {
-//    BewerbungMapper INSTANCE = Mappers.getMapper(BewerbungMapper.class);
-//
-//    Bewerbung mapToBewerbung(BewerbungDTO bewerbungDTO);
-//
-//    BewerbungDTO mapToBewerbungDTO(Bewerbung bewerbung);
 
     public static BewerbungDTO toDTO(Bewerbung bewerbung) {
-
         if (bewerbung == null) {
             return null;
         }
 
-        BewerbungDTO bewerbungDTO = new BewerbungDTO();
-        bewerbungDTO.setId(bewerbung.getId());
-        bewerbungDTO.setStudent(bewerbung.getStudent().getId());
-        bewerbungDTO.setStellenausschreibungen(bewerbung.getStellenausschreibung().getId());
-        bewerbungDTO.setBewerbungsschreiben(bewerbung.getBewerbungsschreiben());
+        BewerbungDTO bewerbungDTO = BewerbungDTO.builder()
+                .id(bewerbung.getId())
+                .student(bewerbung.getStudent().getId())
+                .stellenausschreibungen(bewerbung.getStellenausschreibung().getId())
+                .bewerbungsschreiben(bewerbung.getBewerbungsschreiben())
+                .build();
 
         return bewerbungDTO;
     }

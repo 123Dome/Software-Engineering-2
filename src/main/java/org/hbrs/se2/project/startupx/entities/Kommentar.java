@@ -2,11 +2,7 @@ package org.hbrs.se2.project.startupx.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -18,7 +14,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder(toBuilder = true)
+@Builder
 public class Kommentar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

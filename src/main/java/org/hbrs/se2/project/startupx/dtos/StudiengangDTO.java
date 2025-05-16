@@ -1,14 +1,12 @@
 package org.hbrs.se2.project.startupx.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class StudiengangDTO {
     private Long id;
     private String studiengang;

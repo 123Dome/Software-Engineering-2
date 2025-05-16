@@ -12,16 +12,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BrancheMapper {
-//    BrancheMapper INSTANCE = Mappers.getMapper(BrancheMapper.class);
-//
-//    Branche mapToBranche(BrancheDTO brancheDTO);
 
-    public static BrancheDTO toDTO(Branche branche) {
-        if (branche == null) return null;
+    public static BrancheDTO mapToBrancheDto(Branche branche) {
+        if (branche == null) {
+            return null;
+        }
 
-        BrancheDTO brancheDTO = new BrancheDTO();
-        brancheDTO.setId(branche.getId());
-        brancheDTO.setBezeichnung(branche.getBezeichnung());
+        BrancheDTO brancheDTO = BrancheDTO.builder()
+                .id(branche.getId())
+                .bezeichnung(branche.getBezeichnung())
+                .build();
+
         return brancheDTO;
     }
+
 }

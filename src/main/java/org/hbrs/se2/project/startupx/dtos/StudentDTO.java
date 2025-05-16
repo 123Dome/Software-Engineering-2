@@ -1,9 +1,6 @@
 package org.hbrs.se2.project.startupx.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +10,9 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class StudentDTO {
-    private Integer id;
+    private Long id;
     private Long user;
     private Integer matrikelnr;
     private Long studiengang;
