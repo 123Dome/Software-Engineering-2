@@ -4,8 +4,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.dtos.KommentarDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.dtos.StudentDTO;
-import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.Kommentar;
 import org.hbrs.se2.project.startupx.entities.Startup;
 import org.hbrs.se2.project.startupx.entities.User;

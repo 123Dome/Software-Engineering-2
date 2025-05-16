@@ -2,7 +2,6 @@ package org.hbrs.se2.project.startupx.control;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.entities.Branche;
@@ -12,19 +11,11 @@ import org.hbrs.se2.project.startupx.mapper.StartupMapper;
 import org.hbrs.se2.project.startupx.repository.BrancheRepository;
 import org.hbrs.se2.project.startupx.repository.StartupRepository;
 import org.hbrs.se2.project.startupx.repository.StudentRepository;
-import org.hibernate.sql.ast.tree.expression.Star;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
