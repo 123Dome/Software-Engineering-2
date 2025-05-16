@@ -13,10 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StellenausschreibungDTO {
-    private Integer id;
-    private StartupDTO startup;
+    private Long id;
+    private Long startup;
     private String titel;
     private String beschreibung;
-    private List<SkillDTO> skills = new ArrayList<>();
-    private List<BewerbungDTO> bewerbungen = new ArrayList<>();
+    private List<Long> skills;
+    private List<Long> bewerbungen;
 }

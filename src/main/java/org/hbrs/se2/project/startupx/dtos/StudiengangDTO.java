@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudiengangDTO {
-    private Integer id;
+    private Long id;
     private String studiengang;
 }

@@ -1,15 +1,29 @@
 package org.hbrs.se2.project.startupx.mapper;
 
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.entities.Startup;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.hbrs.se2.project.startupx.entities.*;
+import org.springframework.stereotype.Component;
 
-@Mapper
-public interface StartupMapper {
-    StartupMapper INSTANCE = Mappers.getMapper(StartupMapper.class);
+import java.util.stream.Collectors;
 
-    Startup mapToStartup(StartupDTO startupDTO);
+@Component
+public class StartupMapper {
 
-    StartupDTO mapToStartupDto(Startup startup);
+    public static StartupDTO mapToStartupDto(Startup startup) {
+        if (startup == null) {
+            return null;
+        }
+
+        return new StartupDTO(
+                startup.getId(),
+                startup.getName(),
+                startup.getBranche() != null ? startup.getBranche().getId() : null,
+                startup.getBeschreibung(),
+                startup.getGruendungsdatum(),
+                startup.getAnzahlMitarbeiter(),
+                startup.getKommentare() != null ? startup.getKommentare().stream().map(Kommentar::getId).collect(Collectors.toList()) : null,
+                startup.getStellenausschreibungen() != null ? startup.getStellenausschreibungen().stream().map(Stellenausschreibung::getId).collect(Collectors.toList()) : null,
+                startup.getStudentenListe() != null ? startup.getStudentenListe().stream().map(Student::getId).collect(Collectors.toSet()) : null
+        );
+    }
 }

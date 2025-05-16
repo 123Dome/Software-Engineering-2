@@ -18,13 +18,13 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "student_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
-    private org.hbrs.se2.project.startupx.entities.User user;
+    private User user;
 
     @NotNull
     @Column(name = "matrikelnr", nullable = false)
@@ -34,7 +34,7 @@ public class Student {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "studiengang_id", nullable = false)
-    private org.hbrs.se2.project.startupx.entities.Studiengang studiengang;
+    private Studiengang studiengang;
 
     @Column(name = "steckbrief", length = Integer.MAX_VALUE)
     private String steckbrief;
@@ -45,7 +45,7 @@ public class Student {
     @ManyToMany(mappedBy = "studentenListe")
     private Set<Startup> startups = new LinkedHashSet<>();
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "students")
     private Set<Skill> skills = new LinkedHashSet<>();
 
 }

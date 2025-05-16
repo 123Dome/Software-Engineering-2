@@ -5,6 +5,7 @@ import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.Rolle;
 import org.hbrs.se2.project.startupx.mapper.RolleMapper;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -13,38 +14,41 @@ import java.util.Set;
 @Component
 public class AuthorizationControl {
 
+    @Autowired
+    private RolleMapper rolleMapper;
+
     /**
      * Methode zur Überprüfung, ob ein Benutzer eine gegebene Rolle besitzt
      * 
-     */
-    public boolean isUserInRole(UserDTO user , String role  ) {
-        Set<RolleDTO> rolleList = user.getRollen();
-        // A bit lazy but hey it works ;-)
-        for (  RolleDTO rolle : rolleList ) {
-            if ( rolle.getBezeichnung().equals(role) ) return true;
-        }
-        return false;
-    }
-
-    /**
-     * Erweiterte Methode zur Bestimmung, ob ein User mit einer bestimmten Rolle ein
-     * Feature (hier: ein Web-Seite bzw. eine View) zu einem bestimmten Kontext (Bsp: ein Tageszeit, mit
-     * einem bestimmten Device etc.) angezeigt bekommt
-     */
-    public boolean isUserisAllowedToAccessThisFeature(UserDTO user , String role , String feature , String[] context  ) {
-        Set<RolleDTO> rolleList = user.getRollen();
-        // Check, ob ein Benutzer eine Rolle besitzt:
-        for (  RolleDTO rolle : rolleList ) {
-            if ( rolle.getBezeichnung().equals(role) )
-                // Einfache (!) Kontrolle,  ob die Rolle auf ein Feature zugreifen kann
-                if (checkRolleWithFeature(RolleMapper.INSTANCE.mapToRolle(rolle), feature)) {
-                    // Check, ob context erfüllt ist, bleibt hier noch aus, kann man nachziehen
-                    return true;
-                }
-        }
-
-        return false;
-    }
+//     */
+//    public boolean isUserInRole(UserDTO user , String role  ) {
+//        Set<RolleDTO> rolleList = user.getRollen();
+//        // A bit lazy but hey it works ;-)
+//        for (  RolleDTO rolle : rolleList ) {
+//            if ( rolle.getBezeichnung().equals(role) ) return true;
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * Erweiterte Methode zur Bestimmung, ob ein User mit einer bestimmten Rolle ein
+//     * Feature (hier: ein Web-Seite bzw. eine View) zu einem bestimmten Kontext (Bsp: ein Tageszeit, mit
+//     * einem bestimmten Device etc.) angezeigt bekommt
+//     */
+//    public boolean isUserisAllowedToAccessThisFeature(UserDTO user , String role , String feature , String[] context  ) {
+//        Set<RolleDTO> rolleList = user.getRollen();
+//        // Check, ob ein Benutzer eine Rolle besitzt:
+//        for (  RolleDTO rolle : rolleList ) {
+//            if ( rolle.getBezeichnung().equals(role) )
+//                // Einfache (!) Kontrolle,  ob die Rolle auf ein Feature zugreifen kann
+//                if (checkRolleWithFeature(RolleMaINSTANCEpper..mapToRolle(rolle), feature)) {
+//                    // Check, ob context erfüllt ist, bleibt hier noch aus, kann man nachziehen
+//                    return true;
+//                }
+//        }
+//
+//        return false;
+//    }
 
     private boolean checkRolleWithFeature(Rolle rolle, String feature) {
         String[] rolles = getRollesForFeature(feature);

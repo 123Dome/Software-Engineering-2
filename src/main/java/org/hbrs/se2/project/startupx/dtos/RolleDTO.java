@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RolleDTO {
-    private Integer id;
+    private Long id;
     private String bezeichnung;
 }

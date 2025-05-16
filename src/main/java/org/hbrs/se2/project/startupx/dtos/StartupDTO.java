@@ -13,13 +13,13 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StartupDTO {
-    private Integer id;
+    private Long id;
     private String name;
-    private BrancheDTO branche;
+    private Long branche;
     private String beschreibung;
     private LocalDate gruendungsdatum;
     private Integer anzahlMitarbeiter;
-    private List<KommentarDTO> kommentare = new ArrayList<>();
-    private List<StellenausschreibungDTO> stellenausschreibungen  = new ArrayList<>();
-    private Set<StudentDTO> studentenListe = new LinkedHashSet<>();
+    private List<Long> kommentare;
+    private List<Long> stellenausschreibungen;
+    private Set<Long> studentenListe;
 }

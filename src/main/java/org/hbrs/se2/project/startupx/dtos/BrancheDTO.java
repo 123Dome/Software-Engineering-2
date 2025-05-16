@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BrancheDTO {
-    private Integer id;
+    private Long id;
     private String bezeichnung;
-    private List<StartupDTO> startups = new ArrayList<>();
+    private List<Long> startups = new ArrayList<>();
 }

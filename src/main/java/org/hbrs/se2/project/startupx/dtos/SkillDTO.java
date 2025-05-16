@@ -6,15 +6,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SkillDTO {
-    private Integer id;
+    private Long id;
     private String skillName;
-    private List<StellenausschreibungDTO> stellenausschreibungen = new ArrayList<>();
-    private List<StudentDTO> studenten = new ArrayList<>();
+    private List<Long> stellenausschreibungen = new ArrayList<>();
+    private Set<Long> studenten = new LinkedHashSet<>();
 }

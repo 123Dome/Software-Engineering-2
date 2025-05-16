@@ -13,12 +13,12 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-    private Integer id;
+    private Long id;
     private String vorname;
     private String nachname;
     private String passwort;
     private String nutzername;
     private String email;
     private LocalDate geburtsdatum;
-    private Set<RolleDTO> rollen;
+    private Set<Long> rollen;
 }

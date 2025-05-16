@@ -19,7 +19,7 @@ public class Skill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "skill_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 255)
     @NotNull
@@ -34,8 +34,9 @@ public class Skill {
 
     @ManyToMany
     @JoinTable(name = "student_zu_skill",
+            schema = "startupx",
             joinColumns = @JoinColumn(name = "skill_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id"))
-    private List<Student> students = new ArrayList<>();
+    private Set<Student> students = new LinkedHashSet<>();
 
 }

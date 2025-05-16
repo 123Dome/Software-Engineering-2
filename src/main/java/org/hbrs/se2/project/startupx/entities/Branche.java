@@ -19,7 +19,7 @@ public class Branche {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "branche_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 255)
     @NotNull

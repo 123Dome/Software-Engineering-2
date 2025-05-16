@@ -10,8 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BewerbungDTO {
-    private Integer id;
-    private StudentDTO student;
-    private StellenausschreibungDTO stellenausschreibungen;
+    private Long id;
+    private Long student;
+    private Long stellenausschreibungen;
     private String bewerbungsschreiben;
 }

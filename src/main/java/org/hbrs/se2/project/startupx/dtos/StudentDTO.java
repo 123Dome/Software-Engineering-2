@@ -15,10 +15,10 @@ import java.util.Set;
 @NoArgsConstructor
 public class StudentDTO {
     private Integer id;
-    private UserDTO user;
+    private Long user;
     private Integer matrikelnr;
-    private StudiengangDTO studiengang;
+    private Long studiengang;
     private String steckbrief;
-    private List<SkillDTO> skills = new ArrayList<>();
-    private Set<StartupDTO> startups;
+    private List<Long> skills;
+    private Set<Long> startups;
 }
