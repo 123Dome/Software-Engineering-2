@@ -1,8 +1,6 @@
 package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -14,12 +12,15 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.hbrs.se2.project.startupx.entities.User;
+import org.hbrs.se2.project.startupx.control.RegistrationControl;
+import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Route(value = "registration", layout = AppView.class)
 @PageTitle("Registration")
@@ -34,75 +35,65 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
     private TextField nachname = new TextField("Nachname");
 
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
+    private PasswordField passwort = new PasswordField("Passwort");
+    private PasswordField passwort_bestätigen = new PasswordField("Passwort bestätigen");
 
-    private ComboBox<String> studiengang = new ComboBox<>("Wähle einen Studiengang");
+    private Button abbrechen = new Button ("Abbrechen");
+    private Button registrieren = new Button("Registrieren");
 
-    private TextField password = new TextField("Passwort");
-    private TextField password_confirm = new TextField("Passwort bestätigen");
+    private Binder<UserDTO> binder = new Binder<>(UserDTO.class);
+    private UserDTO userDTO = new UserDTO();
 
-    private Button cancel = new Button ("Cancel");
-    private Button register = new Button("Registrieren");
-
-    //TODO: Muss noch mit dem UserDTO verbunden werden
-    private Binder<User> binder = new Binder(User.class);
+    @Autowired
+    RegistrationControl registrationControl;
 
     public RegistrationView() {
         addClassName("enter-car-view");
-
-        studiengang.setItems("IT","Jura","BWL");
-
-        studiengang.addValueChangeListener(e -> {
-            String selected = e.getValue();
-            Notification.show("Ausgewählt" + selected);
-        });
 
         add(createTitle());
         add(createFormLayout());
         add(createButtonLayout());
 
-        email.addValueChangeListener(
-                event -> {
-                    System.out.println("New Value: " + event.getValue());
+        binder.setBean(userDTO);
+        binder.bindInstanceFields(this);
 
-                    // Weitere Bearbeitung des aktuell eingegebenen Werts (z.B. Abfrage in Richtung DB)
-                });
+        abbrechen.addClickListener(event -> clearForm());
 
-        // Default Mapping of Cars attributes and the names of this View based on names
-        // Source: https://vaadin.com/docs/flow/binding-data/tutorial-flow-components-binder-beans.html
-        binder.bindInstanceFields(this); // Nr. 1 HOOK / API-Methode
-        clearForm();
+        registrieren.addClickListener(
+                e -> {
+                    String passwort = this.passwort.getValue();
+                    String passwort_confirm = passwort_bestätigen.getValue();
 
-        // Registrierung eines Listeners Nr. 1 (moderne Variante mit Lambda-Expression)
-        cancel.addClickListener(event -> clearForm());
+                    if(!passwort_confirm.equals(passwort)) {
+                        Notification.show("Passwörter stimmen nicht überein");
+                        return;
+                    }
 
-        // Registrierung eines Listeners Nr. 2 (traditionelle Variante mit anonymen Objekt)
-        cancel.addClickListener(
-                new ComponentEventListener() {
-                    @Override
-                    public void onComponentEvent(ComponentEvent event) { // Nr. 2 Callback!!
-                        clearForm();
+                    if(binder.validate().isOk()) {
+                        userDTO.setPasswort(passwort);
+                        try {
+                            registrationControl.registerUser(userDTO);
+                            Notification.show("Nutzer registriert!");
+                            clearForm();
+                            UI.getCurrent().navigate((Globals.Pages.LOGIN_VIEW));
+                        } catch (Exception ex) {
+                            Notification.show("Fehler:" + ex.getMessage());
+                        }
+                    } else {
+                        Notification.show("Überprüfe deine Eingaben");
                     }
                 });
-
-        register.addClickListener(
-                e -> {
-                    // Speicherung der Daten über das zuhörige Control-Object.
-                    // Daten des Autos werden aus Formular erfasst und als DTO übergeben.
-                    // Zusätzlich wird das aktuelle UserDTO übergeben.
-                    //User user = (User) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
-                    //carService.createCar(binder.getBean(), user);
-
-                    //ToDO: Implementierung einer RegistrationControl zur Registrierung; Binder;
-
-                    Notification.show("Nutzer angelegt.");
-                    clearForm();
-                    UI.getCurrent().navigate((Globals.Pages.LOGIN_VIEW));
-                });
     }
+
+    // TODO: Echtzeitüberwachung E-Mail und Benutzername?
 
     private void clearForm() {
-        binder.setBean(new User());
+        userDTO = new UserDTO();
+        binder.setBean(userDTO);
+        passwort.clear();
+        passwort_bestätigen.clear();
     }
+
 
     private Component createTitle() {
         return new H3("Student registration");
@@ -110,16 +101,16 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum, studiengang, password, password_confirm);
+        formLayout.add(nutzername,email, vorname, nachname, geburtsdatum, passwort, passwort_bestätigen);
         return formLayout;
     }
 
     private Component createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
-        register.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(register);
-        buttonLayout.add(register);
+        registrieren.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonLayout.add(registrieren);
+        buttonLayout.add(abbrechen);
         return buttonLayout;
     }
 }
