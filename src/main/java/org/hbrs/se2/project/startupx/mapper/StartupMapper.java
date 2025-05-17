@@ -40,7 +40,7 @@ public class StartupMapper {
                     .toList();
         }
 
-        StartupDTO startupDTO = StartupDTO.builder()
+        return StartupDTO.builder()
                 .id(startup.getId())
                 .name(startup.getName())
                 .beschreibung(startup.getBeschreibung())
@@ -51,7 +51,17 @@ public class StartupMapper {
                 .studentenListe(studentIDs)
                 .kommentare(kommentarIDs)
                 .build();
+    }
 
-        return startupDTO;
+    public static Startup mapToStartup(StartupDTO startupDTO, Set<Student> studentList, Branche branche) {
+
+        return Startup.builder()
+                .name(startupDTO.getName())
+                .branche(branche)
+                .beschreibung(startupDTO.getBeschreibung())
+                .gruendungsdatum(startupDTO.getGruendungsdatum())
+                .anzahlMitarbeiter(startupDTO.getAnzahlMitarbeiter())
+                .studentenListe(studentList)
+                .build();
     }
 }

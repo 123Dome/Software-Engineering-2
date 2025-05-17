@@ -65,17 +65,10 @@ public class StartupControl {
             logger.warn("Branche mit der ID " + startupDTO.getBranche() + " nicht gefunden");
         }
 
-
-        Startup startup = Startup.builder()
-                .name(startupDTO.getName())
-                .branche(branche)
-                .beschreibung(startupDTO.getBeschreibung())
-                .gruendungsdatum(startupDTO.getGruendungsdatum())
-                .anzahlMitarbeiter(startupDTO.getAnzahlMitarbeiter())
-                .studentenListe(studentList)
-                .build();
+        Startup startup = StartupMapper.mapToStartup(startupDTO, studentList, branche);
 
         Startup savedStartup = startupRepository.save(startup);
+
         logger.info("Startup gegründet: " + savedStartup);
         return StartupMapper.mapToStartupDto(savedStartup);
     }
