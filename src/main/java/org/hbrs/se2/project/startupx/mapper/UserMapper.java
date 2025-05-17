@@ -18,6 +18,8 @@ public class UserMapper {
 //
 //    User mapToUser(UserDTO userDTO);
 
+    @Mapping(target = "id", ignore = true)
+    User mapToUser(UserDTO userDTO);
 
     public UserDTO mapToUserDto(User user) {
         if (user == null) {
