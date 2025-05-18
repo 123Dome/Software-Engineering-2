@@ -48,15 +48,7 @@ public class KommentarControl {
         Startup startup = startupRepository.findById(kommentarDTO.getStartup())
                 .orElseThrow(() -> new EntityNotFoundException("Startup " + kommentarDTO.getStartup() + " not found"));
 
-
-        Kommentar neuesKommentar = Kommentar.builder()
-                .kommentar(kommentarDTO.getKommentar())
-                .bewertung(kommentarDTO.getBewertung())
-                .updated(kommentarDTO.getUpdated())
-                .erstellungsdatum(kommentarDTO.getErstellungsdatum())
-                .user(user)
-                .startup(startup)
-                .build();
+        Kommentar neuesKommentar = KommentarMapper.mapToKommentar(kommentarDTO, user, startup);
 
         Kommentar savedKommentar = kommentarRepository.save(neuesKommentar);
 

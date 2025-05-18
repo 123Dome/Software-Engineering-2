@@ -20,4 +20,7 @@ public interface StartupRepository extends JpaRepository<Startup, Long> {
 
     @Query("SELECT DISTINCT s FROM Startup s JOIN s.stellenausschreibungen")
     List<Startup> findByHavingAnyStellenausschreibungJoin();
+
+    @Query("SELECT s FROM Startup s ORDER BY s.gruendungsdatum DESC")
+    List<Startup> findTop5ByOrderByGruendungsdatumDesc();
 }

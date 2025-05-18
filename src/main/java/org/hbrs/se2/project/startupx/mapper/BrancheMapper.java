@@ -26,4 +26,11 @@ public class BrancheMapper {
         return brancheDTO;
     }
 
+    public static Branche mapToBranche(BrancheDTO brancheDTO) {
+
+        return Branche.builder()
+                .bezeichnung(brancheDTO.getBezeichnung())
+                .build();
+    }
+
 }
