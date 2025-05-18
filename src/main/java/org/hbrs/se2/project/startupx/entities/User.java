@@ -51,11 +51,11 @@ public class User {
     @Column(name = "geburtsdatum", nullable = false)
     private LocalDate geburtsdatum;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private Set<Kommentar> kommentare = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    private Set<Student> students = new LinkedHashSet<>();
+    @OneToOne(mappedBy = "user")
+    private Student students;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     private Set<Rolle> rollen = new LinkedHashSet<>();

@@ -1,5 +1,6 @@
 package org.hbrs.se2.project.startupx.control;
 
+import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.control.exception.DatabaseUserException;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.mapper.UserMapper;

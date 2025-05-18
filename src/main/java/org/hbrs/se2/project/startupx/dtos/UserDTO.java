@@ -36,5 +36,10 @@ public class UserDTO {
 
     @Past(message = "Geburtsdatum muss in der Vergangenheit liegen")
     private LocalDate geburtsdatum;
+
     private Set<Long> rollen;
+
+    private Set<Long> kommentare;
+
+    private Long students;
 }
