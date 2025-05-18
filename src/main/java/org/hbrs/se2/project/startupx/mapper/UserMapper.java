@@ -5,9 +5,6 @@ import org.hbrs.se2.project.startupx.entities.Kommentar;
 import org.hbrs.se2.project.startupx.entities.Rolle;
 import org.hbrs.se2.project.startupx.entities.Student;
 import org.hbrs.se2.project.startupx.entities.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashSet;
@@ -16,9 +13,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
-//    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-//
-//    User mapToUser(UserDTO userDTO);
 
     public static User mapToUser(UserDTO userDTO, Set<Rolle> rollen, Set<Kommentar> kommentare, Student student) {
 
