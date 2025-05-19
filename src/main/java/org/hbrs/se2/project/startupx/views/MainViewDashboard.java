@@ -28,7 +28,7 @@ public class MainViewDashboard extends VerticalLayout {
         add(new H2("Neueste StartUps"));
 
         //Soll die 5 neusten StartUps anzeigen, aktuell noch alle
-        List<Startup> startups = startupRepository.findAll();
+        List<Startup> startups = startupRepository.findTop5ByOrderByGruendungsdatumDesc();
 
         FlexLayout gallery = new FlexLayout();
         gallery.setFlexWrap(FlexLayout.FlexWrap.WRAP);
