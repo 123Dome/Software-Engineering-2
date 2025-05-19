@@ -25,7 +25,7 @@ public class ShowAllStartUpsView extends Div{
 
     private final StartupRepository startupRepository;
 
-    //Zeigt alle bisher erstellten StartUps
+
     public ShowAllStartUpsView(StartupRepository startupRepository) {
         this.startupRepository = startupRepository;
         add(createTitle());
@@ -35,12 +35,13 @@ public class ShowAllStartUpsView extends Div{
 
 
     private Component createTitle() {
-        return new H3("StartUpListe");
+        return new H3("Liste von StartUps");
     }
 
-    //Erstellt Tabelle
+    //Erstellen der Tabelle
     private Grid setUpGrid() {
-        List<Startup> startups = startupRepository.findAll();
+        //Soll zukünftig alle StartUps listen
+        List<Startup> startups = startupRepository.findByNameContaining("a");
         Grid<Startup> grid = new Grid<>(Startup.class);
         grid.setItems(startups);
         return grid;

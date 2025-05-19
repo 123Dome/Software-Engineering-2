@@ -10,6 +10,8 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.control.ManageStartupControl;
+import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.entities.Startup;
 import org.hbrs.se2.project.startupx.repository.StartupRepository;
 
@@ -23,11 +25,11 @@ public class JobListingView extends Div{
 
     private Button register = new Button("Zum StartUp");
 
-    private final StartupRepository startupRepository;
+    private final ManageStartupControl manageStartupControl;
 
 
-    public JobListingView(StartupRepository startupRepository) {
-        this.startupRepository = startupRepository;
+    public JobListingView(ManageStartupControl manageStartupControl) {
+        this.manageStartupControl = manageStartupControl;
         add(createTitle());
         add(setUpGrid());
         add(createButtonLayout());
@@ -41,8 +43,8 @@ public class JobListingView extends Div{
     //Erstellen der Tabelle
     private Grid setUpGrid() {
         //Soll zukünftig alle StartUps listen, die auch eine Stelle ausgeschrieben haben
-        List<Startup> startups = startupRepository.findByNameContaining("a");
-        Grid<Startup> grid = new Grid<>(Startup.class);
+        List<StartupDTO> startups = manageStartupControl.findByHavingAnyStellenausschreibungJoin();
+        Grid<StartupDTO> grid = new Grid<>(StartupDTO.class);
         grid.setItems(startups);
         return grid;
     }
