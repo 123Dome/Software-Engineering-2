@@ -27,7 +27,6 @@ public class JobListingView extends Div{
 
     private final ManageStartupControl manageStartupControl;
 
-
     public JobListingView(ManageStartupControl manageStartupControl) {
         this.manageStartupControl = manageStartupControl;
         add(createTitle());
@@ -42,10 +41,19 @@ public class JobListingView extends Div{
 
     //Erstellen der Tabelle
     private Grid setUpGrid() {
-        //Soll zukünftig alle StartUps listen, die auch eine Stelle ausgeschrieben haben
         List<StartupDTO> startups = manageStartupControl.findByHavingAnyStellenausschreibungJoin();
         Grid<StartupDTO> grid = new Grid<>(StartupDTO.class);
         grid.setItems(startups);
+
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            StartupDTO selected = event.getValue();
+            if (selected != null) {
+                getUI().ifPresent(ui ->
+                        ui.navigate("startup/" + selected.getId())
+                );
+            }
+        });
+
         return grid;
     }
 
