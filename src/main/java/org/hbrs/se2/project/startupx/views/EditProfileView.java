@@ -31,6 +31,8 @@ public class EditProfileView extends Div{
 
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
 
+    // TODO: Binder hinzufügen
+
     //TODO: Daten des Users müssen abgerufen werden und editierbar sein, danach zurückgeschrieben werden
     public EditProfileView() {
         addClassName("enter-car-view");
@@ -82,13 +84,12 @@ public class EditProfileView extends Div{
         return saveButton;
     }
 
+    //TODO: Wird ausgetauscht durch Binder.validate
     private boolean checkTextfields(){
-        // TODO: Eigene Exceptionklasse erstellen
         if(nutzername.getValue() == null || nutzername.getValue().isEmpty()){
             throw new IllegalArgumentException("Nutzername darf nicht leer sein");
         }
         if(email.getValue() == null || email.getValue().isEmpty()){
-            // TODO: Prüfung auf richtiges E-Mail Format
             throw new IllegalArgumentException("Email darf nicht leer sein");
         }
         if(vorname.getValue() == null || vorname.getValue().isEmpty()){
