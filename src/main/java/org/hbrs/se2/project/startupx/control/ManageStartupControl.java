@@ -33,6 +33,7 @@ import java.util.Set;
  * @version 1.0
  */
 @Controller
+@Transactional
 public class ManageStartupControl {
 
     private static final Logger logger = LoggerFactory.getLogger(ManageStartupControl.class);

@@ -19,19 +19,20 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.PostConstruct;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.Branche;
 import org.hbrs.se2.project.startupx.repository.BrancheRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 @Route(value = "CreateStartUp", layout = AppView.class)
 @PageTitle("StartUp erstellen")
@@ -49,6 +50,8 @@ public class CreateStartUpView extends Div {
     private Button register = new Button("Register");
     private Button cancel = new Button("Abbrechen");
 
+    private LocalDate heute = LocalDate.now();
+
     private StartupDTO startupDTO = new StartupDTO();
 
     private Binder<StartupDTO> binder = new Binder<>(StartupDTO.class);
@@ -60,6 +63,14 @@ public class CreateStartUpView extends Div {
         add(createTitle());
         add(createFormLayout());
         add(createButtonLayout());
+
+        UserDTO userDTO = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
+
+        Set<Long> studentenids = new LinkedHashSet<>();
+        studentenids.add(userDTO.getId());
+        startupDTO.setGruendungsdatum(heute);
+        //Testfall
+        startupDTO.setStudentenListe(studentenids);
 
         binder.setBean(startupDTO);
         configureBinder();
