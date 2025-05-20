@@ -92,6 +92,16 @@ public class ProfileView extends Div {
         List<StartupDTO> startups = manageStartupControl.getStartups(studentDTO);
         Grid<StartupDTO> grid = new Grid<>(StartupDTO.class);
         grid.setItems(startups);
+
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            StartupDTO selected = event.getValue();
+            if (selected != null) {
+                getUI().ifPresent(ui ->
+                        ui.navigate("startup/" + selected.getId())
+                );
+            }
+        });
+
         return grid;
     }
 
