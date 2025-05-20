@@ -16,7 +16,7 @@ import org.hbrs.se2.project.startupx.repository.StudentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Korbinian Gauglitz
  * @version 1.0
  */
-@Controller
+@Service
 public class ManageStartupControl {
 
     private static final Logger logger = LoggerFactory.getLogger(ManageStartupControl.class);
@@ -71,6 +71,7 @@ public class ManageStartupControl {
         return StartupMapper.mapToStartupDto(savedStartup);
     }
 
+    @Transactional
     public List<StartupDTO> findAll() {
         List<Startup> startupList = startupRepository.findAll();
 
