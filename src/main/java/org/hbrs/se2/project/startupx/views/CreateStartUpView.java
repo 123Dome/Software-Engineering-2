@@ -66,6 +66,7 @@ public class CreateStartUpView extends Div {
 
         UserDTO userDTO = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
 
+
         Set<Long> studentenids = new LinkedHashSet<>();
         studentenids.add(userDTO.getId());
         startupDTO.setGruendungsdatum(heute);
