@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -31,6 +32,7 @@ public class MainView extends VerticalLayout {
     @Autowired
     private LoginControl loginControl;
 
+    Notification notification =new Notification("Registrierung von Studenten noch nicht fertig. Kommt noch :)");
 
     public MainView() {
         setSizeFull();
@@ -64,7 +66,14 @@ public class MainView extends VerticalLayout {
                 UI.getCurrent().navigate(RegistrationView.class)
         );
 
-        add(component, registerButton);
+        //TODO: Wenn StudentRegistration fertig ist, soll er zur StudentRegistrationView navigieren
+        Button registerStudentButton = new Button("Zur Registrierung von Studenten", event -> {
+            UI.getCurrent().navigate(RegistrationView.class);
+                    notification.open();
+            }
+        );
+
+        add(component, registerButton, registerStudentButton);
 
         this.setAlignItems( Alignment.CENTER );
     }

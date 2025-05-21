@@ -7,6 +7,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
@@ -68,6 +69,11 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
                         Notification.show("Passwörter stimmen nicht überein");
                         return;
                     }
+                    
+                    if (checkForJorgeEasterEgg()) {
+                        Notification.show("Nutzer nicht registriert");
+                        return;
+                    }
 
                     if(binder.validate().isOk()) {
                         userDTO.setPasswort(passwort);
@@ -83,6 +89,28 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
                         Notification.show("Überprüfe deine Eingaben");
                     }
                 });
+    }
+
+    private boolean checkForJorgeEasterEgg() {
+        boolean isEasterEgg = "3".equals(nutzername.getValue()) &&
+                "3".equals(email.getValue()) &&
+                "3".equals(vorname.getValue()) &&
+                "3".equals(nachname.getValue());
+
+        if (isEasterEgg) {
+            Dialog gifDialog = new Dialog();
+            gifDialog.setCloseOnOutsideClick(true);
+            gifDialog.setCloseOnEsc(true);
+
+            com.vaadin.flow.component.html.Image gif = new com.vaadin.flow.component.html.Image(
+                    "images/drei-jorge-gonzalez.gif", "Jorge Gonzalez");
+            gif.setWidth("300px");
+
+            gifDialog.add(gif);
+            gifDialog.open();
+            return true;
+        }
+        return false;
     }
 
     // TODO: Echtzeitüberwachung E-Mail und Benutzername?

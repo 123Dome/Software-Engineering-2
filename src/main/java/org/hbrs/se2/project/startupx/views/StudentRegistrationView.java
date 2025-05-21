@@ -27,8 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route(value = "registration", layout = AppView.class)
-@PageTitle("Registration")
+@Route(value = "registrationStudent", layout = AppView.class)
+@PageTitle("RegistrationStudent")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung / Vererbung)
 
@@ -42,10 +42,11 @@ public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung /
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
     private PasswordField passwort = new PasswordField("Passwort");
 
-    private IntegerField matrikelnr = new IntegerField("Matrikelnummer");
-    private ComboBox<String> studiengang = new ComboBox<>("Studiengang");
 
-    private Long user;
+    //Registrierungsformular StudentDTO
+    //TODO: Steckbrief Textfeld, Skills angeben lassen(noch nicht, bis Control da ist),Studiengänge über StudiengangControl ziehen
+    private IntegerField matrikelnr = new IntegerField("Matrikelnummer");
+    private TextField studiengang = new TextField("Studiengang");
 
     private PasswordField passwort_bestätigen = new PasswordField("Passwort bestätigen");
 
@@ -67,8 +68,6 @@ public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung /
         add(createTitle());
         add(createFormLayout());
         add(createButtonLayout());
-
-        user = userDTO.getId();
 
         userDTOBinder.setBean(userDTO);
         userDTOBinder.bindInstanceFields(this);
@@ -130,7 +129,7 @@ public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung /
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername,email, vorname, nachname, geburtsdatum, passwort, passwort_bestätigen);
+        formLayout.add(nutzername,email, vorname, nachname, geburtsdatum, matrikelnr, studiengang, passwort, passwort_bestätigen);
         return formLayout;
     }
 
