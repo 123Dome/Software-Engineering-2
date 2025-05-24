@@ -1,8 +1,10 @@
 package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -17,7 +19,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.control.EditProfilControl;
+import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
+import org.hbrs.se2.project.startupx.dtos.StudiengangDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.entities.Studiengang;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,8 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Profil bearbeiten")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class EditProfileView extends Div{
+
     @Autowired
     private EditProfilControl editProfilControl;
+
+    @Autowired
+    private StudiengangControl studiengangControl;
 
     private TextField nutzername = new TextField("Benutzername");
     private TextField email = new TextField("Email");
@@ -35,16 +45,23 @@ public class EditProfileView extends Div{
 
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
 
+    //private TextField matrikelnr = new TextField("Matrikelnummer");
+    private TextField steckbrief = new TextField("Steckbrief");
+    private ComboBox<StudiengangDTO> studiengang = new ComboBox<>("Studiengang");
+
     //TODO: Daten des Users müssen abgerufen werden und editierbar sein, danach zurückgeschrieben werden
-    public EditProfileView() {
-        addClassName("enter-car-view");
+    public EditProfileView(EditProfilControl editProfilControl, StudiengangControl studiengangControl) {
+        this.studiengangControl = studiengangControl;
+        this.editProfilControl = editProfilControl;
+        addClassName("EditProfileView");
 
         UserDTO userDTO = (UserDTO) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
+        StudentDTO studentDTO = editProfilControl.getStudentDTO(userDTO);
 
         add(createTitle());
-        setTextFieldWithUserData(userDTO);
+        setTextFieldWithUserData(userDTO, studentDTO);
         add(createFormLayout());
-        add(createSaveButton(userDTO));
+        add(createSaveButton2(userDTO, studentDTO));
         Button changePasswordButton = new Button("Passwort ändern");
         Dialog passwordDialog = createPasswordDialog(userDTO);
         changePasswordButton.addClickListener(e -> passwordDialog.open());
@@ -56,17 +73,46 @@ public class EditProfileView extends Div{
         return new H3("Profil bearbeiten");
     }
 
-    private void setTextFieldWithUserData(UserDTO userDTO){
+    private void setTextFieldWithUserData(UserDTO userDTO, StudentDTO studentDTO){
         nutzername.setValue(userDTO.getNutzername());
         email.setValue(userDTO.getEmail());
         vorname.setValue(userDTO.getVorname());
         nachname.setValue(userDTO.getNachname());
         geburtsdatum.setValue(userDTO.getGeburtsdatum());
+        steckbrief.setValue(studentDTO.getSteckbrief());
+        studiengang.setItems(studiengangControl.getAll());
+        studiengang.setItemLabelGenerator(StudiengangDTO::getStudiengang);
+    }
+
+    private Button createSaveButton2 (UserDTO userDTO, StudentDTO studentDTO) {
+        Button saveButton = new Button("Änderungen speichern", e -> {
+            if(checkTextfields()){
+                StudentDTO newStudentDTO = new StudentDTO();
+                UserDTO newUserDTO = new UserDTO();
+                newUserDTO.setId(userDTO.getId());
+                newUserDTO.setRollen(userDTO.getRollen());
+                newUserDTO.setNutzername(nutzername.getValue());
+                newUserDTO.setEmail(email.getValue());
+                newUserDTO.setVorname(vorname.getValue());
+                newUserDTO.setNachname(nachname.getValue());
+                newUserDTO.setGeburtsdatum(geburtsdatum.getValue());
+                newUserDTO.setPasswort(userDTO.getPasswort());
+
+                newStudentDTO.setId(userDTO.getId());
+                newStudentDTO.setSteckbrief(steckbrief.getValue());
+                newStudentDTO.setStudiengang(studiengang.getValue().getId());
+                if(editProfilControl.updateStudent(newUserDTO, studentDTO)){
+                    Notification.show("Profil aktualisiert");
+                }
+            }
+            // TODO: Fehlerausgabe
+        });
+        return saveButton;
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum);
+        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum, steckbrief, studiengang);
         return formLayout;
     }
 
@@ -113,7 +159,6 @@ public class EditProfileView extends Div{
                 return;
             }
 
-            // Du kannst hier deinen EditProfilControl nutzen:
             boolean success = editProfilControl.updatePassword(userDTO.getId(), currentPassword.getValue(), newPassword.getValue());
             if (success) {
                 Notification.show("Passwort erfolgreich geändert");
@@ -150,6 +195,9 @@ public class EditProfileView extends Div{
         }
         if(geburtsdatum.getValue() == null){
             throw new IllegalArgumentException("Geburtsdatum darf nicht leer sein");
+        }
+        if (studiengang.getValue()== null) {
+            throw new IllegalArgumentException("Es muss ein Studiengang ausgewählt sein");
         }
         return true;
     }
