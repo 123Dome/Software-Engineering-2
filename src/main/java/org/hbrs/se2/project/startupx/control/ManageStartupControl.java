@@ -92,7 +92,7 @@ public class ManageStartupControl {
 
     public List<StartupDTO> findByHavingAnyStellenausschreibungJoin() {
 
-        List<Startup> startupList = startupRepository.findByHavingAnyStellenausschreibungJoin();
+        List<Startup> startupList = startupRepository.findByStellenausschreibungenIsNotEmpty();
 
         List<StartupDTO> startupDTOList = new ArrayList<>();
 

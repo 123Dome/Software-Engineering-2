@@ -127,6 +127,8 @@ public class EditProfilControl {
 
         try {
             studentRepository.save(existingStudent);
+            System.out.println("Saving user: " + existingStudent);
+            System.out.println("Saving user: " + existingStudent.getSteckbrief());
             return true;
         } catch (Exception e) {
             throw new RuntimeException("Student konnte nicht gespeichert werden.");

@@ -53,7 +53,11 @@ public class EditProfileView extends Div {
     private final Binder<UserDTO> userDTOBinder = new Binder<>(UserDTO.class);
     private final Binder<StudentDTO> studentDTOBinder = new Binder<>(StudentDTO.class);
 
+    //private TextField matrikelnr = new TextField("Matrikelnummer");
+
+    //TODO: Daten des Users müssen abgerufen werden und editierbar sein, danach zurückgeschrieben werden
     public EditProfileView(EditProfilControl editProfilControl, StudiengangControl studiengangControl) {
+        this.studiengangControl = studiengangControl;
         this.editProfilControl = editProfilControl;
         this.studiengangControl = studiengangControl;
         addClassName("edit-profile-view");
