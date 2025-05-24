@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1374</x>
-      <y>420</y>
+      <x>1332</x>
+      <y>396</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -16,8 +16,8 @@ AuthorizationControl</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>300</x>
-      <y>690</y>
+      <x>498</x>
+      <y>696</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -28,8 +28,8 @@ LoginControl</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>12</x>
-      <y>252</y>
+      <x>210</x>
+      <y>228</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -40,32 +40,8 @@ ManageStartupControl</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1062</x>
-      <y>360</y>
-      <w>132</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;dao&gt;&gt;
-RolleDAO</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>1062</x>
-      <y>474</y>
-      <w>132</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;dao&gt;&gt;
-UserDAO</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>804</x>
-      <y>360</y>
+      <x>1002</x>
+      <y>336</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -76,8 +52,8 @@ RolleDTO</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>804</x>
-      <y>252</y>
+      <x>1002</x>
+      <y>228</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -88,8 +64,8 @@ StartupDTO</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>804</x>
-      <y>474</y>
+      <x>1002</x>
+      <y>450</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -100,8 +76,8 @@ UserDTO</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>552</x>
-      <y>252</y>
+      <x>750</x>
+      <y>228</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -112,8 +88,8 @@ Startup</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>552</x>
-      <y>360</y>
+      <x>750</x>
+      <y>336</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -124,8 +100,8 @@ Rolle</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>552</x>
-      <y>474</y>
+      <x>750</x>
+      <y>450</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -136,142 +112,68 @@ User</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>306</x>
-      <y>252</y>
+      <x>504</x>
+      <y>228</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+    <panel_attributes>&lt;&lt;control&gt;&gt;
 StartupRepository</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1074</x>
-      <y>630</y>
-      <w>108</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;boundary&gt;&gt;
-JDBCConnection</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>306</x>
-      <y>360</y>
+      <x>504</x>
+      <y>336</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+    <panel_attributes>&lt;&lt;control&gt;&gt;
 RolleRepository</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>306</x>
-      <y>474</y>
+      <x>504</x>
+      <y>450</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+    <panel_attributes>&lt;&lt;control&gt;&gt;
 UserRepository</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>1062</x>
-      <y>732</y>
-      <w>132</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;exception&gt;&gt;
-DatabaseLayerException</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>Relation</id>
     <coordinates>
-      <x>426</x>
-      <y>504</y>
+      <x>624</x>
+      <y>480</y>
       <w>408</w>
-      <h>210</h>
+      <h>240</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 einloggen in</panel_attributes>
-    <additional_attributes>660.0;10.0;10.0;330.0</additional_attributes>
+    <additional_attributes>660.0;10.0;660.0;380.0;10.0;380.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>360</x>
-      <y>504</y>
+      <x>504</x>
+      <y>480</y>
       <w>72</w>
-      <h>198</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-sucht User
-durch JPA</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;310.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>426</x>
-      <y>498</y>
-      <w>648</w>
       <h>228</h>
     </coordinates>
-    <panel_attributes>lt=&lt;.
-r2=sucht User\ndurch JDBC</panel_attributes>
-    <additional_attributes>1060.0;10.0;10.0;360.0</additional_attributes>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>294</x>
-      <y>792</y>
-      <w>132</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;exception&gt;&gt;
-DatabaseUserException</panel_attributes>
-    <additional_attributes/>
+    <panel_attributes>lt=&lt;-
+m2=sucht User\ndurch JPA</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;360.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>360</x>
-      <y>714</y>
-      <w>126</w>
-      <h>90</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-wirft falls
-User nicht gefunden</panel_attributes>
-    <additional_attributes>10.0;130.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>930</x>
-      <y>480</y>
-      <w>144</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-sucht, befüllt</panel_attributes>
-    <additional_attributes>10.0;20.0;220.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>858</x>
-      <y>390</y>
+      <x>1056</x>
+      <y>366</y>
       <w>24</w>
       <h>96</h>
     </coordinates>
@@ -282,8 +184,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>414</x>
-      <y>438</y>
+      <x>612</x>
+      <y>414</y>
       <w>426</w>
       <h>48</h>
     </coordinates>
@@ -295,35 +197,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1116</x>
-      <y>504</y>
-      <w>72</w>
-      <h>138</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-durchsucht
-nach User</panel_attributes>
-    <additional_attributes>10.0;210.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>1122</x>
-      <y>654</y>
-      <w>126</w>
-      <h>90</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-wirft bei
-technischen Fehlern
-in DB</panel_attributes>
-    <additional_attributes>10.0;130.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>432</x>
-      <y>486</y>
+      <x>630</x>
+      <y>462</y>
       <w>132</w>
       <h>24</h>
     </coordinates>
@@ -335,20 +210,20 @@ r2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>912</x>
-      <y>426</y>
-      <w>474</w>
+      <x>1104</x>
+      <y>402</y>
+      <w>240</w>
       <h>60</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 prüft Berechtigungen anhand Rollen</panel_attributes>
-    <additional_attributes>10.0;80.0;10.0;20.0;770.0;20.0</additional_attributes>
+    <additional_attributes>20.0;80.0;20.0;20.0;380.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>912</x>
-      <y>390</y>
+      <x>1110</x>
+      <y>366</y>
       <w>18</w>
       <h>60</h>
     </coordinates>
@@ -358,82 +233,8 @@ prüft Berechtigungen anhand Rollen</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1176</x>
-      <y>372</y>
-      <w>168</w>
-      <h>288</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-durchsucht
-nach Rollen</panel_attributes>
-    <additional_attributes>10.0;460.0;160.0;460.0;160.0;10.0;30.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>930</x>
-      <y>372</y>
-      <w>144</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;.
-sucht,befüllt
-r2=*</panel_attributes>
-    <additional_attributes>220.0;20.0;10.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>702</x>
-      <y>264</y>
-      <w>384</w>
-      <h>396</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
-r1=speichert</panel_attributes>
-    <additional_attributes>620.0;640.0;10.0;640.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>678</x>
-      <y>366</y>
-      <w>42</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>lt=-
-r2=*</panel_attributes>
-    <additional_attributes>10.0;20.0;50.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>678</x>
-      <y>480</y>
-      <w>42</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>lt=-
-r2=*</panel_attributes>
-    <additional_attributes>10.0;20.0;50.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>678</x>
-      <y>258</y>
-      <w>42</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>lt=-
-r2=*</panel_attributes>
-    <additional_attributes>10.0;20.0;50.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>414</x>
-      <y>324</y>
+      <x>612</x>
+      <y>300</y>
       <w>426</w>
       <h>48</h>
     </coordinates>
@@ -445,8 +246,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>564</x>
-      <y>390</y>
+      <x>762</x>
+      <y>366</y>
       <w>24</w>
       <h>96</h>
     </coordinates>
@@ -457,8 +258,8 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>414</x>
-      <y>216</y>
+      <x>612</x>
+      <y>192</y>
       <w>426</w>
       <h>48</h>
     </coordinates>
@@ -470,21 +271,21 @@ m2=*</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>138</x>
-      <y>258</y>
+      <x>336</x>
+      <y>234</y>
       <w>180</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-sucht Auto
+sucht Startup
 durch JPA</panel_attributes>
     <additional_attributes>280.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>432</x>
-      <y>258</y>
+      <x>630</x>
+      <y>234</y>
       <w>132</w>
       <h>24</h>
     </coordinates>
@@ -495,38 +296,378 @@ speichert</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>492</x>
-      <y>282</y>
-      <w>108</w>
-      <h>210</h>
+      <x>630</x>
+      <y>36</y>
+      <w>492</w>
+      <h>204</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
-m2=*
-gründet</panel_attributes>
-    <additional_attributes>100.0;330.0;10.0;330.0;10.0;70.0;110.0;70.0;160.0;10.0</additional_attributes>
+    <panel_attributes>lt=&lt;.
+r2=befüllt mit Werten</panel_attributes>
+    <additional_attributes>800.0;320.0;800.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
-    <id>Relation</id>
+    <id>UMLNote</id>
     <coordinates>
-      <x>120</x>
-      <y>282</y>
-      <w>450</w>
+      <x>660</x>
+      <y>372</y>
+      <w>78</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>lt=&lt;.
-erstellt</panel_attributes>
-    <additional_attributes>730.0;10.0;730.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
+    <panel_attributes>Mögliche Rollen:
+bg=yellow
+Admin
+User</panel_attributes>
+    <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>108</x>
-      <y>174</y>
-      <w>762</w>
-      <h>90</h>
+      <x>732</x>
+      <y>366</y>
+      <w>30</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=yellow</panel_attributes>
+    <additional_attributes>30.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>780</x>
+      <y>522</y>
+      <w>60</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;entity&gt;&gt;
+Student</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>804</x>
+      <y>480</y>
+      <w>18</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>834</x>
+      <y>252</y>
+      <w>108</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+r2=*
+r1=gründet</panel_attributes>
+    <additional_attributes>10.0;480.0;160.0;480.0;160.0;70.0;70.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>270</x>
+      <y>696</y>
+      <w>102</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+MainView</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1344</x>
+      <y>480</y>
+      <w>102</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+AppView</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>534</x>
+      <y>30</y>
+      <w>102</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+EnterStartupView</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>252</x>
+      <y>36</y>
+      <w>294</w>
+      <h>204</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
-befüllt mit Werten aus View</panel_attributes>
-    <additional_attributes>1250.0;130.0;1250.0;20.0;10.0;20.0;10.0;130.0</additional_attributes>
+r2=initiiert</panel_attributes>
+    <additional_attributes>10.0;320.0;10.0;20.0;470.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>312</x>
+      <y>156</y>
+      <w>744</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>1220.0;120.0;1220.0;10.0;10.0;10.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1386</x>
+      <y>426</y>
+      <w>66</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+initiiert</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>366</x>
+      <y>702</y>
+      <w>144</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+initiiert</panel_attributes>
+    <additional_attributes>220.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>336</x>
+      <y>480</y>
+      <w>714</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+aktueller Session User</panel_attributes>
+    <additional_attributes>1170.0;10.0;1170.0;460.0;10.0;460.0;10.0;410.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>534</x>
+      <y>90</y>
+      <w>102</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+ShowStartupView</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>282</x>
+      <y>96</y>
+      <w>264</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+r2=initiiert</panel_attributes>
+    <additional_attributes>10.0;220.0;10.0;20.0;420.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>96</y>
+      <w>456</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+r2=zeigt an</panel_attributes>
+    <additional_attributes>740.0;220.0;740.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>342</x>
+      <y>906</y>
+      <w>132</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;control&gt;&gt;
+RegistrationControl</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>360</x>
+      <y>822</y>
+      <w>102</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;boundary&gt;&gt;
+RegistrationView</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>348</y>
+      <w>132</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+enthält
+r2=*</panel_attributes>
+    <additional_attributes>10.0;20.0;200.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>408</x>
+      <y>846</y>
+      <w>66</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+initiiert</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>192</x>
+      <y>462</y>
+      <w>324</w>
+      <h>474</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+r2=speichert\nneuen User\ndurch JPA</panel_attributes>
+    <additional_attributes>520.0;10.0;10.0;10.0;20.0;770.0;250.0;770.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>468</x>
+      <y>480</y>
+      <w>648</w>
+      <h>456</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>1060.0;10.0;1060.0;740.0;10.0;740.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>456</x>
+      <y>480</y>
+      <w>636</w>
+      <h>372</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+befüllt</panel_attributes>
+    <additional_attributes>1040.0;10.0;1040.0;600.0;10.0;600.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>288</x>
+      <y>720</y>
+      <w>84</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+verlinkt
+auf</panel_attributes>
+    <additional_attributes>120.0;200.0;10.0;200.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>312</x>
+      <y>504</y>
+      <w>1092</w>
+      <h>294</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+navigiert zu, falls User nicht eingeloggt</panel_attributes>
+    <additional_attributes>10.0;370.0;10.0;470.0;1800.0;470.0;1800.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>534</x>
+      <y>522</y>
+      <w>102</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;control&gt;&gt;
+StudentRepository</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>534</y>
+      <w>162</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+enthält
+r2=*</panel_attributes>
+    <additional_attributes>10.0;20.0;250.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1146</x>
+      <y>528</y>
+      <w>78</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;dto&gt;&gt;
+StudentDTO</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>612</x>
+      <y>552</y>
+      <w>588</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;.
+sucht, befüllt aus DB
+m2=*</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;950.0;50.0;950.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>312</x>
+      <y>258</y>
+      <w>234</w>
+      <h>294</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+sucht Student
+durch JPA</panel_attributes>
+    <additional_attributes>370.0;470.0;10.0;470.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>
