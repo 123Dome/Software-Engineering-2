@@ -2,7 +2,9 @@ package org.hbrs.se2.project.startupx.control;
 
 import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.entities.Student;
 import org.hbrs.se2.project.startupx.entities.User;
+import org.hbrs.se2.project.startupx.repository.StudentRepository;
 import org.hbrs.se2.project.startupx.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,8 @@ public class EditProfilControl {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Transactional
     public boolean updateUser(UserDTO newUserDTO) {
@@ -37,6 +41,28 @@ public class EditProfilControl {
             return true;
         } catch (Exception e) {
             throw new RuntimeException("Das Profil konnte nicht gespeichert werden. Bitte versuche es erneut.", e);
+        }
+    }
+
+    @Transactional
+    public boolean updateStudent(UserDTO newUserDTO, Student newStudentDTO) {
+        if (!updateUser(newUserDTO)) {
+            return false;
+        }
+        Student existingStudent = studentRepository.findById(newStudentDTO.getId()).orElse(null);
+        if (existingStudent == null) {
+            throw new IllegalArgumentException("Student konnte nicht gefunden werden.");
+        }
+
+        existingStudent.setSkills(newStudentDTO.getSkills());
+        existingStudent.setSteckbrief(newStudentDTO.getSteckbrief());
+        existingStudent.setStudiengang(newStudentDTO.getStudiengang());
+
+        try {
+            studentRepository.save(existingStudent);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Student konnte nicht gespeichert werden.");
         }
     }
 
