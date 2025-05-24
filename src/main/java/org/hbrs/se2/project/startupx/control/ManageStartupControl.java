@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * StartupControl ist für jegliche Interaktion zwischen Nutzer/Views und der Datenbankanbindung (durch
@@ -33,6 +30,7 @@ import java.util.Set;
  * @version 1.0
  */
 @Controller
+@Transactional
 public class ManageStartupControl {
 
     private static final Logger logger = LoggerFactory.getLogger(ManageStartupControl.class);
@@ -82,6 +80,15 @@ public class ManageStartupControl {
         logger.info("StartupDTOList erstellt.");
         return startupDTOList;
     }
+
+    public StartupDTO findByID(Long id) {
+        Optional<Startup> startup = startupRepository.findById(id);
+        if (startup.isPresent()) {
+            return StartupMapper.mapToStartupDto(startup.get());
+        }
+        throw new RuntimeException("Fehler, kein StartUp gefunden.");
+    }
+
 
     public List<StartupDTO> findByHavingAnyStellenausschreibungJoin() {
 

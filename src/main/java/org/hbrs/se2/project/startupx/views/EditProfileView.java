@@ -5,10 +5,14 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -31,8 +35,6 @@ public class EditProfileView extends Div{
 
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
 
-    // TODO: Binder hinzufügen
-
     //TODO: Daten des Users müssen abgerufen werden und editierbar sein, danach zurückgeschrieben werden
     public EditProfileView() {
         addClassName("enter-car-view");
@@ -43,6 +45,11 @@ public class EditProfileView extends Div{
         setTextFieldWithUserData(userDTO);
         add(createFormLayout());
         add(createSaveButton(userDTO));
+        Button changePasswordButton = new Button("Passwort ändern");
+        Dialog passwordDialog = createPasswordDialog(userDTO);
+        changePasswordButton.addClickListener(e -> passwordDialog.open());
+
+        add(changePasswordButton, passwordDialog);
     }
 
     private Component createTitle() {
@@ -84,12 +91,55 @@ public class EditProfileView extends Div{
         return saveButton;
     }
 
-    //TODO: Wird ausgetauscht durch Binder.validate
+    private Dialog createPasswordDialog(UserDTO userDTO) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Passwort ändern");
+
+        PasswordField currentPassword = new PasswordField("Aktuelles Passwort");
+        PasswordField newPassword = new PasswordField("Neues Passwort");
+        PasswordField confirmPassword = new PasswordField("Passwort bestätigen");
+
+        VerticalLayout layout = new VerticalLayout(currentPassword, newPassword, confirmPassword);
+        layout.setSpacing(true);
+        layout.setPadding(false);
+
+        Button save = new Button("Speichern", event -> {
+            if (!newPassword.getValue().equals(confirmPassword.getValue())) {
+                Notification.show("Die Passwörter stimmen nicht überein.");
+                return;
+            }
+            if (currentPassword.getValue().isEmpty() || newPassword.getValue().isEmpty()) {
+                Notification.show("Bitte alle Felder ausfüllen.");
+                return;
+            }
+
+            // Du kannst hier deinen EditProfilControl nutzen:
+            boolean success = editProfilControl.updatePassword(userDTO.getId(), currentPassword.getValue(), newPassword.getValue());
+            if (success) {
+                Notification.show("Passwort erfolgreich geändert");
+                dialog.close();
+            } else {
+                Notification.show("Aktuelles Passwort ist falsch");
+            }
+        });
+
+        Button cancel = new Button("Abbrechen", event -> dialog.close());
+
+        HorizontalLayout buttons = new HorizontalLayout(save, cancel);
+        dialog.getFooter().add(buttons);
+        dialog.add(layout);
+
+        return dialog;
+    }
+
+
     private boolean checkTextfields(){
+        // TODO: Eigene Exceptionklasse erstellen
         if(nutzername.getValue() == null || nutzername.getValue().isEmpty()){
             throw new IllegalArgumentException("Nutzername darf nicht leer sein");
         }
         if(email.getValue() == null || email.getValue().isEmpty()){
+            // TODO: Prüfung auf richtiges E-Mail Format
             throw new IllegalArgumentException("Email darf nicht leer sein");
         }
         if(vorname.getValue() == null || vorname.getValue().isEmpty()){

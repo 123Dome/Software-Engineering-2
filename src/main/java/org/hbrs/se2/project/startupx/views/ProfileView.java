@@ -2,6 +2,7 @@ package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
@@ -12,8 +13,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import org.hbrs.se2.project.startupx.control.ManageStartupControl;
+import org.hbrs.se2.project.startupx.dtos.StartupDTO;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.mapper.StudentMapper;
+import org.hbrs.se2.project.startupx.repository.StudentRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
+
+import java.util.List;
 
 @Route(value = "userProfile", layout = AppView.class)
 @PageTitle("Mein Profil")
@@ -22,10 +30,20 @@ public class ProfileView extends Div {
 
     private UserDTO userDTO;
 
-    public ProfileView() {
+    private StudentRepository studentRepository;
+
+    private final ManageStartupControl manageStartupControl;
+
+    public ProfileView(ManageStartupControl manageStartupControl, StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+        this.manageStartupControl = manageStartupControl;
         addClassName("profile-view");
         loadCurrentUser();
         add(createProfileLayout());
+        StudentDTO studentDTO = StudentMapper.mapToStudentDto(studentRepository.findById(userDTO.getStudents()).get());
+        if (studentDTO.getStartups().size() != 0) {
+            add(setUpGrid(studentDTO));
+        }
     }
 
     //Aktuelle Nutzerdaten laden
@@ -67,6 +85,24 @@ public class ProfileView extends Div {
         layout.add(createProfileImage(), createUserInfoLayout());
 
         return layout;
+    }
+
+    private Grid setUpGrid(StudentDTO studentDTO) {
+        //Soll zukünftig alle StartUps listen
+        List<StartupDTO> startups = manageStartupControl.getStartups(studentDTO);
+        Grid<StartupDTO> grid = new Grid<>(StartupDTO.class);
+        grid.setItems(startups);
+
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            StartupDTO selected = event.getValue();
+            if (selected != null) {
+                getUI().ifPresent(ui ->
+                        ui.navigate("startup/" + selected.getId())
+                );
+            }
+        });
+
+        return grid;
     }
 
 }

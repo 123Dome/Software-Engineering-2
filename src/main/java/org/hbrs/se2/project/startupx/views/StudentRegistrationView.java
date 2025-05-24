@@ -7,29 +7,33 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.control.RegistrationControl;
+import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Route(value = "registration", layout = AppView.class)
-@PageTitle("Registration")
+import java.util.List;
+
+@Route(value = "registrationStudent", layout = AppView.class)
+@PageTitle("RegistrationStudent")
 @CssImport("./styles/views/entercar/enter-car-view.css")
-public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererbung)
+public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung / Vererbung)
 
 
-    //Registrierungsformular
+    //Registrierungsformular UserDTO
     private TextField nutzername = new TextField("Benutzername");
     private TextField email = new TextField("Email");
     private TextField vorname = new TextField("Vorname");
@@ -37,26 +41,39 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
 
     private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
     private PasswordField passwort = new PasswordField("Passwort");
+
+
+    //Registrierungsformular StudentDTO
+    //TODO: Steckbrief Textfeld, Skills angeben lassen(noch nicht, bis Control da ist),Studiengänge über StudiengangControl ziehen
+    private IntegerField matrikelnr = new IntegerField("Matrikelnummer");
+    private TextField studiengang = new TextField("Studiengang");
+
     private PasswordField passwort_bestätigen = new PasswordField("Passwort bestätigen");
 
     private Button abbrechen = new Button ("Abbrechen");
     private Button registrieren = new Button("Registrieren");
 
-    private Binder<UserDTO> binder = new Binder<>(UserDTO.class);
+    private Binder<UserDTO> userDTOBinder = new Binder<>(UserDTO.class);
+    private Binder<StudentDTO> studentDTOBinder = new Binder<>(StudentDTO.class);
+
     private UserDTO userDTO = new UserDTO();
+    private StudentDTO studentDTO = new StudentDTO();
 
     @Autowired
     RegistrationControl registrationControl;
 
-    public RegistrationView() {
+    public StudentRegistrationView() {
         addClassName("enter-car-view");
 
         add(createTitle());
         add(createFormLayout());
         add(createButtonLayout());
 
-        binder.setBean(userDTO);
-        binder.bindInstanceFields(this);
+        userDTOBinder.setBean(userDTO);
+        userDTOBinder.bindInstanceFields(this);
+
+        studentDTOBinder.setBean(studentDTO);
+        studentDTOBinder.bindInstanceFields(this);
 
         abbrechen.addClickListener(event -> clearForm());
 
@@ -69,16 +86,11 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
                         Notification.show("Passwörter stimmen nicht überein");
                         return;
                     }
-                    
-                    if (checkForJorgeEasterEgg()) {
-                        Notification.show("Nutzer nicht registriert");
-                        return;
-                    }
 
-                    if(binder.validate().isOk()) {
+                    if(userDTOBinder.validate().isOk()) {
                         userDTO.setPasswort(passwort);
                         try {
-                            registrationControl.registerUser(userDTO);
+                            registrationControl.registerStudent(userDTO, studentDTO);
                             Notification.show("Nutzer registriert!");
                             clearForm();
                             UI.getCurrent().navigate((Globals.Pages.LOGIN_VIEW));
@@ -91,33 +103,21 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
                 });
     }
 
-    private boolean checkForJorgeEasterEgg() {
-        boolean isEasterEgg = "3".equals(nutzername.getValue()) &&
-                "3".equals(email.getValue()) &&
-                "3".equals(vorname.getValue()) &&
-                "3".equals(nachname.getValue());
-
-        if (isEasterEgg) {
-            Dialog gifDialog = new Dialog();
-            gifDialog.setCloseOnOutsideClick(true);
-            gifDialog.setCloseOnEsc(true);
-
-            com.vaadin.flow.component.html.Image gif = new com.vaadin.flow.component.html.Image(
-                    "images/drei-jorge-gonzalez.gif", "Jorge Gonzalez");
-            gif.setWidth("300px");
-
-            gifDialog.add(gif);
-            gifDialog.open();
-            return true;
+    //TODO: umwandeln in loadStudiengang()
+    /*
+    private void loadBranchen() {
+        List<BrancheDTO> brancheDTOs = manageStartupControl.getBranches();
+        for (BrancheDTO dto : brancheDTOs) {
+            brancheMap.put(dto.getBezeichnung(), dto.getId());
         }
-        return false;
+        brancheComboBox.setItems(brancheMap.keySet());
     }
-
+     */
     // TODO: Echtzeitüberwachung E-Mail und Benutzername?
 
     private void clearForm() {
         userDTO = new UserDTO();
-        binder.setBean(userDTO);
+        userDTOBinder.setBean(userDTO);
         passwort.clear();
         passwort_bestätigen.clear();
     }
@@ -129,7 +129,7 @@ public class RegistrationView extends Div { // 3. Form (Spezialisierung / Vererb
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername,email, vorname, nachname, geburtsdatum, passwort, passwort_bestätigen);
+        formLayout.add(nutzername,email, vorname, nachname, geburtsdatum, matrikelnr, studiengang, passwort, passwort_bestätigen);
         return formLayout;
     }
 

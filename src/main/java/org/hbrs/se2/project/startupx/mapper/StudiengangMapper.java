@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StudiengangMapper {
 
-    public StudiengangDTO mapToDto(Studiengang studiengang) {
+    public static StudiengangDTO mapToDto(Studiengang studiengang) {
         if (studiengang == null) {
             return null;
         }

@@ -41,13 +41,13 @@ public class Student {
     @Column(name = "steckbrief", length = Integer.MAX_VALUE)
     private String steckbrief;
 
-    @OneToMany(mappedBy = "student")
+    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
     private Set<Bewerbung> bewerbungen = new LinkedHashSet<>();
 
-    @ManyToMany(mappedBy = "studentenListe")
+    @ManyToMany(mappedBy = "studentenListe", fetch = FetchType.EAGER)
     private Set<Startup> startups = new LinkedHashSet<>();
 
-    @ManyToMany(mappedBy = "students")
+    @ManyToMany(mappedBy = "students", fetch = FetchType.EAGER)
     private Set<Skill> skills = new LinkedHashSet<>();
 
 }

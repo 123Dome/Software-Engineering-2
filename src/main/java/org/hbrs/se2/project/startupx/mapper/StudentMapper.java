@@ -1,9 +1,7 @@
 package org.hbrs.se2.project.startupx.mapper;
 
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
-import org.hbrs.se2.project.startupx.entities.Skill;
-import org.hbrs.se2.project.startupx.entities.Startup;
-import org.hbrs.se2.project.startupx.entities.Student;
+import org.hbrs.se2.project.startupx.entities.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -43,5 +41,21 @@ public class StudentMapper {
                 .build();
 
         return studentDTO;
+    }
+
+    public static Student mapToStudent(StudentDTO studentDTO, Set<Bewerbung> bewerbungSet, Set<Skill> skillSet, Set<Startup> startupSet, User user, Studiengang studiengang) {
+        if (studentDTO == null) {
+            return null;
+        }
+
+        return Student.builder()
+                .user(user)
+                .bewerbungen(bewerbungSet)
+                .skills(skillSet)
+                .studiengang(studiengang)
+                .steckbrief(studentDTO.getSteckbrief())
+                .matrikelnr(studentDTO.getMatrikelnr())
+                .startups(startupSet)
+                .build();
     }
 }

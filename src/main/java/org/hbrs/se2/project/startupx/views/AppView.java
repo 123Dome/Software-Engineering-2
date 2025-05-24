@@ -289,10 +289,12 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         Class<? extends Component> target = (Class<? extends Component>) beforeEnterEvent.getNavigationTarget();
 
-        // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView navigiert wird
-        if (getCurrentUser() == null && !target.equals(RegistrationView.class)) {
+        // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView oder StudentRegistrationView navigiert wird
+        if (getCurrentUser() == null &&
+                !target.equals(RegistrationView.class) &&
+                !target.equals(StudentRegistrationView.class)) {
+
             beforeEnterEvent.rerouteTo(Globals.Pages.LOGIN_VIEW);
         }
-
     }
 }
