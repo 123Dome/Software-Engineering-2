@@ -41,7 +41,7 @@ public class CreateStartUpView extends Div {
 
     private final ManageStartupControl manageStartupControl;
 
-    //Textfelder anhand der Datenbank, muss evtl. noch genauer angepasst werden
+    //Textfelder anhand der Datenbank
     private TextField name = new TextField("Name des StartUps");
     private ComboBox<String> brancheComboBox = new ComboBox<>("Branche");
     private Map<String, Long> brancheMap = new HashMap<>();

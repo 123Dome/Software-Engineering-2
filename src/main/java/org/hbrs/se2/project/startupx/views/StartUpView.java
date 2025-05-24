@@ -2,14 +2,13 @@ package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -21,6 +20,7 @@ import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Route(value = "startup/:id", layout = AppView.class)
 @PageTitle("StartUp Details")
@@ -29,6 +29,8 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final ManageStartupControl manageStartupControl;
     private StartupDTO startup;
     private UserDTO currentUser;
+
+    private final Binder<StartupDTO> binder = new Binder<>(StartupDTO.class);
 
     private final VerticalLayout readOnlyLayout = new VerticalLayout();
     private final VerticalLayout editLayout = new VerticalLayout();
@@ -42,16 +44,34 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final DatePicker gruendungField = new DatePicker("Gründungsdatum");
     private final NumberField brancheField = new NumberField("Branche ID");
 
+    // Bild
+    private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
+
     public StartUpView(ManageStartupControl manageStartupControl) {
         this.manageStartupControl = manageStartupControl;
         addClassName("startup-details-view");
 
         bearbeitenButton.addClickListener(e -> switchToEditMode());
         speichernButton.addClickListener(e -> saveChanges());
+
+        binder.forField(nameField).asRequired("Name darf nicht leer sein").bind(StartupDTO::getName, StartupDTO::setName);
+        binder.forField(beschreibungField).bind(StartupDTO::getBeschreibung, StartupDTO::setBeschreibung);
+        binder.forField(mitarbeiterField).bind(
+                dto -> dto.getAnzahlMitarbeiter() != null ? dto.getAnzahlMitarbeiter().doubleValue() : null,
+                (dto, value) -> dto.setAnzahlMitarbeiter(value != null ? value.intValue() : null)
+        );
+        binder.forField(gruendungField).bind(StartupDTO::getGruendungsdatum, StartupDTO::setGruendungsdatum);
+        binder.forField(brancheField).bind(
+                dto -> dto.getBranche() != null ? dto.getBranche().doubleValue() : null,
+                (dto, value) -> dto.setBranche(value != null ? value.longValue() : null)
+        );
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        startupImage.setWidth("120px");
+        startupImage.setHeight("auto");
+
         String idString = event.getRouteParameters().get("id").orElse(null);
         if (idString != null) {
             try {
@@ -59,14 +79,13 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 this.startup = manageStartupControl.findByID(id);
                 this.currentUser = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
 
-                // Nur Gründer sehen den Bearbeiten-Button
                 boolean isGruender = startup.getStudentenListe() != null &&
                         currentUser != null &&
                         startup.getStudentenListe().contains(currentUser.getStudents());
 
-                add(readOnlyLayout);
                 readOnlyLayout.removeAll();
                 readOnlyLayout.add(createReadOnlyLayout());
+                add(readOnlyLayout);
 
                 if (isGruender) {
                     bearbeitenButton.setVisible(true);
@@ -81,24 +100,57 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
     private VerticalLayout createReadOnlyLayout() {
         VerticalLayout layout = new VerticalLayout();
+        layout.add(startupImage);
         layout.add(new H3(startup.getName()));
         layout.add(new Paragraph("Beschreibung: " + startup.getBeschreibung()));
-        layout.add(new Paragraph("Branche-ID: " + startup.getBranche()));
+        layout.add(new Paragraph("Branche: " + manageStartupControl.getBrancheNameById(startup.getBranche())));
         layout.add(new Paragraph("Gründungsdatum: " + startup.getGruendungsdatum()));
         layout.add(new Paragraph("Mitarbeiteranzahl: " + startup.getAnzahlMitarbeiter()));
+
+        List<Long> stellenanzeigen = startup.getStellenausschreibungen();
+        if (stellenanzeigen != null && !stellenanzeigen.isEmpty()) {
+            layout.add(new H3("Stellenanzeigen:"));
+            for (Long id : stellenanzeigen) {
+                layout.add(new Span("Anzeige ID: " + id));
+            }
+        }
+
         return layout;
     }
 
     private VerticalLayout createEditLayout() {
-        nameField.setValue(startup.getName() != null ? startup.getName() : "");
-        beschreibungField.setValue(startup.getBeschreibung() != null ? startup.getBeschreibung() : "");
-        mitarbeiterField.setValue(startup.getAnzahlMitarbeiter() != null ? startup.getAnzahlMitarbeiter().doubleValue() : 0);
-        gruendungField.setValue(startup.getGruendungsdatum());
-        brancheField.setValue(startup.getBranche() != null ? startup.getBranche().doubleValue() : 0);
+        //generisches Bild
+        Image editImage = new Image("images/startup_placeholder.png", "StartUp-Logo");
+        editImage.setWidth("120px");
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.add(new H3("StartUp bearbeiten"));
-        layout.add(nameField, beschreibungField, mitarbeiterField, gruendungField, brancheField, speichernButton);
+        //Branche als String
+        String branchenName = manageStartupControl.getBrancheNameById(startup.getBranche());
+        Paragraph branchenInfo = new Paragraph("Aktuelle Branche: " + branchenName);
+
+        // Stellenanzeigen
+        VerticalLayout stellenanzeigenLayout = new VerticalLayout();
+        stellenanzeigenLayout.add(new Paragraph("Stellenanzeigen:"));
+        if (startup.getStellenausschreibungen() != null && !startup.getStellenausschreibungen().isEmpty()) {
+            for (Long id : startup.getStellenausschreibungen()) {
+                stellenanzeigenLayout.add(new Span("- #" + id));
+            }
+        } else {
+            stellenanzeigenLayout.add(new Span("Keine Stellenanzeigen vorhanden."));
+        }
+
+        // Layout
+        VerticalLayout layout = new VerticalLayout(
+                new H3("StartUp bearbeiten"),
+                editImage,
+                branchenInfo,
+                nameField, beschreibungField, mitarbeiterField, gruendungField, brancheField,
+                stellenanzeigenLayout,
+                speichernButton
+        );
+
+        //Binder setzen
+        binder.setBean(startup);
+
         return layout;
     }
 
@@ -111,24 +163,22 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     }
 
     private void saveChanges() {
-        try {
-            startup.setName(nameField.getValue());
-            startup.setBeschreibung(beschreibungField.getValue());
-            startup.setAnzahlMitarbeiter(mitarbeiterField.getValue().intValue());
-            startup.setGruendungsdatum(gruendungField.getValue());
-            startup.setBranche(brancheField.getValue().longValue());
+        if (binder.validate().isOk()) {
+            try {
+                manageStartupControl.updateStartup(startup);
+                Notification.show("Änderungen gespeichert.");
 
-            manageStartupControl.updateStartup(startup);
-            Notification.show("Änderungen gespeichert.");
+                //Wechsel zurück zu Read only
+                remove(editLayout);
+                readOnlyLayout.removeAll();
+                readOnlyLayout.add(createReadOnlyLayout());
+                add(readOnlyLayout, bearbeitenButton);
 
-            // Zurück zur Leseansicht
-            remove(editLayout);
-            add(readOnlyLayout);
-            readOnlyLayout.removeAll();
-            readOnlyLayout.add(createReadOnlyLayout());
-            add(bearbeitenButton);
-        } catch (Exception e) {
-            Notification.show("Fehler beim Speichern: " + e.getMessage());
+            } catch (Exception e) {
+                Notification.show("Fehler beim Speichern: " + e.getMessage());
+            }
+        } else {
+            Notification.show("Bitte überprüfe deine Eingaben.");
         }
     }
 }

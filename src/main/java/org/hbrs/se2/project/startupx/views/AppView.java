@@ -203,13 +203,14 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
        Tab[] tabs = new Tab[]{ createTab( "Startseite", MainViewDashboard.class)
                , createTab( "Liste von StartUps", ShowAllStartUpsView.class)
                , createTab( "Jobbörse", JobListingView.class)
+               , createTab("StartUp erstellen", CreateStartUpView.class)
        };
 
        // Falls er Admin-Rechte hat, sollte der User auch Autos hinzufügen können
        // (Alternative: Verwendung der Methode 'isUserisAllowedToAccessThisFeature')
        if ( this.authorizationControl.isUserInRole( this.getCurrentUser() , Globals.Roles.ADMIN ) ) {
            System.out.println("User is Admin!");
-           tabs = Utils.append( tabs , createTab("StartUp erstellen", CreateStartUpView.class));
+           //tabs = Utils.append( tabs , createTab("StartUp erstellen", CreateStartUpView.class));
        }
 
        // ToDo für die Teams: Weitere Tabs aus ihrem Projekt hier einfügen!

@@ -25,4 +25,9 @@ public class StudiengangControl {
 
         return studiengangDTOS;
     }
+
+    public StudiengangDTO getById(Long id) {
+        Studiengang studiengang = studiengangRepository.findById(id).orElse(null);
+        return StudiengangMapper.mapToDto(studiengang);
+    }
 }

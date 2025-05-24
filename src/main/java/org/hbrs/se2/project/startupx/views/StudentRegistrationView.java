@@ -19,7 +19,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.control.RegistrationControl;
-import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
+import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.dtos.StudiengangDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
@@ -30,98 +31,79 @@ import java.util.List;
 @Route(value = "registrationStudent", layout = AppView.class)
 @PageTitle("RegistrationStudent")
 @CssImport("./styles/views/entercar/enter-car-view.css")
-public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung / Vererbung)
+public class StudentRegistrationView extends Div {
 
+    // Felder UserDTO
+    private final TextField nutzername = new TextField("Benutzername");
+    private final TextField email = new TextField("Email");
+    private final TextField vorname = new TextField("Vorname");
+    private final TextField nachname = new TextField("Nachname");
+    private final DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
+    private final PasswordField passwort = new PasswordField("Passwort");
+    private final PasswordField passwort_bestätigen = new PasswordField("Passwort bestätigen");
 
-    //Registrierungsformular UserDTO
-    private TextField nutzername = new TextField("Benutzername");
-    private TextField email = new TextField("Email");
-    private TextField vorname = new TextField("Vorname");
-    private TextField nachname = new TextField("Nachname");
+    // Felder StudentDTO
+    private final IntegerField matrikelnr = new IntegerField("Matrikelnummer");
+    private final ComboBox<StudiengangDTO> studiengang = new ComboBox<>("Studiengang");
 
-    private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
-    private PasswordField passwort = new PasswordField("Passwort");
+    // Buttons
+    private final Button abbrechen = new Button("Abbrechen");
+    private final Button registrieren = new Button("Registrieren");
 
-
-    //Registrierungsformular StudentDTO
-    //TODO: Steckbrief Textfeld, Skills angeben lassen(noch nicht, bis Control da ist),Studiengänge über StudiengangControl ziehen
-    private IntegerField matrikelnr = new IntegerField("Matrikelnummer");
-    private TextField studiengang = new TextField("Studiengang");
-
-    private PasswordField passwort_bestätigen = new PasswordField("Passwort bestätigen");
-
-    private Button abbrechen = new Button ("Abbrechen");
-    private Button registrieren = new Button("Registrieren");
-
-    private Binder<UserDTO> userDTOBinder = new Binder<>(UserDTO.class);
-    private Binder<StudentDTO> studentDTOBinder = new Binder<>(StudentDTO.class);
+    private final Binder<UserDTO> userDTOBinder = new Binder<>(UserDTO.class);
+    private final Binder<StudentDTO> studentDTOBinder = new Binder<>(StudentDTO.class);
 
     private UserDTO userDTO = new UserDTO();
     private StudentDTO studentDTO = new StudentDTO();
 
     @Autowired
-    RegistrationControl registrationControl;
+    private RegistrationControl registrationControl;
 
-    public StudentRegistrationView() {
+    @Autowired
+    private StudiengangControl studiengangControl;
+
+    public StudentRegistrationView(StudiengangControl studiengangControl, RegistrationControl registrationControl) {
+        this.studiengangControl = studiengangControl;
+        this.registrationControl = registrationControl;
         addClassName("enter-car-view");
+
+        // Setup Studiengang-ComboBox
+        configureStudiengangComboBox();
+
+        // Binder-Setup
+        userDTOBinder.setBean(userDTO);
+        userDTOBinder.bindInstanceFields(this);
+
+        studentDTOBinder.setBean(studentDTO);
+        studentDTOBinder.forField(matrikelnr)
+                .bind(StudentDTO::getMatrikelnr, StudentDTO::setMatrikelnr);
+
+        studentDTOBinder.forField(studiengang)
+                .withConverter(
+                        dto -> dto != null ? dto.getId() : null,
+                        id -> id != null ? studiengangControl.getById(id) : null
+                )
+                .bind(StudentDTO::getStudiengang, StudentDTO::setStudiengang);
+
 
         add(createTitle());
         add(createFormLayout());
         add(createButtonLayout());
 
-        userDTOBinder.setBean(userDTO);
-        userDTOBinder.bindInstanceFields(this);
+        // Listener
+        abbrechen.addClickListener(event -> {
+            clearForm();
+            UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
+        });
 
-        studentDTOBinder.setBean(studentDTO);
-        studentDTOBinder.bindInstanceFields(this);
-
-        abbrechen.addClickListener(event -> clearForm());
-
-        registrieren.addClickListener(
-                e -> {
-                    String passwort = this.passwort.getValue();
-                    String passwort_confirm = passwort_bestätigen.getValue();
-
-                    if(!passwort_confirm.equals(passwort)) {
-                        Notification.show("Passwörter stimmen nicht überein");
-                        return;
-                    }
-
-                    if(userDTOBinder.validate().isOk()) {
-                        userDTO.setPasswort(passwort);
-                        try {
-                            registrationControl.registerStudent(userDTO, studentDTO);
-                            Notification.show("Nutzer registriert!");
-                            clearForm();
-                            UI.getCurrent().navigate((Globals.Pages.LOGIN_VIEW));
-                        } catch (Exception ex) {
-                            Notification.show("Fehler:" + ex.getMessage());
-                        }
-                    } else {
-                        Notification.show("Überprüfe deine Eingaben");
-                    }
-                });
+        registrieren.addClickListener(e -> handleRegistration());
     }
 
-    //TODO: umwandeln in loadStudiengang()
-    /*
-    private void loadBranchen() {
-        List<BrancheDTO> brancheDTOs = manageStartupControl.getBranches();
-        for (BrancheDTO dto : brancheDTOs) {
-            brancheMap.put(dto.getBezeichnung(), dto.getId());
-        }
-        brancheComboBox.setItems(brancheMap.keySet());
+    private void configureStudiengangComboBox() {
+        List<StudiengangDTO> studiengangListe = studiengangControl.getAll();
+        studiengang.setItemLabelGenerator(StudiengangDTO::getStudiengang);
+        studiengang.setItems(studiengangListe);
     }
-     */
-    // TODO: Echtzeitüberwachung E-Mail und Benutzername?
-
-    private void clearForm() {
-        userDTO = new UserDTO();
-        userDTOBinder.setBean(userDTO);
-        passwort.clear();
-        passwort_bestätigen.clear();
-    }
-
 
     private Component createTitle() {
         return new H3("Student registration");
@@ -129,7 +111,8 @@ public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung /
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername,email, vorname, nachname, geburtsdatum, matrikelnr, studiengang, passwort, passwort_bestätigen);
+        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum,
+                matrikelnr, studiengang, passwort, passwort_bestätigen);
         return formLayout;
     }
 
@@ -137,8 +120,38 @@ public class StudentRegistrationView extends Div { // 3. Form (Spezialisierung /
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
         registrieren.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(registrieren);
-        buttonLayout.add(abbrechen);
+        buttonLayout.add(registrieren, abbrechen);
         return buttonLayout;
+    }
+
+    private void handleRegistration() {
+        if (!passwort.getValue().equals(passwort_bestätigen.getValue())) {
+            Notification.show("Passwörter stimmen nicht überein");
+            return;
+        }
+
+        if (userDTOBinder.validate().isOk() && studentDTOBinder.validate().isOk()) {
+            userDTO.setPasswort(passwort.getValue());
+            try {
+                registrationControl.registerStudent(userDTO, studentDTO);
+                Notification.show("Nutzer registriert!");
+                clearForm();
+                UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
+            } catch (Exception ex) {
+                Notification.show("Fehler: " + ex.getMessage());
+            }
+        } else {
+            Notification.show("Überprüfe deine Eingaben");
+        }
+    }
+
+    private void clearForm() {
+        userDTO = new UserDTO();
+        studentDTO = new StudentDTO();
+        userDTOBinder.setBean(userDTO);
+        studentDTOBinder.setBean(studentDTO);
+        passwort.clear();
+        passwort_bestätigen.clear();
+        studiengang.clear();
     }
 }
