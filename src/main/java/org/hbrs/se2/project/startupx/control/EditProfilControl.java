@@ -112,23 +112,22 @@ public class EditProfilControl {
             throw new IllegalArgumentException("Student konnte nicht gefunden werden.");
         }
 
-        /*
+
         Set<Skill> existingSkills = new LinkedHashSet<>();
         for (Long skill : newStudentDTO.getSkills()) {
             existingSkills.add(skillRepository.findById(skill).orElse(null));
         }
-         */
+
 
         Studiengang newStudiengang = studiengangRepository.findById(newStudentDTO.getStudiengang()).orElse(null);
 
-        //existingStudent.setSkills(existingSkills);
+        existingStudent.setSkills(existingSkills);
         existingStudent.setSteckbrief(newStudentDTO.getSteckbrief());
         existingStudent.setStudiengang(newStudiengang);
 
         try {
             studentRepository.save(existingStudent);
             System.out.println("Saving user: " + existingStudent);
-            System.out.println("Saving user: " + existingStudent.getSteckbrief());
             return true;
         } catch (Exception e) {
             throw new RuntimeException("Student konnte nicht gespeichert werden.");

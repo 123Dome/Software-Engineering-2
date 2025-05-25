@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -60,4 +61,21 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     private Set<Rolle> rollen = new LinkedHashSet<>();
 
+    @Override
+    public String toString() {
+        return "User: " + vorname +  " " + nachname + " ID: " + id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User that = (User) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

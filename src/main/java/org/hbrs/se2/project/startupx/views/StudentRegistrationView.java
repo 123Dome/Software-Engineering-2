@@ -5,6 +5,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -16,17 +17,22 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.selection.MultiSelect;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.control.RegistrationControl;
 import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.dtos.SkillDTO;
 import org.hbrs.se2.project.startupx.dtos.StudiengangDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.entities.Skill;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Route(value = "registrationStudent", layout = AppView.class)
 @PageTitle("RegistrationStudent")
@@ -45,6 +51,7 @@ public class StudentRegistrationView extends Div {
     // Felder StudentDTO
     private final IntegerField matrikelnr = new IntegerField("Matrikelnummer");
     private final ComboBox<StudiengangDTO> studiengang = new ComboBox<>("Studiengang");
+    private final MultiSelectComboBox<SkillDTO> skills = new MultiSelectComboBox<>("Skills");
 
     // Buttons
     private final Button abbrechen = new Button("Abbrechen");
@@ -67,10 +74,8 @@ public class StudentRegistrationView extends Div {
         this.registrationControl = registrationControl;
         addClassName("enter-car-view");
 
-        // Setup Studiengang-ComboBox
         configureStudiengangComboBox();
 
-        // Binder-Setup
         userDTOBinder.setBean(userDTO);
         userDTOBinder.bindInstanceFields(this);
 
@@ -85,6 +90,34 @@ public class StudentRegistrationView extends Div {
                 )
                 .bind(StudentDTO::getStudiengang, StudentDTO::setStudiengang);
 
+        List<SkillDTO> allSkills = studiengangControl.findAllSkills();
+
+        skills.setItemLabelGenerator(SkillDTO::getSkillName);
+        skills.setItems(allSkills); // Alle Skills aus der DB laden
+
+        studentDTOBinder.forField(skills)
+                .withConverter(
+                        (Set<SkillDTO> selectedSkills) -> {
+                            if (selectedSkills == null || selectedSkills.isEmpty()) {
+                                return Set.of();
+                            }
+                            return selectedSkills.stream()
+                                    .map(SkillDTO::getId)
+                                    .collect(Collectors.toSet());
+                        },
+                        (Set<Long> skillIds) -> {
+                            if (skillIds == null || skillIds.isEmpty()) {
+                                return Set.of();
+                            }
+                            return allSkills.stream()
+                                    .filter(skill -> skillIds.contains(skill.getId()))
+                                    .collect(Collectors.toSet());
+                        }
+                )
+                .bind(StudentDTO::getSkills, StudentDTO::setSkills);
+
+        skills.setHeight("auto");
+        skills.setWidth("auto");
 
         add(createTitle());
         add(createFormLayout());
@@ -112,7 +145,7 @@ public class StudentRegistrationView extends Div {
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
         formLayout.add(nutzername, email, vorname, nachname, geburtsdatum,
-                matrikelnr, studiengang, passwort, passwort_bestätigen);
+                matrikelnr, studiengang, skills, passwort, passwort_bestätigen);
         return formLayout;
     }
 

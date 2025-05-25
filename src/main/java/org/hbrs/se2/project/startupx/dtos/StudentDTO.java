@@ -17,7 +17,7 @@ public class StudentDTO {
     private Integer matrikelnr;
     private Long studiengang;
     private String steckbrief;
-    private List<Long> skills;
+    private Set<Long> skills;
     private Set<Long> startups;
     private Set<Long> bewerbungen;
 }
