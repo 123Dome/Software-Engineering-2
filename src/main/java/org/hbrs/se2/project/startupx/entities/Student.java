@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -47,7 +48,27 @@ public class Student {
     @ManyToMany(mappedBy = "studentenListe", fetch = FetchType.EAGER)
     private Set<Startup> startups = new LinkedHashSet<>();
 
-    @ManyToMany(mappedBy = "students", fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "student_zu_skill", schema = "startupx",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new LinkedHashSet<>();
 
+    @Override
+    public String toString() {
+        return "Student mit Matrikelnummer: " + matrikelnr +  " ID: " + id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student that = (Student) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

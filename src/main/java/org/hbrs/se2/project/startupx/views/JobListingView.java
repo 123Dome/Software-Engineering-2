@@ -34,17 +34,31 @@ public class JobListingView extends Div{
         add(createButtonLayout());
     }
 
-
     private Component createTitle() {
         return new H3("Jobbörse");
     }
 
-    //Erstellen der Tabelle
     private Grid setUpGrid() {
         List<StartupDTO> startups = manageStartupControl.findByHavingAnyStellenausschreibungJoin();
-        Grid<StartupDTO> grid = new Grid<>(StartupDTO.class);
+        Grid<StartupDTO> grid = new Grid<>(StartupDTO.class, false); //keine automatische Spalten generieren
         grid.setItems(startups);
 
+        grid.addColumn(StartupDTO::getName).setHeader("Name");
+        grid.addColumn(StartupDTO::getBeschreibung).setHeader("Beschreibung");
+        grid.addColumn(StartupDTO::getGruendungsdatum).setHeader("Gründungsdatum");
+        grid.addColumn(StartupDTO::getAnzahlMitarbeiter).setHeader("Mitarbeiterzahl");
+
+        //Name der Branche
+        grid.addColumn(startup -> manageStartupControl.getBrancheNameById(startup.getBranche()))
+                .setHeader("Branche");
+
+        //Anzahl der Stellenausschreibungen
+        grid.addColumn(startup -> startup.getStellenausschreibungen() != null
+                        ? startup.getStellenausschreibungen().size()
+                        : 0)
+                .setHeader("Stellenanzeigen");
+
+        //Weiterleitung bei Click
         grid.asSingleSelect().addValueChangeListener(event -> {
             StartupDTO selected = event.getValue();
             if (selected != null) {
@@ -57,12 +71,10 @@ public class JobListingView extends Div{
         return grid;
     }
 
-
     private Component createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
         register.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(register);
         buttonLayout.add(register);
         return buttonLayout;
     }

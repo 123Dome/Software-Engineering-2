@@ -92,7 +92,7 @@ public class ManageStartupControl {
 
     public List<StartupDTO> findByHavingAnyStellenausschreibungJoin() {
 
-        List<Startup> startupList = startupRepository.findByHavingAnyStellenausschreibungJoin();
+        List<Startup> startupList = startupRepository.findByStellenausschreibungenIsNotEmpty();
 
         List<StartupDTO> startupDTOList = new ArrayList<>();
 
@@ -206,6 +206,13 @@ public class ManageStartupControl {
         return startupRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Startup mit der " + id + " nicht gefunden."));
     }
+
+    public String getBrancheNameById(Long id) {
+        return brancheRepository.findById(id)
+                .map(Branche::getBezeichnung)
+                .orElse("Unbekannt");
+    }
+
 }
 
 //    public List<StartupDTO> findByBranche(BrancheDTO brancheDTO) {

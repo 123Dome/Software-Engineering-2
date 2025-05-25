@@ -1,8 +1,12 @@
 package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -10,85 +14,166 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.control.EditProfilControl;
+import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.dtos.SkillDTO;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
+import org.hbrs.se2.project.startupx.dtos.StudiengangDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Route(value = "EditProfile", layout = AppView.class)
 @PageTitle("Profil bearbeiten")
 @CssImport("./styles/views/entercar/enter-car-view.css")
-public class EditProfileView extends Div{
+public class EditProfileView extends Div {
+
     @Autowired
     private EditProfilControl editProfilControl;
 
-    private TextField nutzername = new TextField("Benutzername");
-    private TextField email = new TextField("Email");
-    private TextField vorname = new TextField("Vorname");
-    private TextField nachname = new TextField("Nachname");
+    @Autowired
+    private StudiengangControl studiengangControl;
 
-    private DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
+    private final TextField nutzername = new TextField("Benutzername");
+    private final TextField email = new TextField("Email");
+    private final TextField vorname = new TextField("Vorname");
+    private final TextField nachname = new TextField("Nachname");
+    private final DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
+    private final TextArea steckbrief = new TextArea("Steckbrief");
+    private final ComboBox<StudiengangDTO> studiengang = new ComboBox<>("Studiengang");
+    private final MultiSelectComboBox<SkillDTO> skills = new MultiSelectComboBox<>("Skills");
+
+    private final Binder<UserDTO> userDTOBinder = new Binder<>(UserDTO.class);
+    private final Binder<StudentDTO> studentDTOBinder = new Binder<>(StudentDTO.class);
+
+    //private TextField matrikelnr = new TextField("Matrikelnummer");
 
     //TODO: Daten des Users müssen abgerufen werden und editierbar sein, danach zurückgeschrieben werden
-    public EditProfileView() {
-        addClassName("enter-car-view");
+    public EditProfileView(EditProfilControl editProfilControl, StudiengangControl studiengangControl) {
+        this.editProfilControl = editProfilControl;
+        this.studiengangControl = studiengangControl;
+        addClassName("edit-profile-view");
 
         UserDTO userDTO = (UserDTO) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
+        StudentDTO studentDTO = editProfilControl.getStudentDTO(userDTO);
 
-        add(createTitle());
-        setTextFieldWithUserData(userDTO);
-        add(createFormLayout());
-        add(createSaveButton(userDTO));
-        Button changePasswordButton = new Button("Passwort ändern");
-        Dialog passwordDialog = createPasswordDialog(userDTO);
-        changePasswordButton.addClickListener(e -> passwordDialog.open());
+        configureStudiengangComboBox(studentDTO);
 
-        add(changePasswordButton, passwordDialog);
+        userDTOBinder.bindInstanceFields(this);
+        studentDTOBinder.forField(steckbrief).bind(StudentDTO::getSteckbrief, StudentDTO::setSteckbrief);
+        studentDTOBinder.forField(studiengang)
+                .withConverter(
+                        sgDto -> sgDto != null ? sgDto.getId() : null,
+                        id -> id != null ? studiengangControl.getById(id) : null
+                )
+                .bind(StudentDTO::getStudiengang, StudentDTO::setStudiengang);
+
+        userDTOBinder.setBean(userDTO);
+        studentDTOBinder.setBean(studentDTO);
+
+        List<SkillDTO> allSkills = studiengangControl.findAllSkills();
+
+        skills.setItemLabelGenerator(SkillDTO::getSkillName);
+        skills.setItems(allSkills);
+
+        studentDTOBinder.forField(skills)
+                .withConverter(
+                        (Set<SkillDTO> selectedSkills) -> {
+                            if (selectedSkills == null || selectedSkills.isEmpty()) {
+                                return Set.of();
+                            }
+                            return selectedSkills.stream()
+                                    .map(SkillDTO::getId)
+                                    .collect(Collectors.toSet());
+                        },
+                        (Set<Long> skillIds) -> {
+                            if (skillIds == null || skillIds.isEmpty()) {
+                                return Set.of();
+                            }
+                            return allSkills.stream()
+                                    .filter(skill -> skillIds.contains(skill.getId()))
+                                    .collect(Collectors.toSet());
+                        }
+                )
+                .bind(StudentDTO::getSkills, StudentDTO::setSkills);
+
+        skills.setHeight("auto");
+        skills.setWidth("auto");
+
+        VerticalLayout container = new VerticalLayout();
+        container.setPadding(true);
+        container.setSpacing(true);
+        container.setWidthFull();
+        container.setAlignItems(FlexComponent.Alignment.START);
+
+        container.add(createTitle());
+        container.add(createFormLayout());
+        container.add(createButtonRow(userDTO, studentDTO));
+
+        add(container);
     }
 
     private Component createTitle() {
-        return new H3("Profil bearbeiten");
+        H3 title = new H3("Profil bearbeiten");
+        title.getStyle().set("margin-bottom", "1rem");
+        return title;
     }
 
-    private void setTextFieldWithUserData(UserDTO userDTO){
-        nutzername.setValue(userDTO.getNutzername());
-        email.setValue(userDTO.getEmail());
-        vorname.setValue(userDTO.getVorname());
-        nachname.setValue(userDTO.getNachname());
-        geburtsdatum.setValue(userDTO.getGeburtsdatum());
+    private void configureStudiengangComboBox(StudentDTO studentDTO) {
+        List<StudiengangDTO> alleSG = studiengangControl.getAll();
+        studiengang.setItemLabelGenerator(StudiengangDTO::getStudiengang);
+        studiengang.setItems(alleSG);
+        studiengang.setValue(
+                alleSG.stream()
+                        .filter(sg -> sg.getId().equals(studentDTO.getStudiengang()))
+                        .findFirst()
+                        .orElse(null)
+        );
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum);
+        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum, skills, studiengang, steckbrief);
+        formLayout.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("500px", 2)
+        );
+        formLayout.setWidthFull();
         return formLayout;
     }
 
-    private Button createSaveButton (UserDTO userDTO) {
-        Button saveButton = new Button("Änderungen speichern", e -> {
-            if(checkTextfields()){
-                UserDTO newUserDTO = new UserDTO();
-                newUserDTO.setId(userDTO.getId());
-                newUserDTO.setRollen(userDTO.getRollen());
-                newUserDTO.setNutzername(nutzername.getValue());
-                newUserDTO.setEmail(email.getValue());
-                newUserDTO.setVorname(vorname.getValue());
-                newUserDTO.setNachname(nachname.getValue());
-                newUserDTO.setGeburtsdatum(geburtsdatum.getValue());
-                newUserDTO.setPasswort(userDTO.getPasswort());
-                if(editProfilControl.updateUser(newUserDTO)){
+    private Component createButtonRow(UserDTO userDTO, StudentDTO studentDTO) {
+        Button save = new Button("Änderungen speichern", e -> {
+            if (checkTextfields()) {
+                if (editProfilControl.updateStudent(userDTO, studentDTO)) {
                     Notification.show("Profil aktualisiert");
                 }
             }
-            // TODO: Fehlerausgabe
         });
-        return saveButton;
+
+        Button changePassword = new Button("Passwort ändern");
+        Dialog passwordDialog = createPasswordDialog(userDTO);
+        changePassword.addClickListener(e -> passwordDialog.open());
+
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        changePassword.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        HorizontalLayout buttons = new HorizontalLayout(save, changePassword);
+        buttons.setSpacing(true);
+        return new VerticalLayout(buttons, passwordDialog);
     }
 
     private Dialog createPasswordDialog(UserDTO userDTO) {
@@ -101,7 +186,6 @@ public class EditProfileView extends Div{
 
         VerticalLayout layout = new VerticalLayout(currentPassword, newPassword, confirmPassword);
         layout.setSpacing(true);
-        layout.setPadding(false);
 
         Button save = new Button("Speichern", event -> {
             if (!newPassword.getValue().equals(confirmPassword.getValue())) {
@@ -113,7 +197,6 @@ public class EditProfileView extends Div{
                 return;
             }
 
-            // Du kannst hier deinen EditProfilControl nutzen:
             boolean success = editProfilControl.updatePassword(userDTO.getId(), currentPassword.getValue(), newPassword.getValue());
             if (success) {
                 Notification.show("Passwort erfolgreich geändert");
@@ -124,34 +207,19 @@ public class EditProfileView extends Div{
         });
 
         Button cancel = new Button("Abbrechen", event -> dialog.close());
-
         HorizontalLayout buttons = new HorizontalLayout(save, cancel);
         dialog.getFooter().add(buttons);
         dialog.add(layout);
-
         return dialog;
     }
 
-
-    private boolean checkTextfields(){
-        // TODO: Eigene Exceptionklasse erstellen
-        if(nutzername.getValue() == null || nutzername.getValue().isEmpty()){
-            throw new IllegalArgumentException("Nutzername darf nicht leer sein");
-        }
-        if(email.getValue() == null || email.getValue().isEmpty()){
-            // TODO: Prüfung auf richtiges E-Mail Format
-            throw new IllegalArgumentException("Email darf nicht leer sein");
-        }
-        if(vorname.getValue() == null || vorname.getValue().isEmpty()){
-            throw new IllegalArgumentException("Vorname darf nicht leer sein");
-        }
-        if(nachname.getValue() == null || nachname.getValue().isEmpty()){
-            throw new IllegalArgumentException("Nachname darf nicht leer sein");
-        }
-        if(geburtsdatum.getValue() == null){
-            throw new IllegalArgumentException("Geburtsdatum darf nicht leer sein");
-        }
+    private boolean checkTextfields() {
+        if (nutzername.isEmpty()) throw new IllegalArgumentException("Nutzername darf nicht leer sein");
+        if (email.isEmpty()) throw new IllegalArgumentException("Email darf nicht leer sein");
+        if (vorname.isEmpty()) throw new IllegalArgumentException("Vorname darf nicht leer sein");
+        if (nachname.isEmpty()) throw new IllegalArgumentException("Nachname darf nicht leer sein");
+        if (geburtsdatum.isEmpty()) throw new IllegalArgumentException("Geburtsdatum darf nicht leer sein");
+        if (studiengang.isEmpty()) throw new IllegalArgumentException("Es muss ein Studiengang ausgewählt sein");
         return true;
     }
-
 }

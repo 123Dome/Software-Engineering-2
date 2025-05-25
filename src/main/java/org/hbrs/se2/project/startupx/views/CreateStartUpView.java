@@ -21,6 +21,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.PostConstruct;
+import org.hbrs.se2.project.startupx.control.EditProfilControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
@@ -41,7 +42,7 @@ public class CreateStartUpView extends Div {
 
     private final ManageStartupControl manageStartupControl;
 
-    //Textfelder anhand der Datenbank, muss evtl. noch genauer angepasst werden
+    //Textfelder anhand der Datenbank
     private TextField name = new TextField("Name des StartUps");
     private ComboBox<String> brancheComboBox = new ComboBox<>("Branche");
     private Map<String, Long> brancheMap = new HashMap<>();
@@ -56,7 +57,7 @@ public class CreateStartUpView extends Div {
 
     private Binder<StartupDTO> binder = new Binder<>(StartupDTO.class);
 
-    public CreateStartUpView(ManageStartupControl manageStartupControl) {
+    public CreateStartUpView(ManageStartupControl manageStartupControl, EditProfilControl editProfilControl) {
         this.manageStartupControl = manageStartupControl;
         configureFields();
         loadBranchen();
@@ -66,9 +67,11 @@ public class CreateStartUpView extends Div {
 
         UserDTO userDTO = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
 
+        StudentDTO studentFromUser = editProfilControl.getStudentDTO(userDTO);
+
 
         Set<Long> studentenids = new LinkedHashSet<>();
-        studentenids.add(userDTO.getId());
+        studentenids.add(studentFromUser.getId());
         startupDTO.setGruendungsdatum(heute);
         //Testfall
         startupDTO.setStudentenListe(studentenids);

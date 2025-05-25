@@ -15,13 +15,13 @@ public class StudentMapper {
             return null;
         }
 
-        List<Long> skillIds = new ArrayList<>();
+        Set<Long> skillIds = new LinkedHashSet<>();
         Set<Long> startupIds = new LinkedHashSet<>();
 
         if (student.getSkills() != null) {
             skillIds = student.getSkills().stream()
                     .map(Skill::getId)
-                    .toList();
+                    .collect(Collectors.toSet());
         }
 
         if (student.getStartups() != null) {

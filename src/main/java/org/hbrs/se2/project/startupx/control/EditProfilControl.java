@@ -1,21 +1,40 @@
 package org.hbrs.se2.project.startupx.control;
 
 import jakarta.transaction.Transactional;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.entities.Skill;
+import org.hbrs.se2.project.startupx.entities.Student;
+import org.hbrs.se2.project.startupx.entities.Studiengang;
 import org.hbrs.se2.project.startupx.entities.User;
+import org.hbrs.se2.project.startupx.mapper.StudentMapper;
 import org.hbrs.se2.project.startupx.mapper.UserMapper;
+import org.hbrs.se2.project.startupx.repository.SkillRepository;
+import org.hbrs.se2.project.startupx.repository.StudentRepository;
+import org.hbrs.se2.project.startupx.repository.StudiengangRepository;
 import org.hbrs.se2.project.startupx.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class EditProfilControl {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    StudiengangRepository studiengangRepository;
+
+    @Autowired
+    SkillRepository skillRepository;
+
+    @Autowired
+    StudentRepository studentRepository;
 
     public User loadUser(UserDTO dto) {
         if (dto == null) {
@@ -81,5 +100,42 @@ public class EditProfilControl {
             return true;
         }
         return false; // kein User gefunden
+    }
+
+    @Transactional
+    public boolean updateStudent(UserDTO newUserDTO, StudentDTO newStudentDTO) {
+        if (!updateUser(newUserDTO)) {
+            return false;
+        }
+        Student existingStudent = studentRepository.findById(newStudentDTO.getId()).orElse(null);
+        if (existingStudent == null) {
+            throw new IllegalArgumentException("Student konnte nicht gefunden werden.");
+        }
+
+
+        Set<Skill> existingSkills = new LinkedHashSet<>();
+        for (Long skill : newStudentDTO.getSkills()) {
+            existingSkills.add(skillRepository.findById(skill).orElse(null));
+        }
+
+
+        Studiengang newStudiengang = studiengangRepository.findById(newStudentDTO.getStudiengang()).orElse(null);
+
+        existingStudent.setSkills(existingSkills);
+        existingStudent.setSteckbrief(newStudentDTO.getSteckbrief());
+        existingStudent.setStudiengang(newStudiengang);
+
+        try {
+            studentRepository.save(existingStudent);
+            System.out.println("Saving user: " + existingStudent);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Student konnte nicht gespeichert werden.");
+        }
+    }
+
+    public StudentDTO getStudentDTO(UserDTO userDTO) {
+        Student existingStudent = studentRepository.findById(userDTO.getStudents()).orElse(null);
+        return StudentMapper.mapToStudentDto(existingStudent);
     }
 }

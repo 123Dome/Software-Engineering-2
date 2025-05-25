@@ -28,6 +28,8 @@ public class ShowAllStartUpsView extends Div{
 
     private final ManageStartupControl manageStartupControl;
 
+    private String brancheName;
+
     public ShowAllStartUpsView(ManageStartupControl manageStartupControl) {
         this.manageStartupControl = manageStartupControl;
         add(createTitle());
@@ -44,8 +46,16 @@ public class ShowAllStartUpsView extends Div{
     private Grid setUpGrid() {
         //Soll zukünftig alle StartUps listen
         List<StartupDTO> startups = manageStartupControl.findAll();
-        Grid<StartupDTO> grid = new Grid<>(StartupDTO.class);
+        Grid<StartupDTO> grid = new Grid<>(StartupDTO.class, false); //keine automatsiche Erstellung von Spalten
         grid.setItems(startups);
+
+        grid.addColumn(StartupDTO::getName).setHeader("Name");
+        grid.addColumn(StartupDTO::getBeschreibung).setHeader("Beschreibung");
+        grid.addColumn(StartupDTO::getGruendungsdatum).setHeader("Gründungsdatum");
+        grid.addColumn(StartupDTO::getAnzahlMitarbeiter).setHeader("Mitarbeiterzahl");
+
+        grid.addColumn(dto -> manageStartupControl.getBrancheNameById(dto.getBranche()))
+                .setHeader("Branche");
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             StartupDTO selected = event.getValue();

@@ -32,7 +32,7 @@ public class MainView extends VerticalLayout {
     @Autowired
     private LoginControl loginControl;
 
-    Notification notification =new Notification("Registrierung von Studenten noch nicht fertig. Kommt noch :)");
+    //Notification notification =new Notification("Registrierung von Studenten noch nicht fertig. Kommt noch :)");
 
     public MainView() {
         setSizeFull();
@@ -67,13 +67,13 @@ public class MainView extends VerticalLayout {
         );
 
         //TODO: Wenn StudentRegistration fertig ist, soll er zur StudentRegistrationView navigieren
-        Button registerStudentButton = new Button("Zur Registrierung von Studenten", event -> {
-            UI.getCurrent().navigate(RegistrationView.class);
-                    notification.open();
-            }
+        Button registerStudentButton = new Button("Zur Registrierung von Studenten", event ->
+            UI.getCurrent().navigate(StudentRegistrationView.class)
         );
 
-        add(component, registerButton, registerStudentButton);
+        add(component, registerStudentButton
+                //,registerButton
+        );
 
         this.setAlignItems( Alignment.CENTER );
     }

@@ -1,16 +1,15 @@
 package org.hbrs.se2.project.startupx.control;
 
+import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.control.exception.RegistrationException;
 import org.hbrs.se2.project.startupx.dtos.RolleDTO;
+import org.hbrs.se2.project.startupx.dtos.SkillDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.*;
 import org.hbrs.se2.project.startupx.mapper.StudentMapper;
 import org.hbrs.se2.project.startupx.mapper.UserMapper;
-import org.hbrs.se2.project.startupx.repository.RolleRepository;
-import org.hbrs.se2.project.startupx.repository.StudentRepository;
-import org.hbrs.se2.project.startupx.repository.StudiengangRepository;
-import org.hbrs.se2.project.startupx.repository.UserRepository;
+import org.hbrs.se2.project.startupx.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Service
+@Transactional
 public class RegistrationControl {
 
     @Autowired
@@ -30,6 +30,8 @@ public class RegistrationControl {
 
     @Autowired
     private StudentRepository studentRepository;
+    @Autowired
+    private SkillRepository skillRepository;
 
     public User registerUser(UserDTO userDTO) {
         // E-Mail darf nicht existieren
@@ -62,6 +64,7 @@ public class RegistrationControl {
         return userRepository.save(newUser);
     }
 
+    @Transactional
     public void registerStudent(UserDTO userDTO, StudentDTO studentDTO) {
         // E-Mail darf nicht existieren
         User newUser = registerUser(userDTO);
@@ -72,6 +75,12 @@ public class RegistrationControl {
 
         Set<Bewerbung> bewerbungSet = new LinkedHashSet<>();
         Set<Skill> skillSet = new LinkedHashSet<>();
+        for (Long skillId : studentDTO.getSkills()) {
+            Skill skill = skillRepository.findById(skillId)
+                    .orElseThrow(() -> new IllegalArgumentException("Skill mit ID " + skillId + " nicht gefunden"));
+            skillSet.add(skill);
+        }
+
         Studiengang studiengang = studiengangRepository.getReferenceById(studentDTO.getStudiengang());
         Set<Startup> startupSet = new LinkedHashSet<>();
 

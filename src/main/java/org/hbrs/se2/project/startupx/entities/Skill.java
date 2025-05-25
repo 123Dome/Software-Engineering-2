@@ -25,17 +25,13 @@ public class Skill {
     @Column(name = "skill_name", nullable = false)
     private String skillName;
 
-    @ManyToMany
-    @JoinTable(name = "ausschreibung_zu_skill",
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "ausschreibung_zu_skill", schema = "startupx",
             joinColumns = @JoinColumn(name = "skill_id"),
             inverseJoinColumns = @JoinColumn(name = "stellenausschreibung_id"))
     private List<Stellenausschreibung> stellenausschreibungen = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(name = "student_zu_skill",
-            schema = "startupx",
-            joinColumns = @JoinColumn(name = "skill_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id"))
+    @ManyToMany(mappedBy = "skills", fetch = FetchType.EAGER)
     private Set<Student> students = new LinkedHashSet<>();
 
 
