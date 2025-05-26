@@ -4,17 +4,12 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.LoginForm;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import org.hbrs.se2.project.startupx.control.LoginControl;
-import org.hbrs.se2.project.startupx.control.exception.DatabaseUserException;
+import org.hbrs.se2.project.startupx.control.exception.LoginException;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +37,11 @@ public class MainView extends VerticalLayout {
 
             boolean isAuthenticated = false;
             try {
-                isAuthenticated = loginControl.authentificate( e.getUsername() , e.getPassword() );
+                isAuthenticated = loginControl.authenticate( e.getUsername() , e.getPassword() );
 
-            } catch (DatabaseUserException databaseException) {
+            } catch (LoginException loginException) {
                 Dialog dialog = new Dialog();
-                dialog.add( new Text( databaseException.getReason()) );
+                dialog.add( new Text( loginException.getMessage()) );
                 dialog.setWidth("400px");
                 dialog.setHeight("150px");
                 dialog.open();

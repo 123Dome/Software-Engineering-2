@@ -23,7 +23,6 @@ import com.vaadin.flow.router.*;
 import org.hbrs.se2.project.startupx.control.AuthorizationControl;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
-import org.hbrs.se2.project.startupx.util.Utils;
 
 import java.util.Optional;
 

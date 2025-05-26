@@ -1,7 +1,7 @@
 package org.hbrs.se2.project.startupx.control;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.hbrs.se2.project.startupx.control.exception.StartUpException;
 import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
@@ -53,9 +53,9 @@ public class ManageStartupControl {
             try {
                 //TODO ggf. anpassen: Repository ersetzen durch einen "User/Studenten-Control"?
                 studentList.add(studentRepository.findById(studentIds)
-                        .orElseThrow(() -> new EntityNotFoundException("Student mit der ID " + studentIds + " nicht gefunden")));
-            } catch (EntityNotFoundException e) {
-                logger.warn("Student mit der ID " + studentIds + " nicht gefunden");
+                        .orElseThrow(() -> new StartUpException("Student mit der ID " + studentIds + " nicht gefunden")));
+            } catch (StartUpException e) {
+                logger.warn(e.getMessage());
             }
         }
 
@@ -65,7 +65,7 @@ public class ManageStartupControl {
 
         Startup savedStartup = startupRepository.save(startup);
 
-        logger.info("Startup gegründet: " + savedStartup);
+        logger.info("Startup gegründet: {}", savedStartup);
         return StartupMapper.mapToStartupDto(savedStartup);
     }
 
@@ -86,7 +86,8 @@ public class ManageStartupControl {
         if (startup.isPresent()) {
             return StartupMapper.mapToStartupDto(startup.get());
         }
-        throw new RuntimeException("Fehler, kein StartUp gefunden.");
+        logger.error("Startup mit ID {} nicht gefunden.", id);
+        throw new StartUpException("Startup mit der ID " + id + " wurde nicht gefunden.");
     }
 
 
@@ -164,16 +165,16 @@ public class ManageStartupControl {
 
     @Transactional
     public boolean deleteStartup(StartupDTO startupDTO) {
-
         try {
             startupRepository.deleteById(startupDTO.getId());
-            logger.info("Startup: " + startupDTO + " gelöscht");
+            logger.info("Startup gelöscht: {}", startupDTO);
             return true;
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            return false;
+            logger.error("Fehler beim Löschen des Startups mit ID {}: {}", startupDTO.getId(), e.getMessage());
+            throw new StartUpException("Startup konnte nicht gelöscht werden.", e);
         }
     }
+
 
     @Transactional
     public BrancheDTO createBranche(BrancheDTO brancheDTO) {
@@ -182,13 +183,16 @@ public class ManageStartupControl {
 
         Branche savedBranche = brancheRepository.save(newBranche);
 
-        logger.info("Branche mit der Bezeichnunung " + savedBranche.getStartups() + " erstellt.");
+        logger.info("Branche mit der Bezeichnung {} erstellt.", savedBranche.getStartups());
         return BrancheMapper.mapToBrancheDto(savedBranche);
     }
 
     public Branche getBrancheById(Long id) {
         return brancheRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Branche mit der " + id + " nicht gefunden."));
+                .orElseThrow(() -> {
+                    logger.error("Branche mit ID {} nicht gefunden.", id);
+                    return new StartUpException("Branche mit der " + id + " nicht gefunden.");
+                });
     }
 
     public List<BrancheDTO> getBranches() {
@@ -204,7 +208,10 @@ public class ManageStartupControl {
 
     private Startup getStartupById(Long id) {
         return startupRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Startup mit der " + id + " nicht gefunden."));
+                .orElseThrow(() -> {
+                    logger.error("Startup mit ID {} nicht gefunden.", id);
+                    return new StartUpException("Startup mit der ID " + id + " wurde nicht gefunden.");
+                });
     }
 
     public String getBrancheNameById(Long id) {

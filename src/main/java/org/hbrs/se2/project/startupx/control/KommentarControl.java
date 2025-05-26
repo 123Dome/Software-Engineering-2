@@ -1,7 +1,7 @@
 package org.hbrs.se2.project.startupx.control;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.hbrs.se2.project.startupx.control.exception.KommentarException;
 import org.hbrs.se2.project.startupx.dtos.KommentarDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.entities.Kommentar;
@@ -28,7 +28,7 @@ import java.util.List;
 @Component
 public class KommentarControl {
 
-    private static Logger logger = LoggerFactory.getLogger(KommentarControl.class);
+    private static final Logger logger = LoggerFactory.getLogger(KommentarControl.class);
 
     @Autowired
     private KommentarRepository kommentarRepository;
@@ -41,57 +41,59 @@ public class KommentarControl {
 
     @Transactional
     public KommentarDTO createKommentar(KommentarDTO kommentarDTO) {
+        User user = userRepository.findById(kommentarDTO.getUser()).orElse(null);
+        if (user == null) {
+            logger.error("Kommentar konnte nicht erstellt werden: Nutzer mit ID {} nicht gefunden", kommentarDTO.getUser());
+            throw new KommentarException("Nutzer nicht gefunden.");
+        }
 
-        User user = userRepository.findById(kommentarDTO.getUser())
-                .orElseThrow(() -> new EntityNotFoundException("Branche " + kommentarDTO.getUser() + " not found"));
-
-        Startup startup = startupRepository.findById(kommentarDTO.getStartup())
-                .orElseThrow(() -> new EntityNotFoundException("Startup " + kommentarDTO.getStartup() + " not found"));
+        Startup startup = startupRepository.findById(kommentarDTO.getStartup()).orElse(null);
+        if (startup == null) {
+            logger.error("Kommentar konnte nicht erstellt werden: Startup mit ID {} nicht gefunden", kommentarDTO.getStartup());
+            throw new KommentarException("Startup nicht gefunden.");
+        }
 
         Kommentar neuesKommentar = KommentarMapper.mapToKommentar(kommentarDTO, user, startup);
-
         Kommentar savedKommentar = kommentarRepository.save(neuesKommentar);
-
-        logger.info("Kommentar " + neuesKommentar.getId() + " erstellt");
+        logger.info("Kommentar {} erstellt", savedKommentar.getId());
         return KommentarMapper.mapToKommentarDto(savedKommentar);
     }
 
     public List<KommentarDTO> getAllKommentarZuStartup(StartupDTO startupDTO) {
-
         List<Kommentar> kommentarList = kommentarRepository.findByStartup_id(startupDTO.getId());
-
         List<KommentarDTO> kommentarDTOList = new ArrayList<>();
 
         for(Kommentar kommentar : kommentarList) {
             kommentarDTOList.add(KommentarMapper.mapToKommentarDto(kommentar));
         }
 
-        logger.info("Kommentare zu Startup: " + startupDTO.getName() + " erstellt");
+        logger.info("Kommentare für Startup '{}' geladen", startupDTO.getName());
         return kommentarDTOList;
     }
 
     public KommentarDTO updateKommentar(KommentarDTO kommentarDTO) {
-
-        Kommentar altesKommentar = kommentarRepository.findById(kommentarDTO.getId()).get();
+        Kommentar altesKommentar = kommentarRepository.findById(kommentarDTO.getId()).orElse(null);
+        if (altesKommentar == null) {
+            logger.error("Update fehlgeschlagen: Kommentar mit ID {} nicht gefunden", kommentarDTO.getId());
+            throw new KommentarException("Kommentar nicht gefunden.");
+        }
 
         altesKommentar.setKommentar(kommentarDTO.getKommentar());
         altesKommentar.setUpdated(kommentarDTO.getUpdated());
         altesKommentar.setBewertung(kommentarDTO.getBewertung());
 
         kommentarRepository.save(altesKommentar);
-
-        logger.info("Kommentar " + altesKommentar.getId() + " aktualisiert");
+        logger.info("Kommentar {} aktualisiert", altesKommentar.getId());
         return KommentarMapper.mapToKommentarDto(altesKommentar);
     }
 
     public boolean deleteKommentar(KommentarDTO kommentarDTO) {
-
         try {
             kommentarRepository.deleteById(kommentarDTO.getId());
-            logger.info("Kommentar " + kommentarDTO.getId() + " gelöscht");
+            logger.info("Kommentar {} gelöscht", kommentarDTO.getId());
             return true;
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Löschen fehlgeschlagen für Kommentar {}: {}", kommentarDTO.getId(), e.getMessage());
             return false;
         }
     }

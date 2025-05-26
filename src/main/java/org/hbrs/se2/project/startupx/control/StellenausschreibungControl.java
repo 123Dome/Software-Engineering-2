@@ -1,6 +1,7 @@
 package org.hbrs.se2.project.startupx.control;
 
 import jakarta.transaction.Transactional;
+import org.hbrs.se2.project.startupx.control.exception.StellenausschreibungException;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StellenausschreibungDTO;
 import org.hbrs.se2.project.startupx.entities.Bewerbung;
@@ -28,29 +29,35 @@ import java.util.List;
 @Component
 public class StellenausschreibungControl {
 
-    private static Logger logger = LoggerFactory.getLogger(StellenausschreibungControl.class);
+    private static final Logger logger = LoggerFactory.getLogger(StellenausschreibungControl.class);
 
     @Autowired
     StellenausschreibungRepository stellenausschreibungRepository;
+
     @Autowired
     private SkillRepository skillRepository;
+
     @Autowired
     private StartupRepository startupRepository;
 
     @Transactional
     public StellenausschreibungDTO createStellenausschreibung(StellenausschreibungDTO stellenausschreibungDTO) {
-
         List<Skill> skillList = new ArrayList<>();
 
         for (Long skillId : stellenausschreibungDTO.getSkills()) {
-            try {
-                skillList.add(skillRepository.findById(skillId).get());
-            } catch (Exception e) {
-                logger.warn(e.getMessage());
+            Skill skill = skillRepository.findById(skillId).orElse(null);
+            if (skill != null) {
+                skillList.add(skill);
+            } else {
+                logger.warn("Skill mit ID {} nicht gefunden. Wird ignoriert.", skillId);
             }
         }
 
-        Startup startup = startupRepository.findById(stellenausschreibungDTO.getStartup()).get();
+        Startup startup = startupRepository.findById(stellenausschreibungDTO.getStartup())
+                .orElseThrow(() -> {
+                    logger.error("Startup mit ID {} nicht gefunden.", stellenausschreibungDTO.getStartup());
+                    return new StellenausschreibungException("Startup nicht gefunden.");
+                });
 
         List<Bewerbung> bewerbungList = new ArrayList<>();
 
@@ -62,56 +69,69 @@ public class StellenausschreibungControl {
                 .skills(skillList)
                 .build();
 
-        Stellenausschreibung savedStellenausschreibung = stellenausschreibungRepository.save(neueStellenausschreibung);
-
-        logger.info(savedStellenausschreibung + " erstellt");
-        return StellenausschreibungMapper.toDTO(savedStellenausschreibung);
+        try {
+            Stellenausschreibung saved = stellenausschreibungRepository.save(neueStellenausschreibung);
+            logger.info("Stellenausschreibung erstellt: ID={}", saved.getId());
+            return StellenausschreibungMapper.toDTO(saved);
+        } catch (Exception e) {
+            logger.error("Fehler beim Speichern der Stellenausschreibung", e);
+            throw new StellenausschreibungException("Stellenausschreibung konnte nicht gespeichert werden.", e);
+        }
     }
 
     public List<StellenausschreibungDTO> getAllStellenausschreibungByStartup(StartupDTO startupDTO) {
-
         List<Stellenausschreibung> stellenausschreibungList = stellenausschreibungRepository.findByStartup_Id(startupDTO.getId());
-
         List<StellenausschreibungDTO> stellenausschreibungDTOS = new ArrayList<>();
 
         for(Stellenausschreibung stellenausschreibung : stellenausschreibungList) {
             stellenausschreibungDTOS.add(StellenausschreibungMapper.toDTO(stellenausschreibung));
         }
 
-        logger.info("Stellenausschreibung für : " + startupDTO.getName() + " erstellt.");
+        logger.info("Alle Stellenausschreibungen für Startup {} geladen.", startupDTO.getName());
         return stellenausschreibungDTOS;
     }
 
     @Transactional
-    public StellenausschreibungDTO updateStellenausschreibung(StellenausschreibungDTO stellenausschreibungDTO) {
+    public StellenausschreibungDTO updateStellenausschreibung(StellenausschreibungDTO dto) {
+        Stellenausschreibung stelle = stellenausschreibungRepository.findById(dto.getId())
+                .orElseThrow(() -> {
+                    logger.error("Stellenausschreibung mit ID {} nicht gefunden.", dto.getId());
+                    return new StellenausschreibungException("Stellenausschreibung nicht gefunden.");
+                });
 
-        Stellenausschreibung alteStellenausschreibung = stellenausschreibungRepository.findById(stellenausschreibungDTO.getId()).get();
-
-        List<Skill> skillList = new ArrayList<>();
-        for (Long skillId : stellenausschreibungDTO.getSkills()) {
-            skillList.add(skillRepository.findById(skillId).get());
+        List<Skill> skills = new ArrayList<>();
+        for (Long skillId : dto.getSkills()) {
+            Skill skill = skillRepository.findById(skillId).orElse(null);
+            if (skill != null) {
+                skills.add(skill);
+            } else {
+                logger.warn("Skill mit ID {} nicht gefunden. Wird ignoriert.", skillId);
+            }
         }
 
-        alteStellenausschreibung.setSkills(skillList);
-        alteStellenausschreibung.setBeschreibung(stellenausschreibungDTO.getBeschreibung());
-        alteStellenausschreibung.setTitel(stellenausschreibungDTO.getTitel());
+        stelle.setSkills(skills);
+        stelle.setBeschreibung(dto.getBeschreibung());
+        stelle.setTitel(dto.getTitel());
 
-        Stellenausschreibung savedStellenausschreibung = stellenausschreibungRepository.save(alteStellenausschreibung);
-
-        logger.info(savedStellenausschreibung + " aktualisiert");
-        return StellenausschreibungMapper.toDTO(savedStellenausschreibung);
+        try {
+            Stellenausschreibung saved = stellenausschreibungRepository.save(stelle);
+            logger.info("Stellenausschreibung aktualisiert: ID={}", saved.getId());
+            return StellenausschreibungMapper.toDTO(saved);
+        } catch (Exception e) {
+            logger.error("Fehler beim Aktualisieren der Stellenausschreibung", e);
+            throw new StellenausschreibungException("Fehler beim Aktualisieren der Stellenausschreibung.", e);
+        }
     }
 
     @Transactional
-    public boolean deleteStellenausschreibung(StellenausschreibungDTO stellenausschreibungDTO) {
-
+    public boolean deleteStellenausschreibung(StellenausschreibungDTO dto) {
         try {
-            stellenausschreibungRepository.deleteById(stellenausschreibungDTO.getId());
-            logger.info("Stellenausschreibung: " + stellenausschreibungDTO.getId() + " gelöscht");
+            stellenausschreibungRepository.deleteById(dto.getId());
+            logger.info("Stellenausschreibung gelöscht: ID={}", dto.getId());
             return true;
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            return false;
+            logger.error("Fehler beim Löschen der Stellenausschreibung: {}", e.getMessage());
+            throw new StellenausschreibungException("Stellenausschreibung konnte nicht gelöscht werden.", e);
         }
     }
 }

@@ -2,23 +2,27 @@ package org.hbrs.se2.project.startupx.control;
 
 import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.control.exception.RegistrationException;
-import org.hbrs.se2.project.startupx.dtos.RolleDTO;
-import org.hbrs.se2.project.startupx.dtos.SkillDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.*;
 import org.hbrs.se2.project.startupx.mapper.StudentMapper;
 import org.hbrs.se2.project.startupx.mapper.UserMapper;
 import org.hbrs.se2.project.startupx.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
 @Transactional
 public class RegistrationControl {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationControl.class);
 
     @Autowired
     UserRepository userRepository;
@@ -34,31 +38,36 @@ public class RegistrationControl {
     private SkillRepository skillRepository;
 
     public User registerUser(UserDTO userDTO) {
-        // E-Mail darf nicht existieren
-        if(userRepository.findByEmail(userDTO.getEmail()) != null) {
-            throw new RegistrationException("E-Mail existiert bereits.");
-        }
-        // Nutzername darf nicht existieren
-        if(userRepository.findByNutzername(userDTO.getNutzername()) != null) {
-            throw new RegistrationException("Nutzername existiert bereits.");
-        }
-        // Jeder User hat erstmal die Standardrolle User
-        Rolle defaultRolle = rolleRepository.findByBezeichnung("user");
+        List<String> errors = new ArrayList<>();
 
+        if (userRepository.findByEmail(userDTO.getEmail()) != null) {
+            logger.warn("Registrierung fehlgeschlagen: E-Mail existiert bereits ({})", userDTO.getEmail());
+            errors.add("E-Mail existiert bereits.");
+        }
+
+        if (userRepository.findByNutzername(userDTO.getNutzername()) != null) {
+            logger.warn("Registrierung fehlgeschlagen: Nutzername existiert bereits ({})", userDTO.getNutzername());
+            errors.add("Nutzername existiert bereits.");
+        }
+
+        Rolle defaultRolle = rolleRepository.findByBezeichnung("user");
         if (defaultRolle == null) {
-            throw new RegistrationException("Rolle 'user' nicht gefunden.");
+            logger.error("Registrierung fehlgeschlagen: Standardrolle 'user' nicht gefunden.");
+            errors.add("Rolle 'user' nicht gefunden.");
+        }
+
+        if (!errors.isEmpty()) {
+            logger.error("Registrierung abgebrochen wegen: {}", errors);
+            throw new RegistrationException(errors);
         }
 
         Set<Rolle> defaultRollen = new LinkedHashSet<>();
         defaultRollen.add(defaultRolle);
 
-
-
         Set<Kommentar> kommentarList = new LinkedHashSet<>();
         Student student = null;
 
         User newUser = UserMapper.mapToUser(userDTO, defaultRollen, kommentarList, student);
-
         newUser.getRollen().add(defaultRolle);
 
         return userRepository.save(newUser);
@@ -66,31 +75,46 @@ public class RegistrationControl {
 
     @Transactional
     public void registerStudent(UserDTO userDTO, StudentDTO studentDTO) {
-        // E-Mail darf nicht existieren
         User newUser = registerUser(userDTO);
+        List<String> errors = new ArrayList<>();
 
         if (studentRepository.findByMatrikelnr(studentDTO.getMatrikelnr()) != null) {
-            throw new RegistrationException("Matrikelnr existiert bereits.");
+            logger.warn("Studentenregistrierung fehlgeschlagen: Matrikelnummer existiert bereits ({})", studentDTO.getMatrikelnr());
+            errors.add("Matrikelnr existiert bereits.");
+        }
+
+        Set<Skill> skillSet = new LinkedHashSet<>();
+        for (Long skillId : studentDTO.getSkills()) {
+            skillRepository.findById(skillId)
+                    .ifPresentOrElse(
+                            skillSet::add,
+                            () -> {
+                                logger.warn("Studentenregistrierung fehlgeschlagen: Skill mit ID {} nicht gefunden.", skillId);
+                                errors.add("Skill mit ID " + skillId + " nicht gefunden.");
+                            }
+                    );
+        }
+
+        Studiengang studiengang = null;
+        try {
+            studiengang = studiengangRepository.getReferenceById(studentDTO.getStudiengang());
+        } catch (Exception e) {
+            logger.error("Studentenregistrierung fehlgeschlagen: Studiengang mit ID {} nicht gefunden.", studentDTO.getStudiengang());
+            errors.add("Studiengang mit ID " + studentDTO.getStudiengang() + " nicht gefunden.");
+        }
+
+        if (!errors.isEmpty()) {
+            logger.error("Studentenregistrierung abgebrochen wegen: {}", errors);
+            throw new RegistrationException(errors);
         }
 
         Set<Bewerbung> bewerbungSet = new LinkedHashSet<>();
-        Set<Skill> skillSet = new LinkedHashSet<>();
-        for (Long skillId : studentDTO.getSkills()) {
-            Skill skill = skillRepository.findById(skillId)
-                    .orElseThrow(() -> new IllegalArgumentException("Skill mit ID " + skillId + " nicht gefunden"));
-            skillSet.add(skill);
-        }
-
-        Studiengang studiengang = studiengangRepository.getReferenceById(studentDTO.getStudiengang());
         Set<Startup> startupSet = new LinkedHashSet<>();
 
         Student newStudent = StudentMapper.mapToStudent(studentDTO, bewerbungSet, skillSet, startupSet, newUser, studiengang);
-
         studentRepository.save(newStudent);
-
     }
 
-    // Für Echtzeitüberprüfung, ob Email existiert
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
