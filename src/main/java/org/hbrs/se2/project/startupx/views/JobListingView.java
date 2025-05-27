@@ -31,7 +31,7 @@ public class JobListingView extends Div{
         this.manageStartupControl = manageStartupControl;
         add(createTitle());
         add(setUpGrid());
-        add(createButtonLayout());
+        //add(createButtonLayout());
     }
 
     private Component createTitle() {

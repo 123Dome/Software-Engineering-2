@@ -72,9 +72,32 @@ public class EditProfileView extends Div {
 
         configureStudiengangComboBox(studentDTO);
 
-        userDTOBinder.bindInstanceFields(this);
-        studentDTOBinder.forField(steckbrief).bind(StudentDTO::getSteckbrief, StudentDTO::setSteckbrief);
+        userDTOBinder.setBean(userDTO);
+        userDTOBinder.forField(nutzername)
+                .asRequired("Benutzername darf nicht leer sein")
+                .bind(UserDTO::getNutzername, UserDTO::setNutzername);
+        userDTOBinder.forField(email)
+                .asRequired("Email darf nicht leer sein")
+                .withValidator(email -> email.contains("@"), "E-Mail muss gültig sein")
+                .bind(UserDTO::getEmail, UserDTO::setEmail);
+        userDTOBinder.forField(vorname)
+                .asRequired("Vorname darf nicht leer sein")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
+                .bind(UserDTO::getVorname, UserDTO::setVorname);
+        userDTOBinder.forField(nachname)
+                .asRequired("Nachname darf nicht leer sein")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
+                .bind(UserDTO::getNachname, UserDTO::setNachname);
+        userDTOBinder.forField(geburtsdatum)
+                .asRequired("Geburtsdatum darf nicht leer sein")
+                .bind(UserDTO::getGeburtsdatum, UserDTO::setGeburtsdatum);
+
+
+        studentDTOBinder.forField(steckbrief)
+                .asRequired("Steckbrief darf nicht leer sein")
+                .bind(StudentDTO::getSteckbrief, StudentDTO::setSteckbrief);
         studentDTOBinder.forField(studiengang)
+                .asRequired("Studiengang darf nicht leer sein")
                 .withConverter(
                         sgDto -> sgDto != null ? sgDto.getId() : null,
                         id -> id != null ? studiengangControl.getById(id) : null
@@ -90,6 +113,7 @@ public class EditProfileView extends Div {
         skills.setItems(allSkills);
 
         studentDTOBinder.forField(skills)
+                .asRequired("Wähle mindestens 1 Skill aus")
                 .withConverter(
                         (Set<SkillDTO> selectedSkills) -> {
                             if (selectedSkills == null || selectedSkills.isEmpty()) {
@@ -157,11 +181,9 @@ public class EditProfileView extends Div {
 
     private Component createButtonRow(UserDTO userDTO, StudentDTO studentDTO) {
         Button save = new Button("Änderungen speichern", e -> {
-            if (checkTextfields()) {
                 if (editProfilControl.updateStudent(userDTO, studentDTO)) {
                     Notification.show("Profil aktualisiert");
                 }
-            }
         });
 
         Button changePassword = new Button("Passwort ändern");
@@ -188,6 +210,10 @@ public class EditProfileView extends Div {
         layout.setSpacing(true);
 
         Button save = new Button("Speichern", event -> {
+            if (!isValidPassword(newPassword.getValue())) {
+                Notification.show("Passwort muss mindestens 8 Zeichen, einen Groß- und Kleinbuchstaben und ein Sonderzeichen enthalten.");
+                return;
+            }
             if (!newPassword.getValue().equals(confirmPassword.getValue())) {
                 Notification.show("Die Passwörter stimmen nicht überein.");
                 return;
@@ -213,13 +239,11 @@ public class EditProfileView extends Div {
         return dialog;
     }
 
-    private boolean checkTextfields() {
-        if (nutzername.isEmpty()) throw new IllegalArgumentException("Nutzername darf nicht leer sein");
-        if (email.isEmpty()) throw new IllegalArgumentException("Email darf nicht leer sein");
-        if (vorname.isEmpty()) throw new IllegalArgumentException("Vorname darf nicht leer sein");
-        if (nachname.isEmpty()) throw new IllegalArgumentException("Nachname darf nicht leer sein");
-        if (geburtsdatum.isEmpty()) throw new IllegalArgumentException("Geburtsdatum darf nicht leer sein");
-        if (studiengang.isEmpty()) throw new IllegalArgumentException("Es muss ein Studiengang ausgewählt sein");
-        return true;
+    private boolean isValidPassword(String password) {
+        return password.length() >= 8 &&
+                password.matches(".*[A-Z].*") &&
+                password.matches(".*[a-z].*") &&
+                password.matches(".*[^a-zA-Z0-9].*");
     }
+
 }

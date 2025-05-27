@@ -30,7 +30,7 @@ public class MainViewDashboard extends VerticalLayout {
 
         add(new H3("Neueste StartUps"));
 
-        //Soll die 5 neusten StartUps anzeigen, aktuell noch alle
+        //Soll die 5 neusten StartUps anzeigen
         List<StartupDTO> startups = manageStartupControl.findTop5ByOrderByGruendungsdatumDesc();
 
         FlexLayout gallery = new FlexLayout();
