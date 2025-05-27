@@ -54,17 +54,32 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         bearbeitenButton.addClickListener(e -> switchToEditMode());
         speichernButton.addClickListener(e -> saveChanges());
 
-        binder.forField(nameField).asRequired("Name darf nicht leer sein").bind(StartupDTO::getName, StartupDTO::setName);
-        binder.forField(beschreibungField).bind(StartupDTO::getBeschreibung, StartupDTO::setBeschreibung);
-        binder.forField(mitarbeiterField).bind(
-                dto -> dto.getAnzahlMitarbeiter() != null ? dto.getAnzahlMitarbeiter().doubleValue() : null,
-                (dto, value) -> dto.setAnzahlMitarbeiter(value != null ? value.intValue() : null)
-        );
-        binder.forField(gruendungField).bind(StartupDTO::getGruendungsdatum, StartupDTO::setGruendungsdatum);
-        binder.forField(brancheField).bind(
-                dto -> dto.getBranche() != null ? dto.getBranche().doubleValue() : null,
-                (dto, value) -> dto.setBranche(value != null ? value.longValue() : null)
-        );
+        binder.forField(nameField)
+                .asRequired("Name darf nicht leer sein")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
+                .bind(StartupDTO::getName, StartupDTO::setName);
+
+        binder.forField(beschreibungField)
+                .asRequired("Beschreibung darf nicht leer sein")
+                .bind(StartupDTO::getBeschreibung, StartupDTO::setBeschreibung);
+
+        binder.forField(mitarbeiterField)
+                .asRequired("Mitarbeiterzahl erforderlich")
+                .bind(
+                        dto -> dto.getAnzahlMitarbeiter() != null ? dto.getAnzahlMitarbeiter().doubleValue() : null,
+                        (dto, value) -> dto.setAnzahlMitarbeiter(value != null ? value.intValue() : null)
+                );
+
+        binder.forField(gruendungField)
+                .asRequired("Gründungsdatum erforderlich")
+                .bind(StartupDTO::getGruendungsdatum, StartupDTO::setGruendungsdatum);
+
+        binder.forField(brancheField)
+                .asRequired("Branche-ID erforderlich")
+                .bind(
+                        dto -> dto.getBranche() != null ? dto.getBranche().doubleValue() : null,
+                        (dto, value) -> dto.setBranche(value != null ? value.longValue() : null)
+                );
     }
 
     @Override
@@ -72,6 +87,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         startupImage.setWidth("120px");
         startupImage.setHeight("auto");
 
+        // Hole die ID des Startups aus der URL (z.B. ./startup/3 → id = 3)
         String idString = event.getRouteParameters().get("id").orElse(null);
         if (idString != null) {
             try {
@@ -79,14 +95,17 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 this.startup = manageStartupControl.findByID(id);
                 this.currentUser = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
 
+                // Prüfe, ob der eingeloggte User zur Gründerliste des Startups gehört
                 boolean isGruender = startup.getStudentenListe() != null &&
                         currentUser != null &&
                         startup.getStudentenListe().contains(currentUser.getStudents());
 
+                //Read-Only Ansicht
                 readOnlyLayout.removeAll();
                 readOnlyLayout.add(createReadOnlyLayout());
                 add(readOnlyLayout);
 
+                // Falls der eingeloggte User ein Gründer ist, darf er bearbeiten
                 if (isGruender) {
                     bearbeitenButton.setVisible(true);
                     add(bearbeitenButton);

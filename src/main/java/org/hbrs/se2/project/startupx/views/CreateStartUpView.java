@@ -96,6 +96,7 @@ public class CreateStartUpView extends Div {
         cancel.addClickListener(event -> clearForm());
     }
 
+    //lädt Branchen aus der DB und verknüpft die mit dem Dropdown-Menü
     private void loadBranchen() {
         List<BrancheDTO> brancheDTOs = manageStartupControl.getBranches();
         for (BrancheDTO dto : brancheDTOs) {
@@ -115,9 +116,12 @@ public class CreateStartUpView extends Div {
         binder.setBean(startupDTO);
 
         binder.forField(name)
+                .asRequired("Name des StartUps ist erforderlich")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
                 .bind(StartupDTO::getName, StartupDTO::setName);
 
         binder.forField(brancheComboBox)
+                .asRequired("Wähle eine Branche für das StartUp")
                 .withConverter(
                         name -> brancheMap.getOrDefault(name, null),
                         id -> brancheMap.entrySet().stream()
@@ -130,9 +134,11 @@ public class CreateStartUpView extends Div {
                 .bind(StartupDTO::getBranche, StartupDTO::setBranche);
 
         binder.forField(beschreibung)
+                .asRequired("Beschreibung darf nicht leer sein")
                 .bind(StartupDTO::getBeschreibung, StartupDTO::setBeschreibung);
 
         binder.forField(anzahlMitarbeiter)
+                .asRequired("Wähle eine Anzahl von Mitarbeitern zwischen 1 und 100")
                 .bind(StartupDTO::getAnzahlMitarbeiter, StartupDTO::setAnzahlMitarbeiter);
     }
 

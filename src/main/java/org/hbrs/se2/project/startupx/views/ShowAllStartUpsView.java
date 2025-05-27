@@ -28,13 +28,12 @@ public class ShowAllStartUpsView extends Div{
 
     private final ManageStartupControl manageStartupControl;
 
-    private String brancheName;
 
     public ShowAllStartUpsView(ManageStartupControl manageStartupControl) {
         this.manageStartupControl = manageStartupControl;
         add(createTitle());
         add(setUpGrid());
-        add(createButtonLayout());
+        //add(createButtonLayout());
     }
 
 

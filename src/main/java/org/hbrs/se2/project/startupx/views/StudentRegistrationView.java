@@ -8,6 +8,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
@@ -77,13 +78,41 @@ public class StudentRegistrationView extends Div {
         configureStudiengangComboBox();
 
         userDTOBinder.setBean(userDTO);
-        userDTOBinder.bindInstanceFields(this);
+        userDTOBinder.forField(nutzername)
+                .asRequired("Benutzername darf nicht leer sein")
+                .bind(UserDTO::getNutzername, UserDTO::setNutzername);
+        userDTOBinder.forField(email)
+                .asRequired("E-Mail darf nicht leer sein")
+                .withValidator(email -> email.contains("@"), "E-Mail enthält kein '@'")
+                .bind(UserDTO::getEmail, UserDTO::setEmail);
+        userDTOBinder.forField(vorname)
+                .asRequired("Vorname darf nicht leer sein")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
+                .bind(UserDTO::getVorname, UserDTO::setVorname);
+        userDTOBinder.forField(nachname)
+                .asRequired("Nachname darf nicht leer sein")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
+                .bind(UserDTO::getNachname, UserDTO::setNachname);
+        userDTOBinder.forField(geburtsdatum)
+                .asRequired("Geburtsdatum darf nicht leer sein")
+                .bind(UserDTO::getGeburtsdatum, UserDTO::setGeburtsdatum);
+
+        userDTOBinder.forField(passwort)
+                .asRequired("Passwort ist erforderlich")
+                .withValidator(pwd -> pwd.length() >= 8, "Mindestens 8 Zeichen")
+                .withValidator(pwd -> pwd.matches(".*[A-Z].*"), "Mindestens ein Großbuchstabe")
+                .withValidator(pwd -> pwd.matches(".*[a-z].*"), "Mindestens ein Kleinbuchstabe")
+                .withValidator(pwd -> pwd.matches(".*[^a-zA-Z0-9].*"), "Mindestens ein Sonderzeichen")
+                .bind(UserDTO::getPasswort, UserDTO::setPasswort);
 
         studentDTOBinder.setBean(studentDTO);
         studentDTOBinder.forField(matrikelnr)
+                .asRequired("Matrikelnummer darf nicht leer sein")
+                .withValidator(nr -> nr != null && nr > 0, "Nur positive Zahlen erlaubt")
                 .bind(StudentDTO::getMatrikelnr, StudentDTO::setMatrikelnr);
 
         studentDTOBinder.forField(studiengang)
+                .asRequired("Studiengang darf nicht leer sein")
                 .withConverter(
                         dto -> dto != null ? dto.getId() : null,
                         id -> id != null ? studiengangControl.getById(id) : null
@@ -96,6 +125,7 @@ public class StudentRegistrationView extends Div {
         skills.setItems(allSkills); // Alle Skills aus der DB laden
 
         studentDTOBinder.forField(skills)
+                .asRequired("Wähle mindestens 1 Skill aus")
                 .withConverter(
                         (Set<SkillDTO> selectedSkills) -> {
                             if (selectedSkills == null || selectedSkills.isEmpty()) {
@@ -138,6 +168,28 @@ public class StudentRegistrationView extends Div {
         studiengang.setItems(studiengangListe);
     }
 
+    private boolean checkForJorgeEasterEgg() {
+        boolean isEasterEgg = "3".equals(nutzername.getValue()) &&
+                "3@3".equals(email.getValue()) &&
+                "3".equals(vorname.getValue()) &&
+                "3".equals(nachname.getValue());
+
+        if (isEasterEgg) {
+            Dialog gifDialog = new Dialog();
+            gifDialog.setCloseOnOutsideClick(true);
+            gifDialog.setCloseOnEsc(true);
+
+            com.vaadin.flow.component.html.Image gif = new com.vaadin.flow.component.html.Image(
+                    "images/drei-jorge-gonzalez.gif", "Jorge Gonzalez");
+            gif.setWidth("300px");
+
+            gifDialog.add(gif);
+            gifDialog.open();
+            return true;
+        }
+        return false;
+    }
+
     private Component createTitle() {
         return new H3("Student registration");
     }
@@ -158,6 +210,9 @@ public class StudentRegistrationView extends Div {
     }
 
     private void handleRegistration() {
+        if (checkForJorgeEasterEgg()){
+            return;
+        }
         if (!passwort.getValue().equals(passwort_bestätigen.getValue())) {
             Notification.show("Passwörter stimmen nicht überein");
             return;
