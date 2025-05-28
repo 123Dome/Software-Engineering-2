@@ -20,4 +20,22 @@ public class StartupDTO {
     private List<Long> kommentare;
     private List<Long> stellenausschreibungen;
     private Set<Long> studentenListe;
+
+    @Override
+    public String toString() {
+        return "Startup: " + name + "(" + id + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StartupDTO that = (StartupDTO) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
