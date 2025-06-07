@@ -190,10 +190,17 @@ public class EditProfileView extends Div {
         Dialog passwordDialog = createPasswordDialog(userDTO);
         changePassword.addClickListener(e -> passwordDialog.open());
 
+        Button deleteProfile = new Button("Profil löschen");
+        Dialog deleteProfileConfirmationDialog = createDeleteProfileConfirmationDialog(userDTO, studentDTO);
+        deleteProfile.addClickListener(e -> {
+            deleteProfileConfirmationDialog.open();
+        });
+
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         changePassword.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        deleteProfile.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-        HorizontalLayout buttons = new HorizontalLayout(save, changePassword);
+        HorizontalLayout buttons = new HorizontalLayout(save, changePassword,  deleteProfile);
         buttons.setSpacing(true);
         return new VerticalLayout(buttons, passwordDialog);
     }
@@ -244,6 +251,27 @@ public class EditProfileView extends Div {
                 password.matches(".*[A-Z].*") &&
                 password.matches(".*[a-z].*") &&
                 password.matches(".*[^a-zA-Z0-9].*");
+    }
+
+    private Dialog createDeleteProfileConfirmationDialog(UserDTO userDTO, StudentDTO studentDTO) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Profile löschen");
+
+        Button bestaetigen = new Button("Bestätigen");
+        bestaetigen.addClickListener(e -> {
+            // delete profile and return to login page
+            editProfilControl.deleteStudent(userDTO, studentDTO);
+            Notification.show("Profil erfolgreich gelöscht");
+            dialog.close();
+            // navigate to login page and close session
+            UI ui = getUI().get();
+            ui.getSession().close();
+            ui.getPage().setLocation("/");
+        });
+        Button cancel = new Button("Abbrechen", event -> dialog.close());
+        HorizontalLayout buttons = new HorizontalLayout(bestaetigen, cancel);
+        dialog.add(buttons);
+        return dialog;
     }
 
 }
