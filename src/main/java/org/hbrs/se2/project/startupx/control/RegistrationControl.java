@@ -2,9 +2,11 @@ package org.hbrs.se2.project.startupx.control;
 
 import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.control.exception.RegistrationException;
+import org.hbrs.se2.project.startupx.dtos.InvestorDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.*;
+import org.hbrs.se2.project.startupx.mapper.InvestorMapper;
 import org.hbrs.se2.project.startupx.mapper.StudentMapper;
 import org.hbrs.se2.project.startupx.mapper.UserMapper;
 import org.hbrs.se2.project.startupx.repository.*;
@@ -26,6 +28,7 @@ public class RegistrationControl {
 
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     private RolleRepository rolleRepository;
 
@@ -34,8 +37,15 @@ public class RegistrationControl {
 
     @Autowired
     private StudentRepository studentRepository;
+
     @Autowired
     private SkillRepository skillRepository;
+
+    @Autowired
+    private InvestorRepository investorRepository;
+
+    @Autowired
+    private BrancheRepository brancheRepository;
 
     public User registerUser(UserDTO userDTO) {
         List<String> errors = new ArrayList<>();
@@ -113,7 +123,33 @@ public class RegistrationControl {
         Set<Startup> startupSet = new LinkedHashSet<>();
 
         Student newStudent = StudentMapper.mapToStudent(studentDTO, bewerbungSet, skillSet, startupSet, newUser, studiengang);
+
+        logger.info("Registrierung erfolgreich: {}", newStudent);
         studentRepository.save(newStudent);
+    }
+
+    @Transactional
+    public void registerInvestor(UserDTO userDTO, InvestorDTO investorDTO) {
+        User newUser = registerUser(userDTO);
+        List<String> errors = new ArrayList<>();
+
+        Branche branche = null;
+        try {
+            branche = brancheRepository.getReferenceById(investorDTO.getBrancheId());
+        } catch (Exception e){
+            logger.error("Branche mit ID {} nicht gefunden.", investorDTO.getBrancheId());
+            errors.add("Branche mit ID " + investorDTO.getBrancheId() + " nicht gefunden.");
+        }
+
+        if (!errors.isEmpty()) {
+            logger.error("Investorenregistrierung abgebrochen wegen: {}", errors);
+            throw new RegistrationException(errors);
+        }
+
+        Investor newInvestor = InvestorMapper.mapToInvestor(investorDTO, newUser, branche);
+
+        logger.info("Registrierung erfolgreich: {}", newInvestor);
+        investorRepository.save(newInvestor);
     }
 
     public boolean emailExists(String email) {

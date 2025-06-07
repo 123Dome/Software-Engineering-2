@@ -184,7 +184,7 @@ public class ManageStartupControl {
         Branche savedBranche = brancheRepository.save(newBranche);
 
         logger.info("Branche mit der Bezeichnung {} erstellt.", savedBranche.getStartups());
-        return BrancheMapper.mapToBrancheDto(savedBranche);
+        return BrancheMapper.mapToBrancheDTO(savedBranche);
     }
 
     public Branche getBrancheById(Long id) {
@@ -199,7 +199,7 @@ public class ManageStartupControl {
         List<Branche> brancheList = brancheRepository.findAll();
         List<BrancheDTO> brancheDTOList = new ArrayList<>();
         for(Branche branche : brancheList) {
-            brancheDTOList.add(BrancheMapper.mapToBrancheDto(branche));
+            brancheDTOList.add(BrancheMapper.mapToBrancheDTO(branche));
         }
 
         logger.info("Branchen zurückgegeben.");

@@ -56,19 +56,15 @@ public class MainView extends VerticalLayout {
             }
         });
 
-        // Registrierungs-Button hinzugefügt, verweist auf die Registrierungsseite
-        Button registerButton = new Button("Zur Registrierung", event ->
-                UI.getCurrent().navigate(RegistrationView.class)
-        );
-
-        //TODO: Wenn StudentRegistration fertig ist, soll er zur StudentRegistrationView navigieren
         Button registerStudentButton = new Button("Zur Registrierung von Studenten", event ->
             UI.getCurrent().navigate(StudentRegistrationView.class)
         );
 
-        add(component, registerStudentButton
-                //,registerButton
+        Button registerInvestorButton = new Button("Zur Registrierung von Investor", event ->
+            UI.getCurrent().navigate(InvestorRegistrationView.class)
         );
+
+        add(component, registerStudentButton, registerInvestorButton);
 
         this.setAlignItems( Alignment.CENTER );
     }

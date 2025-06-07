@@ -45,7 +45,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     public AppView(AuthorizationControl authorizationControl) {
         this.authorizationControl = authorizationControl;
         if (getCurrentUser() == null) {
-            System.out.println("LOG: In Constructor of App View - No User given!");
+            // System.out.println("LOG: In Constructor of App View - No User given!");
         } else {
             setUpUI();
         }
@@ -208,7 +208,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
        // Falls er Admin-Rechte hat, sollte der User auch Autos hinzufügen können
        // (Alternative: Verwendung der Methode 'isUserisAllowedToAccessThisFeature')
        if ( this.authorizationControl.isUserInRole( this.getCurrentUser() , Globals.Roles.ADMIN ) ) {
-           System.out.println("User is Admin!");
+           // System.out.println("User is Admin!");
            //tabs = Utils.append( tabs , createTab("StartUp erstellen", CreateStartUpView.class));
        }
 
@@ -291,7 +291,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
 
         // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView oder StudentRegistrationView navigiert wird
         if (getCurrentUser() == null &&
-                !target.equals(RegistrationView.class) &&
+                !target.equals(InvestorRegistrationView.class) &&
                 !target.equals(StudentRegistrationView.class)) {
 
             beforeEnterEvent.rerouteTo(Globals.Pages.LOGIN_VIEW);
