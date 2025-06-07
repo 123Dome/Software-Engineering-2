@@ -29,5 +29,7 @@ public class UserDTO {
 
     private Set<Long> kommentare;
 
-    private Long students;
+    private Long student;
+
+    private Long investor;
 }

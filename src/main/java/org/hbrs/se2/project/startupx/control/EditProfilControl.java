@@ -142,7 +142,7 @@ public class EditProfilControl {
     }
 
     public StudentDTO getStudentDTO(UserDTO userDTO) {
-        Student existingStudent = studentRepository.findById(userDTO.getStudents()).orElse(null);
+        Student existingStudent = studentRepository.findById(userDTO.getStudent()).orElse(null);
         if (existingStudent == null) {
             throw new EditProfilException("Student nicht gefunden.");
         }
@@ -158,7 +158,7 @@ public class EditProfilControl {
          * 2. delete Student
          * 3. delete User
          */
-        Student studentToRemove = studentRepository.findById(userDTO.getStudents()).orElse(null);
+        Student studentToRemove = studentRepository.findById(userDTO.getStudent()).orElse(null);
         if (studentToRemove == null) {
             throw new EditProfilException("Student konnte nicht gefunden.");
         }

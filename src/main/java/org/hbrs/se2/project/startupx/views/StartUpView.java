@@ -19,7 +19,6 @@ import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Route(value = "startup/:id", layout = AppView.class)
@@ -98,7 +97,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 // Prüfe, ob der eingeloggte User zur Gründerliste des Startups gehört
                 boolean isGruender = startup.getStudentenListe() != null &&
                         currentUser != null &&
-                        startup.getStudentenListe().contains(currentUser.getStudents());
+                        startup.getStudentenListe().contains(currentUser.getStudent());
 
                 //Read-Only Ansicht
                 readOnlyLayout.removeAll();
