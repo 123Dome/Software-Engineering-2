@@ -56,7 +56,10 @@ public class User {
     private Set<Kommentar> kommentare = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "user")
-    private Student students;
+    private Student student;
+
+    @OneToOne(mappedBy = "user")
+    private Investor investor;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     private Set<Rolle> rollen = new LinkedHashSet<>();

@@ -66,8 +66,9 @@ public class RegistrationControl {
 
         Set<Kommentar> kommentarList = new LinkedHashSet<>();
         Student student = null;
+        Investor investor = null;
 
-        User newUser = UserMapper.mapToUser(userDTO, defaultRollen, kommentarList, student);
+        User newUser = UserMapper.mapToUser(userDTO, defaultRollen, kommentarList, student, investor);
         newUser.getRollen().add(defaultRolle);
 
         return userRepository.save(newUser);

@@ -28,6 +28,9 @@ public class Branche {
     @OneToMany(mappedBy = "branche")
     private List<Startup> startups = new ArrayList<>();
 
+    @OneToMany(mappedBy = "branche")
+    private List<Investor> investors = new ArrayList<>();
+
     @Override
     public int hashCode() {
         return Objects.hash(id);

@@ -40,7 +40,7 @@ public class ProfileView extends Div {
         addClassName("profile-view");
         loadCurrentUser();
         add(createProfileLayout());
-        StudentDTO studentDTO = StudentMapper.mapToStudentDto(studentRepository.findById(userDTO.getStudents()).get());
+        StudentDTO studentDTO = StudentMapper.mapToStudentDto(studentRepository.findById(userDTO.getStudent()).get());
         if (!studentDTO.getStartups().isEmpty()) {
             add(setUpGrid(studentDTO));
         }
