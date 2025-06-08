@@ -124,8 +124,8 @@ public class RegistrationControl {
 
         Student newStudent = StudentMapper.mapToStudent(studentDTO, bewerbungSet, skillSet, startupSet, newUser, studiengang);
 
-        logger.info("Registrierung erfolgreich: {}", newStudent);
         studentRepository.save(newStudent);
+        logger.info("Registrierung erfolgreich: {}", newStudent);
     }
 
     @Transactional
@@ -148,8 +148,8 @@ public class RegistrationControl {
 
         Investor newInvestor = InvestorMapper.mapToInvestor(investorDTO, newUser, branche);
 
-        logger.info("Registrierung erfolgreich: {}", newInvestor);
         investorRepository.save(newInvestor);
+        logger.info("Registrierung erfolgreich: {}", newInvestor);
     }
 
 }
