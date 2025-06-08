@@ -152,7 +152,4 @@ public class RegistrationControl {
         investorRepository.save(newInvestor);
     }
 
-    public boolean emailExists(String email) {
-        return userRepository.findByEmail(email) != null;
-    }
 }
