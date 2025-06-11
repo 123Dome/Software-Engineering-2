@@ -2,8 +2,10 @@ package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -22,10 +24,17 @@ import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.control.SkillControl;
+import org.hbrs.se2.project.startupx.control.StellenausschreibungControl;
+import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.dtos.*;
+import org.hbrs.se2.project.startupx.entities.Skill;
 import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Route(value = "startup/:id", layout = AppView.class)
@@ -33,12 +42,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class StartUpView extends Div implements BeforeEnterObserver {
 
     private final ManageStartupControl manageStartupControl;
+    private final StellenausschreibungControl stellenausschreibungControl;
+    private final StudiengangControl studiengangControl;
+    private final SkillControl skillControl;
+
+
     private final BewertungControl bewertungControl;
 
     private StartupDTO startup;
     private UserDTO currentUser;
 
     private final Binder<StartupDTO> binder = new Binder<>(StartupDTO.class);
+    private final Binder<StellenausschreibungDTO> stellenausschreibungDTOBinder = new Binder<>(StellenausschreibungDTO.class);
 
     private final VerticalLayout readOnlyLayout = new VerticalLayout();
     private final VerticalLayout editLayout = new VerticalLayout();
@@ -52,10 +67,23 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final DatePicker gruendungField = new DatePicker("Gründungsdatum");
     private final NumberField brancheField = new NumberField("Branche ID");
 
+    // Stellenausschreibungsfelder
+    //Textfelder
+    private final TextField titel = new TextField("Titel");
+    private final TextArea beschreibung = new TextArea("Beschreibung");
+    private final MultiSelectComboBox<SkillDTO> skills = new MultiSelectComboBox<>("Skills");
+
+    //Button
+    private final Button erstelleButton = new Button("Stellenausschreibung erstellen");
+    private final Button abbrechenButton = new Button("Stellenausschreibung abbrechen");
+
     // Bild
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
     public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
+    public StartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl) {
+        this.studiengangControl = studiengangControl;
+        this.stellenausschreibungControl = stellenausschreibungControl;
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
         addClassName("startup-details-view");
@@ -89,6 +117,10 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                         dto -> dto.getBranche() != null ? dto.getBranche().doubleValue() : null,
                         (dto, value) -> dto.setBranche(value != null ? value.longValue() : null)
                 );
+
+        Button openStellenausschreibungButton = new Button("Neue Stellenausschreibung", e -> createStellenausschreibung());
+        add(openStellenausschreibungButton);
+        this.skillControl = skillControl;
     }
 
     @Override
@@ -213,6 +245,56 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         } else {
             Notification.show("Bitte überprüfe deine Eingaben.");
         }
+
+    }
+
+    private void createStellenausschreibung() {
+
+        stellenausschreibungDTOBinder.setBean(new StellenausschreibungDTO());
+
+        Dialog dialog = new Dialog("Neue Stellenausschreibung erstellen");
+
+        FormLayout formlayout = new FormLayout();
+
+        loadSkills();
+
+        stellenausschreibungDTOBinder.forField(skills)
+                .asRequired("Wähle mindestens 1 Skill aus")
+                .withConverter(
+                        (Set<SkillDTO> selectedSkills) -> {
+                            if (selectedSkills == null || selectedSkills.isEmpty()) {
+                                return Set.of();
+                            }
+                            return selectedSkills.stream()
+                                    .map(SkillDTO::getId)
+                                    .collect(Collectors.toSet());
+                        },
+                        (Set<Long> skillIds) -> {
+                            if (skillIds == null || skillIds.isEmpty()) {
+                                return Set.of();
+                            }
+                            return Set.of();
+                        }
+                )
+                .bind(StellenausschreibungDTO::getSkills, StellenausschreibungDTO::setSkills);
+
+        stellenausschreibungDTOBinder.forField(titel).bind(StellenausschreibungDTO::getTitel, StellenausschreibungDTO::setTitel);
+        stellenausschreibungDTOBinder.forField(beschreibung).bind(StellenausschreibungDTO::getBeschreibung, StellenausschreibungDTO::setBeschreibung);
+
+        erstelleButton.addClickListener(e -> {
+            stellenausschreibungControl.createStellenausschreibung(stellenausschreibungDTOBinder.getBean());
+        });
+
+        formlayout.add(titel, beschreibung, skills);
+        dialog.add(formlayout, erstelleButton, abbrechenButton);
+        dialog.open();
+    }
+
+    private void loadSkills() {
+        List<SkillDTO> allSkills = studiengangControl.findAllSkills();
+
+        skills.setItemLabelGenerator(SkillDTO::getSkillName);
+        skills.setItems(allSkills);
     }
 
     private Component setUpBewertenButton() {

@@ -7,9 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "stellenausschreibung", schema = "startupx")
@@ -40,7 +38,7 @@ public class Stellenausschreibung {
     private String beschreibung;
 
     @ManyToMany
-    private List<Skill> skills = new ArrayList<>();
+    private Set<Skill> skills = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "stellenausschreibung")
     private List<Bewerbung> bewerbungen = new ArrayList<>();

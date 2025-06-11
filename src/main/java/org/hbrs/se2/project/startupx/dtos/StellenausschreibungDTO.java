@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,6 +16,6 @@ public class StellenausschreibungDTO {
     private Long startup;
     private String titel;
     private String beschreibung;
-    private List<Long> skills;
+    private Set<Long> skills;
     private List<Long> bewerbungen;
 }
