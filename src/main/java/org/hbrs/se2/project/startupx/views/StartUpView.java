@@ -120,8 +120,6 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                         (dto, value) -> dto.setBranche(value != null ? value.longValue() : null)
                 );
 
-        Button openStellenausschreibungButton = new Button("Neue Stellenausschreibung", e -> createStellenausschreibung());
-        add(openStellenausschreibungButton);
         this.skillControl = skillControl;
     }
 
@@ -150,8 +148,9 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
                 // Falls der eingeloggte User ein Gründer ist, darf er bearbeiten
                 if (isGruender) {
+                    Button openStellenausschreibungButton = new Button("Neue Stellenausschreibung", e -> createStellenausschreibung());
                     bearbeitenButton.setVisible(true);
-                    add(bearbeitenButton);
+                    add(bearbeitenButton, openStellenausschreibungButton);
                 }
 
             } catch (Exception e) {
