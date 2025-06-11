@@ -25,10 +25,7 @@ public class Skill {
     @Column(name = "skill_name", nullable = false)
     private String skillName;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "ausschreibung_zu_skill", schema = "startupx",
-            joinColumns = @JoinColumn(name = "skill_id"),
-            inverseJoinColumns = @JoinColumn(name = "stellenausschreibung_id"))
+    @ManyToMany(mappedBy = "skills", fetch = FetchType.EAGER)
     private List<Stellenausschreibung> stellenausschreibungen = new ArrayList<>();
 
     @ManyToMany(mappedBy = "skills", fetch = FetchType.EAGER)

@@ -31,6 +31,7 @@ import org.hbrs.se2.project.startupx.dtos.*;
 import org.hbrs.se2.project.startupx.entities.Skill;
 import org.hbrs.se2.project.startupx.util.Globals;
 
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final TextField titel = new TextField("Titel");
     private final TextArea beschreibung = new TextArea("Beschreibung");
     private final MultiSelectComboBox<SkillDTO> skills = new MultiSelectComboBox<>("Skills");
+    private List<SkillDTO> allSkills = new ArrayList<>();
 
     //Button
     private final Button erstelleButton = new Button("Stellenausschreibung erstellen");
@@ -249,8 +251,9 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     }
 
     private void createStellenausschreibung() {
-
-        stellenausschreibungDTOBinder.setBean(new StellenausschreibungDTO());
+        StellenausschreibungDTO newStellenausschreibung = new StellenausschreibungDTO();
+        newStellenausschreibung.setStartup(startup.getId());
+        stellenausschreibungDTOBinder.setBean(newStellenausschreibung);
 
         Dialog dialog = new Dialog("Neue Stellenausschreibung erstellen");
 
@@ -273,7 +276,9 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                             if (skillIds == null || skillIds.isEmpty()) {
                                 return Set.of();
                             }
-                            return Set.of();
+                            return allSkills.stream()
+                                    .filter(skill -> skillIds.contains(skill.getId()))
+                                    .collect(Collectors.toSet());
                         }
                 )
                 .bind(StellenausschreibungDTO::getSkills, StellenausschreibungDTO::setSkills);
@@ -283,6 +288,13 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
         erstelleButton.addClickListener(e -> {
             stellenausschreibungControl.createStellenausschreibung(stellenausschreibungDTOBinder.getBean());
+            Notification.show("Stellenausschreibung erstellt.");
+            dialog.close();
+        });
+
+        abbrechenButton.addClickListener(e -> {
+            Notification.show("Stellenausschreibung nicht erstellt.");
+            dialog.close();
         });
 
         formlayout.add(titel, beschreibung, skills);
@@ -291,7 +303,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     }
 
     private void loadSkills() {
-        List<SkillDTO> allSkills = studiengangControl.findAllSkills();
+        allSkills = studiengangControl.findAllSkills();
 
         skills.setItemLabelGenerator(SkillDTO::getSkillName);
         skills.setItems(allSkills);

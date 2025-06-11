@@ -38,6 +38,9 @@ public class Stellenausschreibung {
     private String beschreibung;
 
     @ManyToMany
+    @JoinTable(name = "ausschreibung_zu_skill", schema = "startupx",
+            joinColumns = @JoinColumn(name = "stellenausschreibung_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "stellenausschreibung")
