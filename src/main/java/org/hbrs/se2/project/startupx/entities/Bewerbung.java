@@ -3,6 +3,8 @@ package org.hbrs.se2.project.startupx.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hbrs.se2.project.startupx.util.BewerbungsStatus;
+import org.hbrs.se2.project.startupx.util.BewerbungsStatusConverter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -27,6 +29,10 @@ public class Bewerbung {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
+
+    @Convert(converter = BewerbungsStatusConverter.class)
+    @Column(name = "status", nullable = false)
+    private BewerbungsStatus status;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -1,6 +1,7 @@
 package org.hbrs.se2.project.startupx.dtos;
 
 import lombok.*;
+import org.hbrs.se2.project.startupx.util.BewerbungsStatus;
 
 @Getter
 @Setter
@@ -12,4 +13,5 @@ public class BewerbungDTO {
     private Long student;
     private Long stellenausschreibungen;
     private String bewerbungsschreiben;
+    private BewerbungsStatus status;
 }

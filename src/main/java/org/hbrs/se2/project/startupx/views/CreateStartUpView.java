@@ -71,10 +71,12 @@ public class CreateStartUpView extends Div {
 
 
         Set<Long> studentenids = new LinkedHashSet<>();
+        List<Long> mitarbeiter = new ArrayList<>();
         studentenids.add(studentFromUser.getId());
         startupDTO.setGruendungsdatum(heute);
         //Testfall
         startupDTO.setStudentenListe(studentenids);
+        startupDTO.setMitarbeiterList(mitarbeiter);
 
         binder.setBean(startupDTO);
         configureBinder();

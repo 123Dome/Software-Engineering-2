@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -54,6 +55,10 @@ public class Startup {
 
     @OneToMany(mappedBy = "startup")
     private List<Stellenausschreibung> stellenausschreibungen;
+
+    @OneToMany(mappedBy = "startup")
+    private List<Student> mitarbeiterList;
+
 
     @ManyToMany
     @JoinTable(

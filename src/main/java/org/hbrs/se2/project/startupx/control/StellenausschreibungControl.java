@@ -138,4 +138,6 @@ public class StellenausschreibungControl {
             throw new StellenausschreibungException("Stellenausschreibung konnte nicht gelöscht werden.", e);
         }
     }
+
+
 }

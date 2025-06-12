@@ -20,4 +20,5 @@ public class StudentDTO {
     private Set<Long> skills;
     private Set<Long> startups;
     private Set<Long> bewerbungen;
+    private Long startupId;
 }

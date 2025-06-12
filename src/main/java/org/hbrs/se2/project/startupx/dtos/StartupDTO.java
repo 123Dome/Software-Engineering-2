@@ -20,6 +20,7 @@ public class StartupDTO {
     private List<Long> bewertungen;
     private List<Long> stellenausschreibungen;
     private Set<Long> studentenListe;
+    private List<Long> mitarbeiterList;
 
     @Override
     public String toString() {
