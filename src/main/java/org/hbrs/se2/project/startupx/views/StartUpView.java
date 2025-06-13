@@ -25,7 +25,9 @@ import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Route(value = "startup/:id", layout = AppView.class)
 @PageTitle("StartUp Details")
@@ -216,17 +218,64 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
     private Component setUpBewertenButton() {
         Button bewertenButton = new Button("Bewerten");
-
         Dialog dialog = new Dialog();
+        TextField kommentarField = new TextField("Kommentar (optional)");
+        HorizontalLayout sterneLayout = new HorizontalLayout();
+        VerticalLayout dialogLayout = new VerticalLayout();
+
         dialog.setHeaderTitle("Bewertung abgeben");
 
-        VerticalLayout dialogLayout = new VerticalLayout();
-        dialogLayout.add(new Paragraph("Hier kannst du deine Bewertung abgeben.")); // Placeholder
+        Span[] sterne = new Span[5];
+        AtomicInteger selectedRating = new AtomicInteger(0);
+        for (int i = 0; i < 5; i++) {
+            Span stern = new Span("☆");
+            stern.getStyle().set("font-size", "24px");
+            stern.getStyle().set("cursor", "pointer");
+            final int index = i;
+
+            stern.addClickListener(e -> {
+                selectedRating.set(index + 1);
+               for(int j = 0; j < 5; j++) {
+                   sterne[j].setText(j <= index ? "★" : "☆");
+               }
+            });
+
+            sterne[i] = stern;
+            sterneLayout.add(stern);
+        }
+
 
         Button dialogSchließenButton = new Button("Schließen", e -> dialog.close());
-        dialog.getFooter().add(dialogSchließenButton);
+        Button bewertungSpeichernButton = new Button("Speichern", e -> {
+            int bewertung = selectedRating.get();
+            String kommentar = kommentarField.getValue();
+
+            if (bewertung == 0) {
+                Notification.show("Bitte Sterne auswählen!");
+                return;
+            }
+
+            BewertungDTO neueBewertungDTO = new BewertungDTO();
+            neueBewertungDTO.setBewertung(bewertung);
+            neueBewertungDTO.setKommentar(kommentar);
+            neueBewertungDTO.setErstellungsdatum(LocalDate.now());
+            neueBewertungDTO.setStartup(startup.getId());
+            neueBewertungDTO.setUser(currentUser.getId());
+
+            bewertungControl.createBewertung(neueBewertungDTO);
+            Notification.show("Bewertung gespeichert.");
+
+            dialog.close();
+            // Ansicht aktualisieren:
+            readOnlyLayout.removeAll();
+            readOnlyLayout.add(createReadOnlyLayout());
+        });
+
+        dialogLayout.add(sterneLayout, kommentarField);
 
         dialog.add(dialogLayout);
+        dialog.getFooter().add(bewertungSpeichernButton, dialogSchließenButton);
+
 
         bewertenButton.addClickListener(e -> {
             dialog.open();
@@ -277,7 +326,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
         // Volle Sterne
         for (int i = 0; i < volleSterne; i++) {
-            sterne.add(new Span("⭐"));
+            sterne.add(new Span("★"));
         }
 
         if(halberStern) {
@@ -289,7 +338,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
             sterne.add(new Span("☆"));
         }
 
-        sterne.add(String.valueOf(average));
+        sterne.add(new Span(String.format("(%.1f Sterne)", average)));
 
         return sterne;
     }
