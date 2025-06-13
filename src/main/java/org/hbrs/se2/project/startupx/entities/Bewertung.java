@@ -9,21 +9,22 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Entity
-@Table(name = "kommentar", schema = "startupx")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
 @Builder
-public class Kommentar {
+@Table(name = "bewertung", schema = "startupx")
+public class Bewertung {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "kommentar_id", nullable = false)
+    @Column(name = "bewertung_id", nullable = false)
     private Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -34,29 +35,26 @@ public class Kommentar {
     private Startup startup;
 
     @NotNull
-    @Column(name = "kommentar", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "bewertung", nullable = false)
+    private Integer bewertung;
+
+    @Column(name = "kommentar", length = Integer.MAX_VALUE)
     private String kommentar;
 
     @NotNull
     @Column(name = "erstellungsdatum", nullable = false)
     private LocalDate erstellungsdatum;
 
-    @Column(name = "updated")
-    private LocalDate updated;
-
-    @Column(name = "bewertung")
-    private Integer bewertung;
-
     @Override
     public String toString() {
-        return "Kommentar : " + id;
+        return "Bewertung mit ID: " + id;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Kommentar that = (Kommentar) o;
+        Bewertung that = (Bewertung) o;
         return Objects.equals(id, that.id);
     }
 
@@ -64,5 +62,4 @@ public class Kommentar {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

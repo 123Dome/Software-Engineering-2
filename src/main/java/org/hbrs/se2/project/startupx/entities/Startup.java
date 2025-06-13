@@ -50,7 +50,7 @@ public class Startup {
 
     @OneToMany(mappedBy = "startup")
     @OrderBy("erstellungsdatum DESC")
-    private List<Kommentar> kommentare;
+    private List<Bewertung> bewertungen;
 
     @OneToMany(mappedBy = "startup")
     private List<Stellenausschreibung> stellenausschreibungen;
