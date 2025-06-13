@@ -1,7 +1,10 @@
 package org.hbrs.se2.project.startupx.views;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -14,7 +17,9 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
+import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
@@ -26,6 +31,8 @@ import java.util.List;
 public class StartUpView extends Div implements BeforeEnterObserver {
 
     private final ManageStartupControl manageStartupControl;
+    private final BewertungControl bewertungControl;
+
     private StartupDTO startup;
     private UserDTO currentUser;
 
@@ -46,8 +53,9 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     // Bild
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
-    public StartUpView(ManageStartupControl manageStartupControl) {
+    public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
         this.manageStartupControl = manageStartupControl;
+        this.bewertungControl = bewertungControl;
         addClassName("startup-details-view");
 
         bearbeitenButton.addClickListener(e -> switchToEditMode());
@@ -124,6 +132,8 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         layout.add(new Paragraph("Branche: " + manageStartupControl.getBrancheNameById(startup.getBranche())));
         layout.add(new Paragraph("Gründungsdatum: " + startup.getGruendungsdatum()));
         layout.add(new Paragraph("Mitarbeiteranzahl: " + startup.getAnzahlMitarbeiter()));
+        layout.add(setUpBewerten());
+        layout.add(setUpBewertungenGrid());
 
         List<Long> stellenanzeigen = startup.getStellenausschreibungen();
         if (stellenanzeigen != null && !stellenanzeigen.isEmpty()) {
@@ -163,7 +173,8 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 branchenInfo,
                 nameField, beschreibungField, mitarbeiterField, gruendungField, brancheField,
                 stellenanzeigenLayout,
-                speichernButton
+                speichernButton,
+                setUpBewertungenGrid()
         );
 
         //Binder setzen
@@ -198,5 +209,50 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         } else {
             Notification.show("Bitte überprüfe deine Eingaben.");
         }
+    }
+
+    private Component setUpBewerten() {
+        Button bewertenButton = new Button("Bewerten");
+
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Bewertung abgeben");
+
+        VerticalLayout dialogLayout = new VerticalLayout();
+        dialogLayout.add(new Paragraph("Hier kannst du deine Bewertung abgeben.")); // Placeholder
+
+        Button dialogSchließenButton = new Button("Schließen", e -> dialog.close());
+        dialog.getFooter().add(dialogSchließenButton);
+
+        dialog.add(dialogLayout);
+
+        bewertenButton.addClickListener(e -> {
+            dialog.open();
+        });
+
+        return bewertenButton;
+    }
+
+    private Component setUpBewertungenGrid(){
+        List<BewertungDTO> bewertungen = bewertungControl.getAlleBewertungZuStartup(startup.getId());
+
+        if(bewertungen.isEmpty()){
+            return new Paragraph("Keine Bewertungen vorhanden");
+        }
+
+        Grid<BewertungDTO> grid = new Grid<>(BewertungDTO.class);
+        grid.setItems(bewertungen);
+
+        grid.setColumns("user", "bewertung", "kommentar", "erstellungsdatum");
+        grid.getColumnByKey("user").setHeader("User-ID");
+        grid.getColumnByKey("bewertung").setHeader("Sterne");
+        grid.getColumnByKey("kommentar").setHeader("Kommentar");
+        grid.getColumnByKey("erstellungsdatum").setHeader("Datum");
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(false);
+        layout.setPadding(false);
+        layout.add(new H3("Bewertungen"), grid);
+
+        return layout;
     }
 }
