@@ -17,7 +17,7 @@ public class StartupDTO {
     private String beschreibung;
     private LocalDate gruendungsdatum;
     private Integer anzahlMitarbeiter;
-    private List<Long> kommentare;
+    private List<Long> bewertungen;
     private List<Long> stellenausschreibungen;
     private Set<Long> studentenListe;
 

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
-    public static User mapToUser(UserDTO userDTO, Set<Rolle> rollen, Set<Kommentar> kommentare, Student student, Investor investor) {
+    public static User mapToUser(UserDTO userDTO, Set<Rolle> rollen, Set<Bewertung> bewertungen, Student student, Investor investor) {
 
         return User.builder()
                 .vorname(userDTO.getVorname())
@@ -21,7 +21,7 @@ public class UserMapper {
                 .passwort(userDTO.getPasswort())
                 .email(userDTO.getEmail())
                 .rollen(rollen)
-                .kommentare(kommentare)
+                .bewertungen(bewertungen)
                 .student(student)
                 .investor(investor)
                 .build();
@@ -51,10 +51,10 @@ public class UserMapper {
         }
 
 
-        Set<Long> kommentare = new LinkedHashSet<>();
-        if (user.getKommentare() != null) {
-            kommentare = user.getKommentare().stream()
-                    .map(Kommentar::getId)
+        Set<Long> bewertungen = new LinkedHashSet<>();
+        if (user.getBewertungen() != null) {
+            bewertungen = user.getBewertungen().stream()
+                    .map(Bewertung::getId)
                     .collect(Collectors.toSet());
         }
 
@@ -67,7 +67,7 @@ public class UserMapper {
                 .email(user.getEmail())
                 .geburtsdatum(user.getGeburtsdatum())
                 .rollen(rollenIds)
-                .kommentare(kommentare)
+                .bewertungen(bewertungen)
                 .student(studentId)
                 .investor(investorId)
                 .build();

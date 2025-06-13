@@ -32,12 +32,12 @@ class ManageStartupControlTest {
     // Neues StartupDTO wird über Builder erstellt
     @BeforeEach
     void setUp() {
-        List<Long> kommentarListe = new LinkedList<>();
+        List<Long> bewertungListe = new LinkedList<>();
         Set<Long> studentListe = new LinkedHashSet<>();
         List<Long> stellenAusschreibungListe = new LinkedList<>();
         localDate = LocalDate.of(1990, 1, 1);
         startupDTO = StartupDTO.builder()
-                .kommentare(kommentarListe)
+                .bewertungen(bewertungListe)
                 .branche(1L)
                 .studentenListe(studentListe)
                 .stellenausschreibungen(stellenAusschreibungListe)

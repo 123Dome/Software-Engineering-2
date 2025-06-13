@@ -27,7 +27,7 @@ public class UserDTO {
 
     private Set<Long> rollen;
 
-    private Set<Long> kommentare;
+    private Set<Long> bewertungen;
 
     private Long student;
 
