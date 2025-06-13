@@ -13,7 +13,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
+import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
@@ -34,9 +36,12 @@ public class ProfileView extends Div {
 
     private final ManageStartupControl manageStartupControl;
 
-    public ProfileView(ManageStartupControl manageStartupControl, StudentRepository studentRepository) {
+    private final BewertungControl bewertungControl;
+
+    public ProfileView(ManageStartupControl manageStartupControl, StudentRepository studentRepository, BewertungControl bewertungControl) {
         this.studentRepository = studentRepository;
         this.manageStartupControl = manageStartupControl;
+        this.bewertungControl = bewertungControl;
         addClassName("profile-view");
         loadCurrentUser();
         add(createProfileLayout());
@@ -44,6 +49,7 @@ public class ProfileView extends Div {
         if (!studentDTO.getStartups().isEmpty()) {
             add(setUpGrid(studentDTO));
         }
+        add(setUpBewertungenGrid());
     }
 
     //Aktuelle Nutzerdaten laden
@@ -105,4 +111,27 @@ public class ProfileView extends Div {
         return grid;
     }
 
+    private Component setUpBewertungenGrid(){
+        List<BewertungDTO> bewertungen = bewertungControl.getAlleBewertungZuUser(userDTO.getId());
+
+        if(bewertungen.isEmpty()){
+            return new Paragraph("Keine Bewertungen vorhanden");
+        }
+
+        Grid<BewertungDTO> grid = new Grid<>(BewertungDTO.class);
+        grid.setItems(bewertungen);
+
+        grid.setColumns("startup", "bewertung", "kommentar", "erstellungsdatum");
+        grid.getColumnByKey("startup").setHeader("Startup-ID");
+        grid.getColumnByKey("bewertung").setHeader("Sterne");
+        grid.getColumnByKey("kommentar").setHeader("Kommentar");
+        grid.getColumnByKey("erstellungsdatum").setHeader("Datum");
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(false);
+        layout.setPadding(false);
+        layout.add(new H3("Meine Bewertungen"), grid);
+
+        return layout;
+    }
 }
