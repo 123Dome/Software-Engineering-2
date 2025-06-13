@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -132,7 +133,8 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         layout.add(new Paragraph("Branche: " + manageStartupControl.getBrancheNameById(startup.getBranche())));
         layout.add(new Paragraph("Gründungsdatum: " + startup.getGruendungsdatum()));
         layout.add(new Paragraph("Mitarbeiteranzahl: " + startup.getAnzahlMitarbeiter()));
-        layout.add(setUpBewerten());
+        layout.add(setUpDurchschnittBewertungenInSternen());
+        layout.add(setUpBewertenButton());
         layout.add(setUpBewertungenGrid());
 
         List<Long> stellenanzeigen = startup.getStellenausschreibungen();
@@ -174,6 +176,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 nameField, beschreibungField, mitarbeiterField, gruendungField, brancheField,
                 stellenanzeigenLayout,
                 speichernButton,
+                setUpDurchschnittBewertungenInSternen(),
                 setUpBewertungenGrid()
         );
 
@@ -211,7 +214,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         }
     }
 
-    private Component setUpBewerten() {
+    private Component setUpBewertenButton() {
         Button bewertenButton = new Button("Bewerten");
 
         Dialog dialog = new Dialog();
@@ -254,5 +257,40 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         layout.add(new H3("Bewertungen"), grid);
 
         return layout;
+    }
+
+    private Component setUpDurchschnittBewertungenInSternen() {
+        List<BewertungDTO> bewertungen = bewertungControl.getAlleBewertungZuStartup(startup.getId());
+        if(bewertungen.isEmpty()){
+            return new Paragraph("Keine Bewertungen vorhanden");
+        }
+
+        double average = bewertungen.stream()
+                .mapToInt(BewertungDTO::getBewertung)
+                .average()
+                .orElse(0);
+
+        HorizontalLayout sterne = new HorizontalLayout();
+        int volleSterne = (int) average;
+        boolean halberStern = (average - volleSterne) >= 0.5;
+        int leereSterne = 5 - volleSterne - (halberStern ? 1 : 0);
+
+        // Volle Sterne
+        for (int i = 0; i < volleSterne; i++) {
+            sterne.add(new Span("⭐"));
+        }
+
+        if(halberStern) {
+            sterne.add(new Span("⯨"));
+        }
+
+        // Leere Sterne
+        for (int i = 0; i < leereSterne; i++) {
+            sterne.add(new Span("☆"));
+        }
+
+        sterne.add(String.valueOf(average));
+
+        return sterne;
     }
 }
