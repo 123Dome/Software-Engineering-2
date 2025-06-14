@@ -18,13 +18,13 @@ public class StartupMapper {
             return null;
         }
 
-        List<Long> kommentarIDs = new ArrayList<>();
+        List<Long> bewertungIDs = new ArrayList<>();
         Set<Long> studentIDs = new LinkedHashSet<>();
         List<Long> stellenausschreibungIDs = new ArrayList<>();
 
-        if (startup.getKommentare() != null) {
-            kommentarIDs = startup.getKommentare().stream()
-                    .map(Kommentar::getId)
+        if (startup.getBewertungen() != null) {
+            bewertungIDs = startup.getBewertungen().stream()
+                    .map(Bewertung::getId)
                     .toList();
         }
 
@@ -49,7 +49,7 @@ public class StartupMapper {
                 .anzahlMitarbeiter(startup.getAnzahlMitarbeiter())
                 .stellenausschreibungen(stellenausschreibungIDs)
                 .studentenListe(studentIDs)
-                .kommentare(kommentarIDs)
+                .bewertungen(bewertungIDs)
                 .build();
     }
 

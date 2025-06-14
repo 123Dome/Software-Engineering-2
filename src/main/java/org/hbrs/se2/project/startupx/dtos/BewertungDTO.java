@@ -9,12 +9,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class KommentarDTO {
+public class BewertungDTO {
     private Long id;
     private Long user;
     private Long startup;
+    private Integer bewertung;
     private String kommentar;
     private LocalDate erstellungsdatum;
-    private LocalDate updated;
-    private Integer bewertung;
 }

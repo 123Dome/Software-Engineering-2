@@ -53,7 +53,7 @@ public class User {
     private LocalDate geburtsdatum;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    private Set<Kommentar> kommentare = new LinkedHashSet<>();
+    private Set<Bewertung> bewertungen = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "user")
     private Student student;

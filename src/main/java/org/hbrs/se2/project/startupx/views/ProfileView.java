@@ -1,19 +1,21 @@
 package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
+import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
@@ -34,9 +36,14 @@ public class ProfileView extends Div {
 
     private final ManageStartupControl manageStartupControl;
 
-    public ProfileView(ManageStartupControl manageStartupControl, StudentRepository studentRepository) {
+    private final BewertungControl bewertungControl;
+
+    private final VerticalLayout bewertungenLayout = new VerticalLayout();
+
+    public ProfileView(ManageStartupControl manageStartupControl, StudentRepository studentRepository, BewertungControl bewertungControl) {
         this.studentRepository = studentRepository;
         this.manageStartupControl = manageStartupControl;
+        this.bewertungControl = bewertungControl;
         addClassName("profile-view");
         loadCurrentUser();
         add(createProfileLayout());
@@ -44,6 +51,7 @@ public class ProfileView extends Div {
         if (!studentDTO.getStartups().isEmpty()) {
             add(setUpGrid(studentDTO));
         }
+        add(setUpBewertungenKarten());
     }
 
     //Aktuelle Nutzerdaten laden
@@ -105,4 +113,77 @@ public class ProfileView extends Div {
         return grid;
     }
 
+    private Component setUpBewertungenKarten(){
+        bewertungenLayout.removeAll();
+
+        bewertungenLayout.add(new H3("Meine Bewertungen"));
+
+        List<BewertungDTO> bewertungen = bewertungControl.getAlleBewertungZuUser(userDTO.getId());
+
+        if (bewertungen.isEmpty()) {
+            bewertungenLayout.add(new Paragraph("Keine Bewertungen vorhanden"));
+            return bewertungenLayout;
+        }
+
+        for(BewertungDTO bewertung : bewertungen) {
+            Div card = new Div();
+            card.addClassName("bewertungen-karte");
+            card.setWidth("400px");
+            card.getStyle().set("border", "1px solid #ccc");
+            card.getStyle().set("border-radius", "8px");
+            card.getStyle().set("padding", "16px");
+            card.getStyle().set("box-shadow", "2px 2px 6px rgba(0,0,0,0.1)");
+
+            // Startup zur Bewertung
+            String startUpName = manageStartupControl.findByID(bewertung.getStartup()).getName();
+            card.add(new H4("Startup: " + startUpName));
+
+            // Sterne
+            HorizontalLayout sterneLayout = new HorizontalLayout();
+            for(int i = 0; i < 5; i++){
+                Span stern = new Span(i <= bewertung.getBewertung() ? "★" : "☆");
+                stern.getStyle().set("font-size", "20px");
+                sterneLayout.add(stern);
+            }
+            card.add(sterneLayout);
+
+            // Kommentar (optional)
+            if(!bewertung.getKommentar().isEmpty()) {
+                Paragraph kommentar = new Paragraph(bewertung.getKommentar());
+                kommentar.getStyle().set("font-style", "italic");
+                kommentar.getStyle().set("margin-top", "8px");
+                card.add(kommentar);
+            }
+
+            // Datum
+            Paragraph datum = new Paragraph("Datum: " + bewertung.getErstellungsdatum());
+            datum.getStyle().set("font-size", "0.9em");
+            datum.getStyle().set("color", "#666");
+            card.add(datum);
+
+            // Löschen-Button
+            Button bewertungLöschenButton = new Button("Löschen", e -> {
+                // Bestätigungsdialog
+                Dialog löschenBestätigenDialog = new Dialog();
+                löschenBestätigenDialog.add(new Paragraph("Wollen Sie die Bewertung wirklich löschen?"));
+                Button löschenBestätigenButton = new Button("Ja", event -> {
+                    try {
+                        bewertungControl.deleteBewertung(bewertung.getId());
+                        Notification.show("Bewertung gelöscht.");
+                        setUpBewertungenKarten();
+                    } catch (Exception ex) {
+                        Notification.show(ex.getMessage());
+                    }
+                    löschenBestätigenDialog.close();
+                });
+                Button löschenAbbrechenButton = new Button("Abbrechen", event -> löschenBestätigenDialog.close());
+                löschenBestätigenDialog.getFooter().add(löschenBestätigenButton, löschenAbbrechenButton);
+                löschenBestätigenDialog.open();
+            });
+            card.add(bewertungLöschenButton);
+            bewertungenLayout.add(card);
+        }
+
+        return bewertungenLayout;
+    }
 }
