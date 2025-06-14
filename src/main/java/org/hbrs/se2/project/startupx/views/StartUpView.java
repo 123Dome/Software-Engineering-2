@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -137,7 +136,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         layout.add(new Paragraph("Mitarbeiteranzahl: " + startup.getAnzahlMitarbeiter()));
         layout.add(setUpDurchschnittBewertungenInSternen());
         layout.add(setUpBewertenButton());
-        layout.add(setUpBewertungenGrid());
+        layout.add(setUpBewertungenCards());
 
         List<Long> stellenanzeigen = startup.getStellenausschreibungen();
         if (stellenanzeigen != null && !stellenanzeigen.isEmpty()) {
@@ -179,7 +178,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 stellenanzeigenLayout,
                 speichernButton,
                 setUpDurchschnittBewertungenInSternen(),
-                setUpBewertungenGrid()
+                setUpBewertungenCards()
         );
 
         //Binder setzen
@@ -284,26 +283,56 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         return bewertenButton;
     }
 
-    private Component setUpBewertungenGrid(){
+    private Component setUpBewertungenCards(){
         List<BewertungDTO> bewertungen = bewertungControl.getAlleBewertungZuStartup(startup.getId());
+        VerticalLayout layout = new VerticalLayout();
+        layout.addClassName("bewertungen-liste");
+
+        layout.add(new H3("Bewertungen"));
 
         if(bewertungen.isEmpty()){
-            return new Paragraph("Keine Bewertungen vorhanden");
+            layout.add(new Paragraph("Keine Bewertungen vorhanden"));
+            return layout;
         }
 
-        Grid<BewertungDTO> grid = new Grid<>(BewertungDTO.class);
-        grid.setItems(bewertungen);
+        for(BewertungDTO bewertung : bewertungen){
+            Div card = new Div();
+            card.addClassName("bewertungen-karte");
+            card.setWidth("400px");
+            card.getStyle().set("border", "1px solid #ccc");
+            card.getStyle().set("border-radius", "8px");
+            card.getStyle().set("padding", "16px");
+            card.getStyle().set("box-shadow", "2px 2px 6px rgba(0,0,0,0.1)");
 
-        grid.setColumns("user", "bewertung", "kommentar", "erstellungsdatum");
-        grid.getColumnByKey("user").setHeader("User-ID");
-        grid.getColumnByKey("bewertung").setHeader("Sterne");
-        grid.getColumnByKey("kommentar").setHeader("Kommentar");
-        grid.getColumnByKey("erstellungsdatum").setHeader("Datum");
+            // Überschrift (Nutzer)
+            H4 userHeader = new H4("User: " + bewertung.getUser());
+            card.add(userHeader);
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSpacing(false);
-        layout.setPadding(false);
-        layout.add(new H3("Bewertungen"), grid);
+            // Sterne
+            HorizontalLayout sterneLayout = new HorizontalLayout();
+            for(int i = 0; i <= 5; i++){
+                Span stern = new Span(i <= bewertung.getBewertung() ? "★" : "☆");
+                stern.getStyle().set("font-size", "20px");
+                sterneLayout.add(stern);
+            }
+            card.add(sterneLayout);
+
+            // Kommentar (optional)
+            if(!bewertung.getKommentar().isEmpty()) {
+                Paragraph kommentar = new Paragraph(bewertung.getKommentar());
+                kommentar.getStyle().set("font-style", "italic");
+                kommentar.getStyle().set("margin-top", "8px");
+                card.add(kommentar);
+            }
+
+            // Datum
+            Paragraph datum = new Paragraph("Datum: " + bewertung.getErstellungsdatum());
+            datum.getStyle().set("font-size", "0.9em");
+            datum.getStyle().set("color", "#666");
+            card.add(datum);
+
+            layout.add(card);
+        }
 
         return layout;
     }
