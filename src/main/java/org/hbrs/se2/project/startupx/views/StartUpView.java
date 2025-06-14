@@ -22,9 +22,7 @@ import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
-import org.hbrs.se2.project.startupx.repository.UserRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
-import org.hbrs.se2.project.startupx.entities.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +34,6 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
     private final ManageStartupControl manageStartupControl;
     private final BewertungControl bewertungControl;
-    private final UserRepository userRepository;
 
     private StartupDTO startup;
     private UserDTO currentUser;
@@ -58,10 +55,9 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     // Bild
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
-    public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl, UserRepository userRepository) {
+    public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
-        this.userRepository = userRepository;
         addClassName("startup-details-view");
 
         bearbeitenButton.addClickListener(e -> switchToEditMode());
@@ -309,9 +305,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
             card.getStyle().set("box-shadow", "2px 2px 6px rgba(0,0,0,0.1)");
 
             // Überschrift (Nutzer)
-            String nutzername = userRepository.findById(bewertung.getUser())
-                    .map(User::getNutzername)
-                    .orElse("Unbekannt");
+            String nutzername = bewertungControl.getUserNameById(bewertung.getUser());
             H4 userHeader = new H4(nutzername);
             card.add(userHeader);
 

@@ -94,4 +94,19 @@ public class BewertungControl {
             throw new BewertungException("Bewertungen für diesen User konnten nicht geladen werden.", e);
         }
     }
+
+    public String getUserNameById(Long userId) {
+        try {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                logger.warn("User mit der ID {} nicht gefunden.", userId);
+                return "Unbekannter Nutzer";
+            }
+            return user.getNutzername();
+        } catch (Exception e) {
+            logger.error("Fehler beim Laden des Nutzernamens für User-ID: {}", userId, e);
+            throw new BewertungException("Fehler beim Laden des Nutzernamens.", e);
+        }
+    }
+
 }
