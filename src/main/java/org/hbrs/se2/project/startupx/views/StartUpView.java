@@ -22,7 +22,9 @@ import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.repository.UserRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.entities.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +36,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
     private final ManageStartupControl manageStartupControl;
     private final BewertungControl bewertungControl;
+    private final UserRepository userRepository;
 
     private StartupDTO startup;
     private UserDTO currentUser;
@@ -55,9 +58,10 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     // Bild
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
-    public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
+    public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl, UserRepository userRepository) {
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
+        this.userRepository = userRepository;
         addClassName("startup-details-view");
 
         bearbeitenButton.addClickListener(e -> switchToEditMode());
@@ -305,12 +309,15 @@ public class StartUpView extends Div implements BeforeEnterObserver {
             card.getStyle().set("box-shadow", "2px 2px 6px rgba(0,0,0,0.1)");
 
             // Überschrift (Nutzer)
-            H4 userHeader = new H4("User: " + bewertung.getUser());
+            String nutzername = userRepository.findById(bewertung.getUser())
+                    .map(User::getNutzername)
+                    .orElse("Unbekannt");
+            H4 userHeader = new H4(nutzername);
             card.add(userHeader);
 
             // Sterne
             HorizontalLayout sterneLayout = new HorizontalLayout();
-            for(int i = 0; i <= 5; i++){
+            for(int i = 0; i < 5; i++){
                 Span stern = new Span(i <= bewertung.getBewertung() ? "★" : "☆");
                 stern.getStyle().set("font-size", "20px");
                 sterneLayout.add(stern);
@@ -330,6 +337,33 @@ public class StartUpView extends Div implements BeforeEnterObserver {
             datum.getStyle().set("font-size", "0.9em");
             datum.getStyle().set("color", "#666");
             card.add(datum);
+
+            // Löschen-Button, wenn eigene Bewertung
+            if (currentUser != null && currentUser.getId().equals(bewertung.getUser())){
+                Button bewertungLöschenButton = new Button("Löschen");
+                bewertungLöschenButton.getStyle().set("margin-top", "8px");
+
+                bewertungLöschenButton.addClickListener(e -> {
+                    // Bestätigungsdialog
+                    Dialog löschenBestätigenDialog = new Dialog();
+                    löschenBestätigenDialog.add(new Paragraph("Wollen Sie die Bewertung wirklich löschen?"));
+                    Button löschenBestätigenButton = new Button("Ja", event -> {
+                        try {
+                            bewertungControl.deleteBewertung(bewertung.getId());
+                            Notification.show("Bewertung gelöscht.");
+                            readOnlyLayout.removeAll();
+                            readOnlyLayout.add(createReadOnlyLayout());
+                        } catch (Exception ex) {
+                            Notification.show(ex.getMessage());
+                        }
+                        löschenBestätigenDialog.close();
+                    });
+                    Button löschenAbbrechenButton = new Button("Abbrechen", event -> löschenBestätigenDialog.close());
+                    löschenBestätigenDialog.getFooter().add(löschenBestätigenButton, löschenAbbrechenButton);
+                    löschenBestätigenDialog.open();
+                });
+                card.add(bewertungLöschenButton);
+            }
 
             layout.add(card);
         }
