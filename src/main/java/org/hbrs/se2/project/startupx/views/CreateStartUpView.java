@@ -67,7 +67,7 @@ public class CreateStartUpView extends Div {
 
         UserDTO userDTO = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
 
-        StudentDTO studentFromUser = editProfilControl.getStudentDTO(userDTO);
+        StudentDTO studentFromUser = editProfilControl.getStudentDTO(userDTO.getStudent());
 
 
         Set<Long> studentenids = new LinkedHashSet<>();

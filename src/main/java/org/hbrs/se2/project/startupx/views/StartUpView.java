@@ -14,10 +14,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
 import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
@@ -29,7 +26,9 @@ import org.hbrs.se2.project.startupx.control.StellenausschreibungControl;
 import org.hbrs.se2.project.startupx.control.StudiengangControl;
 import org.hbrs.se2.project.startupx.dtos.*;
 import org.hbrs.se2.project.startupx.entities.Skill;
+import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.util.Status;
 
 import java.util.ArrayList;
 import java.time.LocalDate;
@@ -46,9 +45,9 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final StellenausschreibungControl stellenausschreibungControl;
     private final StudiengangControl studiengangControl;
     private final SkillControl skillControl;
-
-
     private final BewertungControl bewertungControl;
+
+    private boolean isGruender = false;
 
     private StartupDTO startup;
     private UserDTO currentUser;
@@ -137,7 +136,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 this.currentUser = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
 
                 // Prüfe, ob der eingeloggte User zur Gründerliste des Startups gehört
-                boolean isGruender = startup.getStudentenListe() != null &&
+                this.isGruender = startup.getStudentenListe() != null &&
                         currentUser != null &&
                         startup.getStudentenListe().contains(currentUser.getStudent());
 
@@ -171,13 +170,46 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         layout.add(setUpBewertenButton());
         layout.add(setUpBewertungenCards());
 
-        List<Long> stellenanzeigen = startup.getStellenausschreibungen();
-        if (stellenanzeigen != null && !stellenanzeigen.isEmpty()) {
-            layout.add(new H3("Stellenanzeigen:"));
-            for (Long id : stellenanzeigen) {
-                layout.add(new Span("Anzeige ID: " + id));
+        List<StellenausschreibungDTO> stellenausschreibungDTOS = stellenausschreibungControl.getAllOpenStellenausschreibungByStartup(startup);
+        layout.add(new H3("Stellenanzeigen"));
+
+        for(StellenausschreibungDTO dto : stellenausschreibungDTOS) {
+            H4 title = new H4(dto.getTitel());
+
+
+            RouterLink link = new RouterLink();
+            link.setRoute(ApplyForJobView.class, new RouteParameters("id", dto.getId().toString()));
+            link.add(title);
+
+            Span skillsSpan = new Span();
+
+            String skillNames = "";
+            if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
+                skillNames = dto.getSkills().stream()
+                        .map(skillId -> {
+                            SkillDTO skillDto = skillControl.getSkillById(skillId);
+                            return skillDto.getSkillName();
+                        })
+                        .collect(Collectors.joining(", "));
             }
+
+            if (!skillNames.isEmpty()) {
+                skillsSpan = new Span("Benötigte Skills: " + skillNames);
+            }
+
+            Span anzahlBewerbungen = new Span();
+            if (isGruender) {
+                anzahlBewerbungen = new Span("Anzahl Bewerbungen: " + String.valueOf(stellenausschreibungControl.findById(dto.getId()).getBewerbungen().size()));
+            }
+
+
+            VerticalLayout lineLayout = new VerticalLayout(link, skillsSpan, anzahlBewerbungen);
+            lineLayout.setSpacing(true);
+
+            layout.add(lineLayout);
+
         }
+
 
         return layout;
     }

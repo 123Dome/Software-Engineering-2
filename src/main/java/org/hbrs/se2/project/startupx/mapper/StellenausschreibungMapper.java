@@ -43,6 +43,7 @@ public class StellenausschreibungMapper {
                 .startup(stellenausschreibung.getStartup().getId())
                 .skills(skillIds)
                 .bewerbungen(bewerbungIds)
+                .status(stellenausschreibung.getStatus())
                 .build();
 
         return stellenausschreibungDTO;

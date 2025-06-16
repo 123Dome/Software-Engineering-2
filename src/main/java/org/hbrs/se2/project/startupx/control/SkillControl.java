@@ -1,7 +1,9 @@
 package org.hbrs.se2.project.startupx.control;
 
+import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.dtos.SkillDTO;
 import org.hbrs.se2.project.startupx.entities.Skill;
+import org.hbrs.se2.project.startupx.mapper.SkillMapper;
 import org.hbrs.se2.project.startupx.repository.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Transactional
 public class SkillControl {
 
     @Autowired
@@ -32,5 +35,9 @@ public class SkillControl {
         }
 
         return skills;
+    }
+
+    public SkillDTO getSkillById(Long id) {
+        return SkillMapper.mapToSkillDto(skillRepository.findById(id).get());
     }
 }

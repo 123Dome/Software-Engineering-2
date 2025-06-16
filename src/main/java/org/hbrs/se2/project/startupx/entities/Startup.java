@@ -34,7 +34,7 @@ public class Startup {
     private String name;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.SET_DEFAULT)
     @ColumnDefault("0")
     @JoinColumn(name = "branche_id", nullable = false)

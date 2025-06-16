@@ -68,7 +68,7 @@ public class EditProfileView extends Div {
         addClassName("edit-profile-view");
 
         UserDTO userDTO = (UserDTO) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
-        StudentDTO studentDTO = editProfilControl.getStudentDTO(userDTO);
+        StudentDTO studentDTO = editProfilControl.getStudentDTO(userDTO.getStudent());
 
         configureStudiengangComboBox(studentDTO);
 

@@ -9,6 +9,7 @@ import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.*;
 import org.hbrs.se2.project.startupx.mapper.StartupMapper;
 import org.hbrs.se2.project.startupx.mapper.StudentMapper;
+import org.hbrs.se2.project.startupx.mapper.UserMapper;
 import org.hbrs.se2.project.startupx.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,13 +142,20 @@ public class EditProfilControl {
         }
     }
 
-    public StudentDTO getStudentDTO(UserDTO userDTO) {
-        Student existingStudent = studentRepository.findById(userDTO.getStudent()).orElse(null);
+    public StudentDTO getStudentDTO(Long studentId) {
+        Student existingStudent = studentRepository.findById(studentId).orElse(null);
         if (existingStudent == null) {
             throw new EditProfilException("Student nicht gefunden.");
         }
         return StudentMapper.mapToStudentDto(existingStudent);
+    }
 
+    public UserDTO getUserDTO(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new EditProfilException("User nicht gefunden.");
+        }
+        return UserMapper.mapToUserDto(user);
     }
 
     @Transactional

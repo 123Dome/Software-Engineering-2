@@ -234,6 +234,7 @@ public class ManageStartupControl {
             startup.setMitarbeiterList(new ArrayList<>());
         }
         startup.getMitarbeiterList().add(student);
+        startup.setAnzahlMitarbeiter(startup.getAnzahlMitarbeiter()+1);
         startupRepository.save(startup);
     }
 
@@ -246,5 +247,8 @@ public class ManageStartupControl {
         if(student.getStartup().equals(startup)) {
             student.setStartup(null);
         }
+        studentRepository.save(student);
+        startup.setAnzahlMitarbeiter(startup.getAnzahlMitarbeiter()-1);
+        startupRepository.save(startup);
     }
 }
