@@ -82,8 +82,8 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     // Bild
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
-    public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
-    public StartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl) {
+
+    public StartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl, BewertungControl bewertungControl) {
         this.studiengangControl = studiengangControl;
         this.stellenausschreibungControl = stellenausschreibungControl;
         this.manageStartupControl = manageStartupControl;
