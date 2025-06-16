@@ -74,5 +74,5 @@ import static org.junit.Assert.assertEquals;
 //
 //        assertEquals(kommentarDTOList.size(), control.getAllKommentarZuStartup(startupDTO).size());
 //    }
-
-}
+//
+//}
