@@ -54,6 +54,10 @@ public class Student {
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new LinkedHashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "startup_id")
+    private Startup startup;
+
     @Override
     public String toString() {
         return "Student mit Matrikelnummer: " + matrikelnr +  " ID: " + id;

@@ -21,6 +21,7 @@ public class StartupMapper {
         List<Long> bewertungIDs = new ArrayList<>();
         Set<Long> studentIDs = new LinkedHashSet<>();
         List<Long> stellenausschreibungIDs = new ArrayList<>();
+        List<Long> mitarbeiterIDs = new ArrayList<>();
 
         if (startup.getBewertungen() != null) {
             bewertungIDs = startup.getBewertungen().stream()
@@ -40,6 +41,12 @@ public class StartupMapper {
                     .toList();
         }
 
+        if (startup.getMitarbeiterList() != null) {
+            mitarbeiterIDs = startup.getMitarbeiterList().stream()
+                    .map(Student::getId)
+                    .toList();
+        }
+
         return StartupDTO.builder()
                 .id(startup.getId())
                 .name(startup.getName())
@@ -50,10 +57,11 @@ public class StartupMapper {
                 .stellenausschreibungen(stellenausschreibungIDs)
                 .studentenListe(studentIDs)
                 .bewertungen(bewertungIDs)
+                .mitarbeiterList(mitarbeiterIDs)
                 .build();
     }
 
-    public static Startup mapToStartup(StartupDTO startupDTO, Set<Student> studentList, Branche branche) {
+    public static Startup mapToStartup(StartupDTO startupDTO, Set<Student> studentList, Branche branche, List<Student> mitarbeiterList) {
 
         return Startup.builder()
                 .name(startupDTO.getName())
@@ -62,6 +70,7 @@ public class StartupMapper {
                 .gruendungsdatum(startupDTO.getGruendungsdatum())
                 .anzahlMitarbeiter(startupDTO.getAnzahlMitarbeiter())
                 .studentenListe(studentList)
+                .mitarbeiterList(mitarbeiterList)
                 .build();
     }
 }

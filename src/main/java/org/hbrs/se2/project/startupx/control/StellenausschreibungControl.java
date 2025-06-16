@@ -12,13 +12,17 @@ import org.hbrs.se2.project.startupx.mapper.StellenausschreibungMapper;
 import org.hbrs.se2.project.startupx.repository.SkillRepository;
 import org.hbrs.se2.project.startupx.repository.StartupRepository;
 import org.hbrs.se2.project.startupx.repository.StellenausschreibungRepository;
+import org.hbrs.se2.project.startupx.util.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
 /**
  * StellenausschreibungControl ist für jegliche Kommunikation zwischen User/Views und der Datenbank zuständig.
  * Die Klasse enthält CRUD-Methode für Stellenausschreibungen.
@@ -26,7 +30,8 @@ import java.util.List;
  * @author Korbinian Gauglitz
  * @version 1.0
  */
-@Component
+
+@Service
 public class StellenausschreibungControl {
 
     private static final Logger logger = LoggerFactory.getLogger(StellenausschreibungControl.class);
@@ -42,7 +47,7 @@ public class StellenausschreibungControl {
 
     @Transactional
     public StellenausschreibungDTO createStellenausschreibung(StellenausschreibungDTO stellenausschreibungDTO) {
-        List<Skill> skillList = new ArrayList<>();
+        Set<Skill> skillList = new LinkedHashSet<>();
 
         for (Long skillId : stellenausschreibungDTO.getSkills()) {
             Skill skill = skillRepository.findById(skillId).orElse(null);
@@ -67,6 +72,7 @@ public class StellenausschreibungControl {
                 .beschreibung(stellenausschreibungDTO.getBeschreibung())
                 .bewerbungen(bewerbungList)
                 .skills(skillList)
+                .status(Status.OFFEN)
                 .build();
 
         try {
@@ -79,12 +85,37 @@ public class StellenausschreibungControl {
         }
     }
 
+    @Transactional
+    public StellenausschreibungDTO findById(Long id) {
+        Stellenausschreibung stellenausschreibung = stellenausschreibungRepository.findById(id).get();
+
+        StellenausschreibungDTO stellenausschreibungDTO = StellenausschreibungMapper.toDTO(stellenausschreibung);
+
+        return stellenausschreibungDTO;
+    }
+
+    @Transactional
     public List<StellenausschreibungDTO> getAllStellenausschreibungByStartup(StartupDTO startupDTO) {
-        List<Stellenausschreibung> stellenausschreibungList = stellenausschreibungRepository.findByStartup_Id(startupDTO.getId());
+        List<Stellenausschreibung> stellenausschreibungList = stellenausschreibungRepository.findByStartup_Id(startupDTO.getId()).stream().toList();
         List<StellenausschreibungDTO> stellenausschreibungDTOS = new ArrayList<>();
 
         for(Stellenausschreibung stellenausschreibung : stellenausschreibungList) {
             stellenausschreibungDTOS.add(StellenausschreibungMapper.toDTO(stellenausschreibung));
+            logger.info(stellenausschreibung.getTitel());
+        }
+
+        logger.info("Alle Stellenausschreibungen für Startup {} geladen.", startupDTO.getName());
+        return stellenausschreibungDTOS;
+    }
+
+    @Transactional
+    public List<StellenausschreibungDTO> getAllOpenStellenausschreibungByStartup(StartupDTO startupDTO) {
+        List<Stellenausschreibung> stellenausschreibungList = stellenausschreibungRepository.findByStartup_IdAndStatus(startupDTO.getId(),Status.OFFEN).stream().toList();
+        List<StellenausschreibungDTO> stellenausschreibungDTOS = new ArrayList<>();
+
+        for(Stellenausschreibung stellenausschreibung : stellenausschreibungList) {
+            stellenausschreibungDTOS.add(StellenausschreibungMapper.toDTO(stellenausschreibung));
+            logger.info(stellenausschreibung.getTitel());
         }
 
         logger.info("Alle Stellenausschreibungen für Startup {} geladen.", startupDTO.getName());
@@ -99,7 +130,7 @@ public class StellenausschreibungControl {
                     return new StellenausschreibungException("Stellenausschreibung nicht gefunden.");
                 });
 
-        List<Skill> skills = new ArrayList<>();
+        Set<Skill> skills = new LinkedHashSet<>();
         for (Long skillId : dto.getSkills()) {
             Skill skill = skillRepository.findById(skillId).orElse(null);
             if (skill != null) {
@@ -134,4 +165,17 @@ public class StellenausschreibungControl {
             throw new StellenausschreibungException("Stellenausschreibung konnte nicht gelöscht werden.", e);
         }
     }
+
+
+    @Transactional
+    public boolean closeStellenausschreibung(Long id) {
+        Stellenausschreibung saved = stellenausschreibungRepository.findById(id).orElse(null);
+        if (saved != null) {
+            saved.setStatus(Status.GESCHLOSSEN);
+            return true;
+        }
+        return false;
+    }
+
+
 }

@@ -2,8 +2,10 @@ package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -12,20 +14,27 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
 import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.control.SkillControl;
+import org.hbrs.se2.project.startupx.control.StellenausschreibungControl;
+import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.dtos.*;
+import org.hbrs.se2.project.startupx.entities.Skill;
+import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.util.Status;
 
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Route(value = "startup/:id", layout = AppView.class)
@@ -33,12 +42,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class StartUpView extends Div implements BeforeEnterObserver {
 
     private final ManageStartupControl manageStartupControl;
+    private final StellenausschreibungControl stellenausschreibungControl;
+    private final StudiengangControl studiengangControl;
+    private final SkillControl skillControl;
     private final BewertungControl bewertungControl;
+
+    private boolean isGruender = false;
 
     private StartupDTO startup;
     private UserDTO currentUser;
 
     private final Binder<StartupDTO> binder = new Binder<>(StartupDTO.class);
+    private final Binder<StellenausschreibungDTO> stellenausschreibungDTOBinder = new Binder<>(StellenausschreibungDTO.class);
 
     private final VerticalLayout readOnlyLayout = new VerticalLayout();
     private final VerticalLayout editLayout = new VerticalLayout();
@@ -52,10 +67,24 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final DatePicker gruendungField = new DatePicker("Gründungsdatum");
     private final NumberField brancheField = new NumberField("Branche ID");
 
+    // Stellenausschreibungsfelder
+    //Textfelder
+    private final TextField titel = new TextField("Titel");
+    private final TextArea beschreibung = new TextArea("Beschreibung");
+    private final MultiSelectComboBox<SkillDTO> skills = new MultiSelectComboBox<>("Skills");
+    private List<SkillDTO> allSkills = new ArrayList<>();
+
+    //Button
+    private final Button erstelleButton = new Button("Stellenausschreibung erstellen");
+    private final Button abbrechenButton = new Button("Stellenausschreibung abbrechen");
+
     // Bild
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
-    public StartUpView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
+
+    public StartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl, BewertungControl bewertungControl) {
+        this.studiengangControl = studiengangControl;
+        this.stellenausschreibungControl = stellenausschreibungControl;
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
         addClassName("startup-details-view");
@@ -89,6 +118,8 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                         dto -> dto.getBranche() != null ? dto.getBranche().doubleValue() : null,
                         (dto, value) -> dto.setBranche(value != null ? value.longValue() : null)
                 );
+
+        this.skillControl = skillControl;
     }
 
     @Override
@@ -105,7 +136,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                 this.currentUser = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
 
                 // Prüfe, ob der eingeloggte User zur Gründerliste des Startups gehört
-                boolean isGruender = startup.getStudentenListe() != null &&
+                this.isGruender = startup.getStudentenListe() != null &&
                         currentUser != null &&
                         startup.getStudentenListe().contains(currentUser.getStudent());
 
@@ -116,8 +147,9 @@ public class StartUpView extends Div implements BeforeEnterObserver {
 
                 // Falls der eingeloggte User ein Gründer ist, darf er bearbeiten
                 if (isGruender) {
+                    Button openStellenausschreibungButton = new Button("Neue Stellenausschreibung", e -> createStellenausschreibung());
                     bearbeitenButton.setVisible(true);
-                    add(bearbeitenButton);
+                    add(bearbeitenButton, openStellenausschreibungButton);
                 }
 
             } catch (Exception e) {
@@ -138,13 +170,46 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         layout.add(setUpBewertenButton());
         layout.add(setUpBewertungenCards());
 
-        List<Long> stellenanzeigen = startup.getStellenausschreibungen();
-        if (stellenanzeigen != null && !stellenanzeigen.isEmpty()) {
-            layout.add(new H3("Stellenanzeigen:"));
-            for (Long id : stellenanzeigen) {
-                layout.add(new Span("Anzeige ID: " + id));
+        List<StellenausschreibungDTO> stellenausschreibungDTOS = stellenausschreibungControl.getAllOpenStellenausschreibungByStartup(startup);
+        layout.add(new H3("Stellenanzeigen"));
+
+        for(StellenausschreibungDTO dto : stellenausschreibungDTOS) {
+            H4 title = new H4(dto.getTitel());
+
+
+            RouterLink link = new RouterLink();
+            link.setRoute(ApplyForJobView.class, new RouteParameters("id", dto.getId().toString()));
+            link.add(title);
+
+            Span skillsSpan = new Span();
+
+            String skillNames = "";
+            if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
+                skillNames = dto.getSkills().stream()
+                        .map(skillId -> {
+                            SkillDTO skillDto = skillControl.getSkillById(skillId);
+                            return skillDto.getSkillName();
+                        })
+                        .collect(Collectors.joining(", "));
             }
+
+            if (!skillNames.isEmpty()) {
+                skillsSpan = new Span("Benötigte Skills: " + skillNames);
+            }
+
+            Span anzahlBewerbungen = new Span();
+            if (isGruender) {
+                anzahlBewerbungen = new Span("Anzahl Bewerbungen: " + String.valueOf(stellenausschreibungControl.findById(dto.getId()).getBewerbungen().size()));
+            }
+
+
+            VerticalLayout lineLayout = new VerticalLayout(link, skillsSpan, anzahlBewerbungen);
+            lineLayout.setSpacing(true);
+
+            layout.add(lineLayout);
+
         }
+
 
         return layout;
     }
@@ -213,6 +278,66 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         } else {
             Notification.show("Bitte überprüfe deine Eingaben.");
         }
+
+    }
+
+    private void createStellenausschreibung() {
+        StellenausschreibungDTO newStellenausschreibung = new StellenausschreibungDTO();
+        newStellenausschreibung.setStartup(startup.getId());
+        stellenausschreibungDTOBinder.setBean(newStellenausschreibung);
+
+        Dialog dialog = new Dialog("Neue Stellenausschreibung erstellen");
+
+        FormLayout formlayout = new FormLayout();
+
+        loadSkills();
+
+        stellenausschreibungDTOBinder.forField(skills)
+                .asRequired("Wähle mindestens 1 Skill aus")
+                .withConverter(
+                        (Set<SkillDTO> selectedSkills) -> {
+                            if (selectedSkills == null || selectedSkills.isEmpty()) {
+                                return Set.of();
+                            }
+                            return selectedSkills.stream()
+                                    .map(SkillDTO::getId)
+                                    .collect(Collectors.toSet());
+                        },
+                        (Set<Long> skillIds) -> {
+                            if (skillIds == null || skillIds.isEmpty()) {
+                                return Set.of();
+                            }
+                            return allSkills.stream()
+                                    .filter(skill -> skillIds.contains(skill.getId()))
+                                    .collect(Collectors.toSet());
+                        }
+                )
+                .bind(StellenausschreibungDTO::getSkills, StellenausschreibungDTO::setSkills);
+
+        stellenausschreibungDTOBinder.forField(titel).bind(StellenausschreibungDTO::getTitel, StellenausschreibungDTO::setTitel);
+        stellenausschreibungDTOBinder.forField(beschreibung).bind(StellenausschreibungDTO::getBeschreibung, StellenausschreibungDTO::setBeschreibung);
+
+        erstelleButton.addClickListener(e -> {
+            stellenausschreibungControl.createStellenausschreibung(stellenausschreibungDTOBinder.getBean());
+            Notification.show("Stellenausschreibung erstellt.");
+            dialog.close();
+        });
+
+        abbrechenButton.addClickListener(e -> {
+            Notification.show("Stellenausschreibung nicht erstellt.");
+            dialog.close();
+        });
+
+        formlayout.add(titel, beschreibung, skills);
+        dialog.add(formlayout, erstelleButton, abbrechenButton);
+        dialog.open();
+    }
+
+    private void loadSkills() {
+        allSkills = studiengangControl.findAllSkills();
+
+        skills.setItemLabelGenerator(SkillDTO::getSkillName);
+        skills.setItems(allSkills);
     }
 
     private Component setUpBewertenButton() {

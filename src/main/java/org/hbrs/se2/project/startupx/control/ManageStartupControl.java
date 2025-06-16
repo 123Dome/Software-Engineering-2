@@ -61,7 +61,9 @@ public class ManageStartupControl {
 
         Branche branche = getBrancheById(startupDTO.getBranche());
 
-        Startup startup = StartupMapper.mapToStartup(startupDTO, studentList, branche);
+        List<Student> mitarbeiterList = new ArrayList<>();
+
+        Startup startup = StartupMapper.mapToStartup(startupDTO, studentList, branche, mitarbeiterList);
 
         Startup savedStartup = startupRepository.save(startup);
 
@@ -220,31 +222,33 @@ public class ManageStartupControl {
                 .orElse("Unbekannt");
     }
 
-}
+    @Transactional
+    public void neuerMitarbeiter(Long studentId, Long startupId) {
 
-//    public List<StartupDTO> findByBranche(BrancheDTO brancheDTO) {
-//
-//        List<Startup> startupList = startupRepository.findByBranche_Id(brancheDTO.getId());
-//
-//        List<StartupDTO> startupDTOList = new ArrayList<>();
-//        for(Startup startup : startupList) {
-//            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
-//        }
-//
-//        logger.info("Startups zur Branche " + brancheDTO.getBezeichnung() + " gefunden.");
-//        return startupDTOList;
-//    }
-//
-//    public List<StartupDTO> findByNameContaining(String nameContaining) {
-//
-//        List<Startup> startupList = startupRepository.findByNameContaining(nameContaining);
-//
-//        List<StartupDTO> startupDTOList = new ArrayList<>();
-//
-//        for(Startup startup : startupList) {
-//            startupDTOList.add(StartupMapper.mapToStartupDto(startup));
-//        }
-//
-//        return startupDTOList;
-//    }
-//
+        Student student = studentRepository.findById(studentId).get();
+        Startup startup = startupRepository.findById(startupId).get();
+
+        student.setStartup(startup);
+        studentRepository.save(student);
+        if (startup.getMitarbeiterList() == null) {
+            startup.setMitarbeiterList(new ArrayList<>());
+        }
+        startup.getMitarbeiterList().add(student);
+        startup.setAnzahlMitarbeiter(startup.getAnzahlMitarbeiter()+1);
+        startupRepository.save(startup);
+    }
+
+    @Transactional
+    public void mitarbeiterEntfernen(Long studentId, Long startupId) {
+
+        Student student = studentRepository.findById(studentId).get();
+        Startup startup = startupRepository.findById(startupId).get();
+
+        if(student.getStartup().equals(startup)) {
+            student.setStartup(null);
+        }
+        studentRepository.save(student);
+        startup.setAnzahlMitarbeiter(startup.getAnzahlMitarbeiter()-1);
+        startupRepository.save(startup);
+    }
+}

@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hbrs.se2.project.startupx.util.BewerbungsStatus;
+import org.hbrs.se2.project.startupx.util.BewerbungsStatusConverter;
+import org.hbrs.se2.project.startupx.util.Status;
+import org.hbrs.se2.project.startupx.util.StatusConverter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "stellenausschreibung", schema = "startupx")
@@ -25,7 +27,7 @@ public class Stellenausschreibung {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "startup_id", nullable = false)
     private Startup startup;
@@ -39,11 +41,18 @@ public class Stellenausschreibung {
     @Column(name = "beschreibung", nullable = false, length = Integer.MAX_VALUE)
     private String beschreibung;
 
-    @ManyToMany
-    private List<Skill> skills = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "ausschreibung_zu_skill", schema = "startupx",
+            joinColumns = @JoinColumn(name = "stellenausschreibung_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    private Set<Skill> skills = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "stellenausschreibung")
     private List<Bewerbung> bewerbungen = new ArrayList<>();
+
+    @Convert(converter = StatusConverter.class)
+    @Column(name = "status")
+    private Status status;
 
     @Override
     public String toString() {

@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class Startup {
     private String name;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.SET_DEFAULT)
     @ColumnDefault("0")
     @JoinColumn(name = "branche_id", nullable = false)
@@ -54,6 +55,10 @@ public class Startup {
 
     @OneToMany(mappedBy = "startup")
     private List<Stellenausschreibung> stellenausschreibungen;
+
+    @OneToMany(mappedBy = "startup")
+    private List<Student> mitarbeiterList;
+
 
     @ManyToMany
     @JoinTable(

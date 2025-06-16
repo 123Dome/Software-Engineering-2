@@ -7,7 +7,10 @@ import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class StellenausschreibungMapper {
@@ -17,14 +20,14 @@ public class StellenausschreibungMapper {
             return null;
         }
 
-        List<Long> skillIds = new ArrayList<>();
+        Set<Long> skillIds = new LinkedHashSet<>();
 
         List<Long> bewerbungIds = new ArrayList<>();
 
         if (stellenausschreibung.getSkills() != null) {
             skillIds = stellenausschreibung.getSkills().stream()
                     .map(Skill::getId)
-                    .toList();
+                    .collect(Collectors.toSet());;
         }
 
         if (stellenausschreibung.getBewerbungen() != null) {
@@ -40,6 +43,7 @@ public class StellenausschreibungMapper {
                 .startup(stellenausschreibung.getStartup().getId())
                 .skills(skillIds)
                 .bewerbungen(bewerbungIds)
+                .status(stellenausschreibung.getStatus())
                 .build();
 
         return stellenausschreibungDTO;
