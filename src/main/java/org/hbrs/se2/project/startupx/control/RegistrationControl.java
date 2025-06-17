@@ -22,7 +22,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class RegistrationControl {
+public class RegistrationControl extends AuthorizationControl {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistrationControl.class);
 
