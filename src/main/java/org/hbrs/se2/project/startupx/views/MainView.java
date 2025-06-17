@@ -32,6 +32,7 @@ public class MainView extends VerticalLayout {
     public MainView() {
         setSizeFull();
         LoginForm component = new LoginForm();
+        component.setId("loginForm");
 
         component.addLoginListener(e -> {
 
@@ -59,6 +60,7 @@ public class MainView extends VerticalLayout {
         Button registerStudentButton = new Button("Zur Registrierung von Studenten", event ->
             UI.getCurrent().navigate(StudentRegistrationView.class)
         );
+        registerStudentButton.setId("registerStudentButton");
 
         Button registerInvestorButton = new Button("Zur Registrierung von Investor", event ->
             UI.getCurrent().navigate(InvestorRegistrationView.class)

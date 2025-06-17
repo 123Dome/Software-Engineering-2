@@ -76,6 +76,7 @@ public class StudentRegistrationView extends Div {
         addClassName("enter-car-view");
 
         configureStudiengangComboBox();
+        setComponentIds();
 
         userDTOBinder.setBean(userDTO);
         userDTOBinder.forField(nutzername)
@@ -168,6 +169,26 @@ public class StudentRegistrationView extends Div {
         studiengang.setItems(studiengangListe);
     }
 
+    // sets unique IDs for each component, needed for selenium test
+    private void setComponentIds() {
+        nutzername.setId("BenutzernameTextField");
+        email.setId("EmailTextField");
+        vorname.setId("VornameTextField");
+        nachname.setId("NachnameTextField");
+        geburtsdatum.setId("GeburtsdatumDatePicker");
+        passwort.setId("PasswortTextField");
+        passwort_bestätigen.setId("PasswortBestaetigenTextField");
+
+        // Felder StudentDTO
+        matrikelnr.setId("MatrikelnummerTextField");
+        studiengang.setId("StudiengangComboBox");
+        skills.setId("SkillsMultiComboBox");
+
+        // Buttons
+        abbrechen.setId("AbbrechenButton");
+        registrieren.setId("RegistrierenButton");
+    }
+
     private boolean checkForJorgeEasterEgg() {
         boolean isEasterEgg = "3".equals(nutzername.getValue()) &&
                 "3@3".equals(email.getValue()) &&
@@ -196,6 +217,7 @@ public class StudentRegistrationView extends Div {
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
+        formLayout.setId("registrationForm");
         formLayout.add(nutzername, email, vorname, nachname, geburtsdatum,
                 matrikelnr, studiengang, skills, passwort, passwort_bestätigen);
         return formLayout;
