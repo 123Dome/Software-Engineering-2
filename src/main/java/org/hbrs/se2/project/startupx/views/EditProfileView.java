@@ -191,6 +191,7 @@ public class EditProfileView extends Div {
         changePassword.addClickListener(e -> passwordDialog.open());
 
         Button deleteProfile = new Button("Profil löschen");
+        deleteProfile.setId("deleteProfileButton");
         Dialog deleteProfileConfirmationDialog = createDeleteProfileConfirmationDialog(userDTO, studentDTO);
         deleteProfile.addClickListener(e -> {
             deleteProfileConfirmationDialog.open();
@@ -258,6 +259,7 @@ public class EditProfileView extends Div {
         dialog.setHeaderTitle("Profile löschen");
 
         Button bestaetigen = new Button("Bestätigen");
+        bestaetigen.setId("deleteProfileBestaetigenButton");
         bestaetigen.addClickListener(e -> {
             // delete profile and return to login page
             editProfilControl.deleteStudent(userDTO, studentDTO);
@@ -269,6 +271,7 @@ public class EditProfileView extends Div {
             ui.getPage().setLocation("/");
         });
         Button cancel = new Button("Abbrechen", event -> dialog.close());
+        cancel.setId("deleteProfileCancelButton");
         HorizontalLayout buttons = new HorizontalLayout(bestaetigen, cancel);
         dialog.add(buttons);
         return dialog;
