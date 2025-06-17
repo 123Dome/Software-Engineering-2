@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import org.hbrs.se2.project.startupx.control.LoginControl;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = "" )
 @RouteAlias(value = "login")
+@PageTitle("Login")
 public class MainView extends VerticalLayout {
 
     // Default: Einfügung des LoginControl-Objekts als Singleton (Spring-Annotation)
