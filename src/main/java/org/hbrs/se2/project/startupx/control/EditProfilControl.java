@@ -150,6 +150,14 @@ public class EditProfilControl {
         return StudentMapper.mapToStudentDto(existingStudent);
     }
 
+    public StudentDTO getStudentDTObyUserId(Long userId) {
+        Student existingStudent = studentRepository.findByUser_Id(userId);
+        if (existingStudent == null) {
+            throw new EditProfilException("Student nicht gefunden.");
+        }
+        return StudentMapper.mapToStudentDto(existingStudent);
+    }
+
     public UserDTO getUserDTO(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {

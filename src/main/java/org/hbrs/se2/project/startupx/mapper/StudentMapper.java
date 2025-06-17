@@ -30,6 +30,12 @@ public class StudentMapper {
                     .collect(Collectors.toSet());
         }
 
+        Long startupId = null;
+
+        if(student.getStartup() != null){
+            startupId = student.getStartup().getId();
+        }
+
         StudentDTO studentDTO = StudentDTO.builder()
                 .id(student.getId())
                 .user(student.getUser().getId())
@@ -38,6 +44,7 @@ public class StudentMapper {
                 .steckbrief(student.getSteckbrief())
                 .skills(skillIds)
                 .startups(startupIds)
+                .startupId(startupId)
                 .build();
 
         return studentDTO;
@@ -56,6 +63,7 @@ public class StudentMapper {
                 .steckbrief(studentDTO.getSteckbrief())
                 .matrikelnr(studentDTO.getMatrikelnr())
                 .startups(startupSet)
+                .startup(null)
                 .build();
     }
 }

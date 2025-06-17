@@ -170,7 +170,7 @@ public class ApplyForJobView extends Div implements BeforeEnterObserver{
                     for (BewerbungDTO app : applications) {
                         Div appCard = new Div();
                         appCard.getStyle().set("border", "1px solid #ccc").set("padding", "10px").set("margin-bottom", "10px");
-                        appCard.add(new Paragraph("BewerberungsID: " + app.getId()));
+                        appCard.add(new Paragraph("BewerbungsID: " + app.getId()));
 
                         StudentDTO bewerberSudent = editProfilControl.getStudentDTO(app.getStudent());
                         UserDTO bewerberUser = editProfilControl.getUserDTO(bewerberSudent.getUser());

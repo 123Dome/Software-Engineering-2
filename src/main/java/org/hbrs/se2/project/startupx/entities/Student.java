@@ -54,7 +54,7 @@ public class Student {
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new LinkedHashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "startup_id")
     private Startup startup;
 

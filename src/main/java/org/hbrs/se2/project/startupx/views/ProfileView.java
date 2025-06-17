@@ -1,6 +1,7 @@
 package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -12,13 +13,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.VaadinSession;
-import org.hbrs.se2.project.startupx.control.BewertungControl;
-import org.hbrs.se2.project.startupx.control.ManageStartupControl;
-import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
-import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.dtos.StudentDTO;
-import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.control.*;
+import org.hbrs.se2.project.startupx.dtos.*;
 import org.hbrs.se2.project.startupx.mapper.StudentMapper;
 import org.hbrs.se2.project.startupx.repository.StudentRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
@@ -30,33 +28,52 @@ import java.util.List;
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class ProfileView extends Div {
 
+
     private UserDTO userDTO;
+    private StudentDTO studentDTO;
 
-    private StudentRepository studentRepository;
-
+    private final EditProfilControl editProfilControl;
     private final ManageStartupControl manageStartupControl;
-
     private final BewertungControl bewertungControl;
+    private final JobApplicationControl jobApplicationControl;
+    private final StellenausschreibungControl stellenausschreibungControl;
 
     private final VerticalLayout bewertungenLayout = new VerticalLayout();
 
-    public ProfileView(ManageStartupControl manageStartupControl, StudentRepository studentRepository, BewertungControl bewertungControl) {
-        this.studentRepository = studentRepository;
+    private final VerticalLayout bewerbungsLayout = new VerticalLayout();
+
+    public ProfileView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl,
+                       JobApplicationControl jobApplicationControl, EditProfilControl editProfilControl,
+                       StellenausschreibungControl stellenausschreibungControl) {
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
+        this.editProfilControl = editProfilControl;
+        this.jobApplicationControl = jobApplicationControl;
+        this.stellenausschreibungControl = stellenausschreibungControl;
         addClassName("profile-view");
         loadCurrentUser();
-        add(createProfileLayout());
-        StudentDTO studentDTO = StudentMapper.mapToStudentDto(studentRepository.findById(userDTO.getStudent()).get());
-        if (!studentDTO.getStartups().isEmpty()) {
-            add(setUpGrid(studentDTO));
-        }
-        add(setUpBewertungenKarten());
+//        add(createProfileLayout());
+//        Grid studentGrid = new Grid();
+//        if (!this.studentDTO.getStartups().isEmpty()) {
+//            studentGrid = setUpGrid(studentDTO);
+//        }
+//        add(setUpBewertungenKarten());
+//        add(myBewerbungen());
+
+        HorizontalLayout reviewsAndApplicationsLayout = new HorizontalLayout();
+        reviewsAndApplicationsLayout.setSpacing(true);
+        reviewsAndApplicationsLayout.add(setUpBewertungenKarten(), myBewerbungen());
+
+        add(createProfileLayout(),
+//                studentGrid,
+                reviewsAndApplicationsLayout
+        );
     }
 
     //Aktuelle Nutzerdaten laden
     private void loadCurrentUser() {
         userDTO = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
+        this.studentDTO = editProfilControl.getStudentDTObyUserId(userDTO.getId());
     }
 
     //Generisches Profilbild wird reingeladen, Größe angepasst
@@ -74,12 +91,31 @@ public class ProfileView extends Div {
         infoLayout.setSpacing(false);
         infoLayout.setPadding(false);
 
+        String arbeitgeber = null;
+        StartupDTO startupDTO;
+        if (studentDTO != null && studentDTO.getStartupId() != null) {
+            startupDTO = manageStartupControl.findByID(studentDTO.getStartupId());
+            arbeitgeber = startupDTO.getName();
+        } else {
+            startupDTO = null;
+        }
+
         infoLayout.add(
                 new H3(userDTO.getVorname() + " " +  userDTO.getNachname()),
                 new Paragraph("Nutzername: " + userDTO.getNutzername()),
                 new Paragraph("Geburtsdatum: " + userDTO.getGeburtsdatum()),
                 new Paragraph("Email: " + userDTO.getEmail())
         );
+
+        if (arbeitgeber != null) {
+            Paragraph arbeitgerParagraph = new Paragraph("Arbeitgeber: " + arbeitgeber);
+            arbeitgerParagraph.addClickListener(click -> {
+                String startupId = startupDTO.getId().toString();
+                UI.getCurrent().navigate("startup/"+startupId);
+            });
+
+            infoLayout.add(arbeitgerParagraph);
+        }
 
         return infoLayout;
     }
@@ -185,5 +221,48 @@ public class ProfileView extends Div {
         }
 
         return bewertungenLayout;
+    }
+
+    private Component myBewerbungen() {
+        bewerbungsLayout.removeAll();
+
+        bewerbungsLayout.add(new H3("Meine Bewerbungen"));
+
+        List<BewerbungDTO> bewerbungen = jobApplicationControl.getApplicationsByStudent(studentDTO.getId());
+
+        if (bewerbungen.isEmpty()) {
+            bewerbungsLayout.add(new Paragraph("Keine Bewerbungen vorhanden"));
+            return bewerbungsLayout;
+        }
+
+        for(BewerbungDTO bewerbung : bewerbungen) {
+            Div card = new Div();
+            card.addClassName("bewerbungen-karte");
+            card.setWidth("400px");
+            card.getStyle().set("border", "1px solid #ccc");
+            card.getStyle().set("border-radius", "8px");
+            card.getStyle().set("padding", "16px");
+            card.getStyle().set("box-shadow", "2px 2px 6px rgba(0,0,0,0.1)");
+
+            StellenausschreibungDTO stellenausschreibungDTO = stellenausschreibungControl.findById(bewerbung.getStellenausschreibungen());
+
+            // Startup zur Bewertung
+            String startUpName = manageStartupControl.findByID(stellenausschreibungDTO.getStartup()).getName();
+            card.add(new H4("Startup: " + startUpName));
+            card.add(new Paragraph("Titel der Stellenausschreibung: " + stellenausschreibungDTO.getTitel()));
+            card.add(new Paragraph("Status: " + bewerbung.getStatus()));
+
+            Button zurAusschreibung = new Button("Zur Stellenausschreibung");
+            zurAusschreibung.addClickListener(click -> {
+                        String stellenausschreibungsId = stellenausschreibungDTO.getId().toString();
+                        UI.getCurrent().navigate("application/"+stellenausschreibungsId);
+                    }
+            );
+
+            card.add(zurAusschreibung);
+            bewerbungsLayout.add(card);
+        }
+
+        return bewerbungsLayout;
     }
 }

@@ -223,13 +223,18 @@ public class ManageStartupControl {
     }
 
     @Transactional
-    public void neuerMitarbeiter(Long studentId, Long startupId) {
+    public void neuerMitarbeiter(Long studentId, Long startupId) throws Exception {
 
         Student student = studentRepository.findById(studentId).get();
         Startup startup = startupRepository.findById(startupId).get();
 
-        student.setStartup(startup);
-        studentRepository.save(student);
+        if(student.getStartup() != null) {
+            student.setStartup(startup);
+            studentRepository.save(student);
+        } else {
+            throw new Exception("Student arbeitet schon bei einem Startup.");
+        }
+
         if (startup.getMitarbeiterList() == null) {
             startup.setMitarbeiterList(new ArrayList<>());
         }
