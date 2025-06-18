@@ -13,6 +13,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -31,6 +32,7 @@ import org.hbrs.se2.project.startupx.entities.Skill;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -248,7 +250,10 @@ public class StudentRegistrationView extends Div {
                 clearForm();
                 UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
             } catch (Exception ex) {
-                Notification.show("Fehler: " + ex.getMessage());
+                Notification errormsg = new Notification("Fehler: " + ex.getMessage());
+                errormsg.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                errormsg.setDuration(5000);
+                errormsg.open();
             }
         } else {
             Notification.show("Überprüfe deine Eingaben");
