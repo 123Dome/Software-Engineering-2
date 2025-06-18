@@ -85,7 +85,7 @@ public class CreateStartUpView extends Div {
             if (binder.validate().isOk()) {
                 try {
                     manageStartupControl.createStartup(startupDTO);
-                    Notification.show("Nutzer registriert!");
+                    Notification.show("StartUp registriert!");
                     clearForm();
                     UI.getCurrent().navigate((Globals.Pages.MAIN_VIEW));
                 }
