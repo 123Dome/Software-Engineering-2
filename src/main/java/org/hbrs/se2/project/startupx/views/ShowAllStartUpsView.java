@@ -5,9 +5,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
@@ -25,6 +30,7 @@ import java.util.List;
 public class ShowAllStartUpsView extends Div{
 
     private Button zumStartUp = new Button("Zum StartUp");
+    private TextField searchField = new TextField();
 
     private final ManageStartupControl manageStartupControl;
 
@@ -32,27 +38,32 @@ public class ShowAllStartUpsView extends Div{
     public ShowAllStartUpsView(ManageStartupControl manageStartupControl) {
         this.manageStartupControl = manageStartupControl;
         add(createTitle());
+        add(setUpSearchField());
         add(setUpGrid());
         //add(createButtonLayout());
     }
-
 
     private Component createTitle() {
         return new H3("Liste von StartUps");
     }
 
+    private TextField setUpSearchField() {
+        searchField.setWidth("100%");
+        searchField.setPlaceholder("Suche");
+        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
+        return searchField;
+    }
+
     //Erstellen der Tabelle
     private Grid setUpGrid() {
         //Soll zukünftig alle StartUps listen
-        List<StartupDTO> startups = manageStartupControl.findAll();
         Grid<StartupDTO> grid = new Grid<>(StartupDTO.class, false); //keine automatsiche Erstellung von Spalten
-        grid.setItems(startups);
 
         grid.addColumn(StartupDTO::getName).setHeader("Name");
         grid.addColumn(StartupDTO::getBeschreibung).setHeader("Beschreibung");
         grid.addColumn(StartupDTO::getGruendungsdatum).setHeader("Gründungsdatum");
         grid.addColumn(StartupDTO::getAnzahlMitarbeiter).setHeader("Mitarbeiterzahl");
-
         grid.addColumn(dto -> manageStartupControl.getBrancheNameById(dto.getBranche()))
                 .setHeader("Branche");
 
@@ -64,6 +75,31 @@ public class ShowAllStartUpsView extends Div{
                 );
             }
         });
+
+        List<StartupDTO> startups = manageStartupControl.findAll();
+        GridListDataView<StartupDTO> dataView = grid.setItems(startups);
+
+        searchField.addValueChangeListener(e -> grid.getDataProvider().refreshAll());
+
+        dataView.addFilter(startupDTO -> {
+            String searchTerm = searchField.getValue().trim();
+
+            if (searchTerm.isEmpty())
+                return true;
+
+            boolean matchesStartupName = startupDTO.getName().contains(searchTerm);
+            boolean matchesBeschreibung = startupDTO.getBeschreibung().contains(searchTerm);
+            boolean matchesGruendungsdatum = startupDTO.getGruendungsdatum().toString().contains(searchTerm);
+            boolean matchesAnzahlMitarbeiter = startupDTO.getAnzahlMitarbeiter().toString().equals(searchTerm);
+            boolean matchesBranche = manageStartupControl.getBrancheNameById(startupDTO.getBranche()).contains(searchTerm);
+
+            return matchesStartupName
+                    || matchesBeschreibung
+                    || matchesGruendungsdatum
+                    || matchesAnzahlMitarbeiter
+                    || matchesBranche;
+        });
+
         return grid;
     }
 
