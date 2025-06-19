@@ -28,6 +28,7 @@ import org.hbrs.se2.project.startupx.util.Globals;
 import org.hbrs.se2.project.startupx.views.investor.InvestorProfileView;
 import org.hbrs.se2.project.startupx.views.investor.InvestorRegistrationView;
 import org.hbrs.se2.project.startupx.views.student.CreateStartUpView;
+import org.hbrs.se2.project.startupx.views.student.JobListingView;
 import org.hbrs.se2.project.startupx.views.student.StudentProfileView;
 import org.hbrs.se2.project.startupx.views.student.StudentRegistrationView;
 

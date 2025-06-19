@@ -69,7 +69,7 @@ public class DashboardView extends VerticalLayout {
 
             double average = bewertungControl.getDurchschnittlicheBewertungZuStartup(s.getId());
             if (average != 0.0) {
-                Span rating = new Span("Ø Bewertung: " + String.format("%.1f", average) + " ⭐");
+                Span rating = new Span(String.format("%.1f", average) + " ⭐");
                 card.add(rating);
             }
 

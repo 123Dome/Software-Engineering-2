@@ -1,4 +1,4 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.student;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
@@ -6,12 +6,10 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.hbrs.se2.project.startupx.control.StellenausschreibungControl;
 import org.hbrs.se2.project.startupx.dtos.SkillDTO;
 import org.hbrs.se2.project.startupx.dtos.StellenausschreibungDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @UIScope
 public class StellenanzeigeDialog extends Dialog {

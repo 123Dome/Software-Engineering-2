@@ -15,11 +15,9 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.entities.Startup;
-import org.hbrs.se2.project.startupx.repository.StartupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -33,10 +31,12 @@ public class ShowAllStartUpsView extends Div{
     private TextField searchField = new TextField();
 
     private final ManageStartupControl manageStartupControl;
+    private final BewertungControl bewertungControl;
 
 
-    public ShowAllStartUpsView(ManageStartupControl manageStartupControl) {
+    public ShowAllStartUpsView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
         this.manageStartupControl = manageStartupControl;
+        this.bewertungControl = bewertungControl;
         add(createTitle());
         add(setUpSearchField());
         add(setUpGrid());
@@ -66,6 +66,14 @@ public class ShowAllStartUpsView extends Div{
         grid.addColumn(StartupDTO::getAnzahlMitarbeiter).setHeader("Mitarbeiterzahl");
         grid.addColumn(dto -> manageStartupControl.getBrancheNameById(dto.getBranche()))
                 .setHeader("Branche");
+        grid.addColumn(dto -> {
+            double average = bewertungControl.getDurchschnittlicheBewertungZuStartup(dto.getId());
+            if (average > 0.0) {
+                return String.format("%.1f ⭐", average);
+            } else {
+                return ""; // Kein Text, wenn keine Bewertung
+            }
+        }).setHeader("Ø Bewertung");
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             StartupDTO selected = event.getValue();
@@ -92,12 +100,14 @@ public class ShowAllStartUpsView extends Div{
             boolean matchesGruendungsdatum = startupDTO.getGruendungsdatum().toString().contains(searchTerm);
             boolean matchesAnzahlMitarbeiter = startupDTO.getAnzahlMitarbeiter().toString().equals(searchTerm);
             boolean matchesBranche = manageStartupControl.getBrancheNameById(startupDTO.getBranche()).contains(searchTerm);
+            boolean matchesBewertung = Double.toString(bewertungControl.getDurchschnittlicheBewertungZuStartup(startupDTO.getId())).contains(searchTerm);
 
             return matchesStartupName
                     || matchesBeschreibung
                     || matchesGruendungsdatum
                     || matchesAnzahlMitarbeiter
-                    || matchesBranche;
+                    || matchesBranche
+                    || matchesBewertung;
         });
 
         return grid;

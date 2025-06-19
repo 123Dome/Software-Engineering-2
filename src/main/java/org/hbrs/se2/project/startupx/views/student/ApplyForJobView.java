@@ -24,7 +24,7 @@ import org.hbrs.se2.project.startupx.views.AppView;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Route(value = "application/:id", layout = AppView.class)
+@Route(value = Globals.Pages.APPLY_FOR_JOB_VIEW + "/:id", layout = AppView.class)
 @PageTitle("ApplyForJobView")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class ApplyForJobView extends Div implements BeforeEnterObserver{

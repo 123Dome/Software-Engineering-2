@@ -29,7 +29,7 @@ import org.hbrs.se2.project.startupx.views.AppView;
 import java.time.LocalDate;
 import java.util.*;
 
-@Route(value = "CreateStartUp", layout = AppView.class)
+@Route(value = Globals.Pages.CREATE_START_UP_VIEW, layout = AppView.class)
 @PageTitle("StartUp erstellen")
 @CssImport("./styles/views/main/main-view.css")
 public class CreateStartUpView extends Div {
