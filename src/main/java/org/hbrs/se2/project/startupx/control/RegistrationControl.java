@@ -79,7 +79,7 @@ public class RegistrationControl {
         Investor investor = null;
 
         User newUser = UserMapper.mapToUser(userDTO, defaultRollen, bewertungList, student, investor);
-        newUser.getRollen().add(defaultRolle);
+        newUser.setRollen(defaultRollen);
 
         return userRepository.save(newUser);
     }
