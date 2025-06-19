@@ -13,17 +13,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.VaadinSession;
 import org.hbrs.se2.project.startupx.control.*;
 import org.hbrs.se2.project.startupx.dtos.*;
-import org.hbrs.se2.project.startupx.mapper.StudentMapper;
-import org.hbrs.se2.project.startupx.repository.StudentRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.util.List;
 
-@Route(value = "userProfile", layout = AppView.class)
+@Route(value = "student_profile", layout = AppView.class)
 @PageTitle("Mein Profil")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class ProfileView extends Div {

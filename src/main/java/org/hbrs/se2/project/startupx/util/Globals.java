@@ -1,15 +1,16 @@
 package org.hbrs.se2.project.startupx.util;
 
 public class Globals {
-    public static String CURRENT_USER = "current_User";
+    public static String CURRENT_USER = "current_user";
 
     public static class Pages {
-        public static final String REGISTRATION = "registration";
-        public static final String CREATE_STARTUP = "create_startup";
-        public static final String EDIT_PROFILE = "edit_profile ";
-
         public static final String LOGIN_VIEW = "login";
-        public static final String MAIN_VIEW = "main";
+        public static final String MAIN_VIEW = "";
+
+        public static final String STUDENT_DASHBOARD = "student_dashboard";
+        public static final String STUDENT_PROFILE = "student_profile";
+
+        public static final String INVESTOR_DASHBOARD = "investor_dashboard";
     }
 
     public static class Roles {

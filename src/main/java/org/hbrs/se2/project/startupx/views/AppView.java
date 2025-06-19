@@ -19,10 +19,13 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.router.*;
-import org.hbrs.se2.project.startupx.control.AuthorizationControl;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.RouterLink;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.student.StudentRegistrationView;
 
 import java.util.Optional;
 
@@ -31,7 +34,6 @@ import java.util.Optional;
  */
 @CssImport("./styles/views/main/main-view.css")
 @CssImport(value = "./styles/views/main/dark-mode.css", themeFor = "vaadin-app-layout")
-//@Route("main")
 @JsModule("./styles/shared-styles.js")
 public class AppView extends AppLayout implements BeforeEnterObserver {
 
@@ -40,13 +42,8 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     private H1 helloUser;
     private MenuItem profileButton;
 
-    private AuthorizationControl authorizationControl;
-
-    public AppView(AuthorizationControl authorizationControl) {
-        this.authorizationControl = authorizationControl;
-        if (getCurrentUser() == null) {
-            // System.out.println("LOG: In Constructor of App View - No User given!");
-        } else {
+    public AppView() {
+        if(getCurrentUser() != null) {
             setUpUI();
         }
     }
@@ -63,21 +60,11 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         addToDrawer(createDrawerContent(menu));
     }
 
-    private boolean checkIfUserIsLoggedIn() {
-        // Falls der Benutzer nicht eingeloggt ist, dann wird er auf die Startseite gelenkt
-        UserDTO userDTO = this.getCurrentUser();
-        if (userDTO == null) {
-            UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Erzeugung der horizontalen Leiste (Header).
      * @return
      */
-    private Component   createHeaderContent() {
+    private Component createHeaderContent() {
         // Ein paar Grund-Einstellungen. Alles wird in ein horizontales Layout gesteckt.
         HorizontalLayout layout = new HorizontalLayout();
         layout.setId("header");
@@ -109,7 +96,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         profileButton = bar.addItem("Profil", e -> switchToProfile());
 
         // Logout-Button am rechts-oberen Rand.
-        MenuItem logoutButton = bar.addItem("Logout" , e -> logoutUser());
+        bar.addItem("Logout" , e -> logoutUser());
         topRightPanel.add(bar);
 
         //Test zum togglen zwischen Light und Darkmode
@@ -128,23 +115,6 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         layout.add( topRightPanel );
         return layout;
     }
-
-    private void logoutUser() {
-        UI ui = this.getUI().get();
-        ui.getSession().close();
-        ui.getPage().setLocation("/");
-    }
-
-    //Navigier zu ProfileView
-    private void switchToProfile(){
-        UI.getCurrent().navigate("userProfile");
-    }
-
-    //Navigiere zu EditProfileView
-    private void switchToEditProfile() {
-        UI.getCurrent().navigate("EditProfile");
-    }
-
 
     /**
      * Hinzufügen der vertikalen Leiste (Drawer)
@@ -179,7 +149,6 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
      * @return
      */
     private Tabs createMenu() {
-
         // Anlegen der Grundstruktur
         final Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
@@ -192,29 +161,11 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     }
 
     private Component[] createMenuItems() {
-       // Abholung der Referenz auf den Authorisierungs-Service
-//       authorizationControl = new AuthorizationControl();
-
-       // Jeder User sollte Autos sehen können, von daher wird dieser schon mal erzeugt und
-       // und dem Tabs-Array hinzugefügt. In der Methode createTab wird ein (Key, Value)-Pair übergeben:
-        // Key: der sichtbare String des Menu-Items
-        // Value: Die UI-Component, die nach dem Klick auf das Menuitem angezeigt wird.
-       Tab[] tabs = new Tab[]{ createTab( "Startseite", MainViewDashboard.class)
-               , createTab( "Liste von StartUps", ShowAllStartUpsView.class)
-               , createTab( "Jobbörse", JobListingView.class)
-               , createTab("StartUp erstellen", CreateStartUpView.class)
-       };
-
-       // Falls er Admin-Rechte hat, sollte der User auch Autos hinzufügen können
-       // (Alternative: Verwendung der Methode 'isUserisAllowedToAccessThisFeature')
-       if ( this.authorizationControl.isUserInRole( this.getCurrentUser() , Globals.Roles.ADMIN ) ) {
-           // System.out.println("User is Admin!");
-           //tabs = Utils.append( tabs , createTab("StartUp erstellen", CreateStartUpView.class));
-       }
-
-       // ToDo für die Teams: Weitere Tabs aus ihrem Projekt hier einfügen!
-
-       return tabs;
+        return new Tab[]{ createTab( "Startseite", MainViewDashboard.class)
+                , createTab( "Liste von StartUps", ShowAllStartUpsView.class)
+                , createTab( "Jobbörse", JobListingView.class)
+                , createTab("StartUp erstellen", CreateStartUpView.class)
+        };
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
@@ -222,6 +173,58 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         tab.add(new RouterLink(text, navigationTarget));
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
+    }
+
+    private Optional<Tab> getTabForComponent(Component component) {
+        return menu.getChildren().filter(tab -> ComponentUtil.getData(tab, Class.class).equals(component.getClass()))
+                .findFirst().map(Tab.class::cast);
+    }
+
+    private String getCurrentPageTitle() {
+        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
+        return title == null ? "" : title.value();
+    }
+
+    private boolean checkIfUserIsLoggedIn() {
+        // Falls der Benutzer nicht eingeloggt ist, dann wird er auf die Startseite gelenkt
+        if (this.getCurrentUser() == null) {
+            UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
+            return false;
+        }
+        return true;
+    }
+
+    private void logoutUser() {
+        UI ui = this.getUI().get();
+        ui.getSession().close();
+        ui.getPage().setLocation("/");
+    }
+
+    private UserDTO getCurrentUser() {
+        return (UserDTO) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
+    }
+
+    //Navigier zu ProfileView
+    private void switchToProfile(){
+        UI.getCurrent().navigate(ProfileView.class);
+    }
+
+    //Navigiere zu EditProfileView
+    private void switchToEditProfile() {
+        UI.getCurrent().navigate(EditProfileView.class);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        Class<? extends Component> target = (Class<? extends Component>) beforeEnterEvent.getNavigationTarget();
+
+        // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView oder StudentRegistrationView navigiert wird
+        if (this.getCurrentUser() == null &&
+                !target.equals(InvestorRegistrationView.class) &&
+                !target.equals(StudentRegistrationView.class)) {
+
+            beforeEnterEvent.rerouteTo(MainView.class);
+        }
     }
 
     @Override
@@ -238,7 +241,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         viewTitle.setText(getCurrentPageTitle());
 
         // Setzen des Vornamens von dem aktuell eingeloggten Benutzer
-        helloUser.setText("Hallo! "  + this.getCurrentNameOfUser() );
+        helloUser.setText("Hallo! "  + this.getCurrentUser().getVorname() );
 
         //Ändert den Button von Profil nach Profil bearbeiten, wenn man sich auf dem eigenen Profil befindet
         Class<?> currentView = getContent().getClass();
@@ -248,53 +251,6 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         } else {
             profileButton.setText("Profil");
             profileButton.getElement().addEventListener("click", e -> switchToProfile());
-        }
-
-    }
-
-    private Optional<Tab> getTabForComponent(Component component) {
-        return menu.getChildren().filter(tab -> ComponentUtil.getData(tab, Class.class).equals(component.getClass()))
-                .findFirst().map(Tab.class::cast);
-    }
-
-    private String getCurrentPageTitle() {
-        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
-        return title == null ? "" : title.value();
-    }
-
-    private String getCurrentNameOfUser() {
-        return getCurrentUser().getVorname();
-    }
-
-    private UserDTO getCurrentUser() {
-        return (UserDTO) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
-    }
-
-
-
-
-    @Override
-    /**
-     * Methode wird vor der eigentlichen Darstellung der UI-Components aufgerufen.
-     * Hier kann man die finale Darstellung noch abbrechen, wenn z.B. der Nutzer nicht eingeloggt ist
-     * Dann erfolgt hier ein ReDirect auf die Login-Seite. Eine Navigation (Methode navigate)
-     * ist hier nicht möglich, da die finale Navigation noch nicht stattgefunden hat.
-     * Diese Methode in der AppLayout sichert auch den un-authorisierten Zugriff auf die innerliegenden
-     * Views (hier: ShowCarsView und EnterCarView) ab.
-     *
-     */
-
-    //Wenn der User nicht eingeloggt ist, soll er die Möglichkeit haben, sich zu Registrieren.
-    //Alle anderen Seiten sind nicht zu erreichen.
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        Class<? extends Component> target = (Class<? extends Component>) beforeEnterEvent.getNavigationTarget();
-
-        // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView oder StudentRegistrationView navigiert wird
-        if (getCurrentUser() == null &&
-                !target.equals(InvestorRegistrationView.class) &&
-                !target.equals(StudentRegistrationView.class)) {
-
-            beforeEnterEvent.rerouteTo(Globals.Pages.LOGIN_VIEW);
         }
     }
 }
