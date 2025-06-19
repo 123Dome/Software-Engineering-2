@@ -15,27 +15,16 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.server.VaadinSession;
-import org.hbrs.se2.project.startupx.control.BewertungControl;
-import org.hbrs.se2.project.startupx.control.ManageStartupControl;
-import org.hbrs.se2.project.startupx.dtos.BewertungDTO;
-import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.dtos.UserDTO;
-import org.hbrs.se2.project.startupx.control.SkillControl;
-import org.hbrs.se2.project.startupx.control.StellenausschreibungControl;
-import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.control.*;
 import org.hbrs.se2.project.startupx.dtos.*;
-import org.hbrs.se2.project.startupx.entities.Skill;
-import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
-import org.hbrs.se2.project.startupx.util.Globals;
-import org.hbrs.se2.project.startupx.util.Status;
+import org.hbrs.se2.project.startupx.views.student.ApplyForJobView;
 
-import java.util.ArrayList;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Route(value = "startup/:id", layout = AppView.class)
 @PageTitle("StartUp Details")
@@ -46,6 +35,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final StudiengangControl studiengangControl;
     private final SkillControl skillControl;
     private final BewertungControl bewertungControl;
+    private final AuthenticationControl authenticationControl;
 
     private boolean isGruender = false;
 
@@ -82,11 +72,13 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
 
-    public StartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl, BewertungControl bewertungControl) {
+    public StartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl, BewertungControl bewertungControl, AuthenticationControl authenticationControl) {
         this.studiengangControl = studiengangControl;
         this.stellenausschreibungControl = stellenausschreibungControl;
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
+        this.skillControl = skillControl;
+        this.authenticationControl = authenticationControl;
         addClassName("startup-details-view");
 
         bearbeitenButton.addClickListener(e -> switchToEditMode());
@@ -118,8 +110,6 @@ public class StartUpView extends Div implements BeforeEnterObserver {
                         dto -> dto.getBranche() != null ? dto.getBranche().doubleValue() : null,
                         (dto, value) -> dto.setBranche(value != null ? value.longValue() : null)
                 );
-
-        this.skillControl = skillControl;
     }
 
     @Override
@@ -133,7 +123,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
             try {
                 Long id = Long.parseLong(idString);
                 this.startup = manageStartupControl.findByID(id);
-                this.currentUser = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
+                this.currentUser = authenticationControl.getCurrentUser();
 
                 // Prüfe, ob der eingeloggte User zur Gründerliste des Startups gehört
                 this.isGruender = startup.getStudentenListe() != null &&
@@ -167,7 +157,10 @@ public class StartUpView extends Div implements BeforeEnterObserver {
         layout.add(new Paragraph("Gründungsdatum: " + startup.getGruendungsdatum()));
         layout.add(new Paragraph("Mitarbeiteranzahl: " + startup.getAnzahlMitarbeiter()));
         layout.add(setUpDurchschnittBewertungenInSternen());
-        layout.add(setUpBewertenButton());
+        // Nur Studenten die Möglichkeit zum bewerben geben
+        if(currentUser.getStudent() != null) {
+            layout.add(setUpBewertenButton());
+        }
         layout.add(setUpBewertungenCards());
 
         List<StellenausschreibungDTO> stellenausschreibungDTOS = stellenausschreibungControl.getAllOpenStellenausschreibungByStartup(startup);

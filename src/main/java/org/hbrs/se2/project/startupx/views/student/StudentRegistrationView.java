@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Route(value = "registrationStudent", layout = AppView.class)
-@PageTitle("RegistrationStudent")
+@Route(value = Globals.Pages.STUDENT_REGISTRATION_VIEW, layout = AppView.class)
+@PageTitle("Registration Student")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class StudentRegistrationView extends Div {
 

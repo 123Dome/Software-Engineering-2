@@ -37,9 +37,9 @@ public class MainView extends VerticalLayout implements BeforeEnterObserver {
                 this.add(setUpLoginPage());
             }
         } else if(user.getStudent() != null){ // Student angemeldet => Student Dashboard
-            event.rerouteTo(MainViewDashboard.class);
+            event.rerouteTo(DashboardView.class);
         } else if(user.getInvestor() != null){ // Investor angemeldet => Investor Dashboard TODO
-            event.rerouteTo(MainViewDashboard.class);
+            event.rerouteTo(DashboardView.class);
         }
     }
 
@@ -61,7 +61,7 @@ public class MainView extends VerticalLayout implements BeforeEnterObserver {
                 new Dialog(new Text(e.getMessage())).open();
             }
             if(isAuthenticated){
-                UI.getCurrent().navigate(MainViewDashboard.class);
+                UI.getCurrent().navigate(DashboardView.class);
             }
         });
 

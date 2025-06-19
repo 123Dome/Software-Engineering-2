@@ -27,6 +27,7 @@ import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.hbrs.se2.project.startupx.views.investor.InvestorProfileView;
 import org.hbrs.se2.project.startupx.views.investor.InvestorRegistrationView;
+import org.hbrs.se2.project.startupx.views.student.CreateStartUpView;
 import org.hbrs.se2.project.startupx.views.student.StudentProfileView;
 import org.hbrs.se2.project.startupx.views.student.StudentRegistrationView;
 
@@ -205,11 +206,19 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{ createTab( "Startseite", MainViewDashboard.class)
-                , createTab( "Liste von StartUps", ShowAllStartUpsView.class)
-                , createTab( "Jobbörse", JobListingView.class)
-                , createTab("StartUp erstellen", CreateStartUpView.class)
-        };
+        if(getCurrentUser().getStudent() != null) {
+            return new Tab[]{
+                      createTab( "Startseite", DashboardView.class),
+                      createTab( "Liste von StartUps", ShowAllStartUpsView.class),
+                      createTab( "Jobbörse", JobListingView.class),
+                      createTab("StartUp erstellen", CreateStartUpView.class)
+            };
+        } else {
+            return new Tab[]{
+                    createTab( "Startseite", DashboardView.class),
+                    createTab( "Liste von StartUps", ShowAllStartUpsView.class)
+            };
+        }
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {

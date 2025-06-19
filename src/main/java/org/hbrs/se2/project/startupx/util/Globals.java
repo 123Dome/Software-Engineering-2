@@ -6,13 +6,14 @@ public class Globals {
     public static class Pages {
         public static final String LOGIN_VIEW = "login";
         public static final String MAIN_VIEW = "";
+        public static final String DASHBOARD_VIEW = "dashboard";
         public static final String EDIT_PROFILE_VIEW = "edit_profile";
 
-        public static final String STUDENT_DASHBOARD = "student_dashboard";
-        public static final String STUDENT_PROFILE = "student_profile";
+        public static final String STUDENT_PROFILE_VIEW = "student_profile";
+        public static final String STUDENT_REGISTRATION_VIEW = "student_registration";
 
-        public static final String INVESTOR_DASHBOARD = "investor_dashboard";
-        public static final String INVESTOR_PROFILE = "investor_profile";
+        public static final String INVESTOR_PROFILE_VIEW = "investor_profile";
+        public static final String INVESTOR_REGISTRATION_VIEW = "investor_registration";
     }
 
     public static class Roles {

@@ -23,7 +23,7 @@ import org.hbrs.se2.project.startupx.views.MainView;
 
 import java.util.List;
 
-@Route(value = Globals.Pages.STUDENT_PROFILE, layout = AppView.class)
+@Route(value = Globals.Pages.STUDENT_PROFILE_VIEW, layout = AppView.class)
 @PageTitle("Mein Profil - Student")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class StudentProfileView extends Div implements BeforeEnterObserver {

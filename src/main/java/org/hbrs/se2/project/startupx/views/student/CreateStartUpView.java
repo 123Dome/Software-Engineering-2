@@ -1,8 +1,7 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.student;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -12,25 +11,20 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
-import jakarta.annotation.PostConstruct;
 import org.hbrs.se2.project.startupx.control.EditProfilControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
-import org.hbrs.se2.project.startupx.entities.Branche;
-import org.hbrs.se2.project.startupx.repository.BrancheRepository;
 import org.hbrs.se2.project.startupx.util.Globals;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hbrs.se2.project.startupx.views.AppView;
 
 import java.time.LocalDate;
 import java.util.*;

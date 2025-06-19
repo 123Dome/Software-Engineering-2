@@ -1,4 +1,4 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.student;
 
 
 import com.vaadin.flow.component.button.Button;
@@ -19,6 +19,7 @@ import org.hbrs.se2.project.startupx.control.*;
 import org.hbrs.se2.project.startupx.dtos.*;
 import org.hbrs.se2.project.startupx.util.BewerbungsStatus;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.AppView;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -28,8 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route(value = "registrationInvestor", layout = AppView.class)
-@PageTitle("RegistrationInvestor")
+@Route(value = Globals.Pages.INVESTOR_REGISTRATION_VIEW, layout = AppView.class)
+@PageTitle("Registration Investor")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung / Vererbung)
 

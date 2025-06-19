@@ -21,7 +21,7 @@ import org.hbrs.se2.project.startupx.util.Globals;
 import org.hbrs.se2.project.startupx.views.AppView;
 import org.hbrs.se2.project.startupx.views.MainView;
 
-@Route(value = Globals.Pages.INVESTOR_PROFILE, layout = AppView.class)
+@Route(value = Globals.Pages.INVESTOR_PROFILE_VIEW, layout = AppView.class)
 @PageTitle("Mein Profil - Investor")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class InvestorProfileView extends Div implements BeforeEnterObserver {
