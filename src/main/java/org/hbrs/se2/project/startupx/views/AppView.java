@@ -25,6 +25,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.investor.InvestorProfileView;
+import org.hbrs.se2.project.startupx.views.investor.InvestorRegistrationView;
+import org.hbrs.se2.project.startupx.views.student.StudentProfileView;
 import org.hbrs.se2.project.startupx.views.student.StudentRegistrationView;
 
 import java.util.Optional;
@@ -45,6 +48,47 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
     public AppView() {
         if(getCurrentUser() != null) {
             setUpUI();
+        }
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        Class<? extends Component> target = (Class<? extends Component>) beforeEnterEvent.getNavigationTarget();
+
+        // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView oder StudentRegistrationView navigiert wird
+        if (this.getCurrentUser() == null &&
+                !target.equals(InvestorRegistrationView.class) &&
+                !target.equals(StudentRegistrationView.class)) {
+
+            beforeEnterEvent.rerouteTo(MainView.class);
+        }
+    }
+
+    @Override
+    protected void afterNavigation() {
+        super.afterNavigation();
+
+        // Falls der Benutzer nicht eingeloggt ist, dann wird er auf die Startseite gelenkt
+        if ( !checkIfUserIsLoggedIn() ) return;
+
+        // Der aktuell-selektierte Tab wird gehighlighted.
+        getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
+
+        // Setzen des aktuellen Names des Tabs
+        viewTitle.setText(getCurrentPageTitle());
+
+        // Setzen des Vornamens von dem aktuell eingeloggten Benutzer
+        helloUser.setText("Hallo! "  + this.getCurrentUser().getVorname() );
+
+        //Ändert den Button von Profil nach Profil bearbeiten, wenn man sich auf dem eigenen Profil befindet
+        Class<?> currentView = getContent().getClass();
+        UserDTO currentUser = getCurrentUser();
+        if (currentView.equals(StudentProfileView.class)) {
+            profileButton.setText("Profil bearbeiten");
+            profileButton.getElement().addEventListener("click", e -> switchToEditProfile());
+        } else {
+            profileButton.setText("Profil");
+            profileButton.getElement().addEventListener("click", e -> switchToProfile());
         }
     }
 
@@ -206,7 +250,12 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
 
     //Navigier zu ProfileView
     private void switchToProfile(){
-        UI.getCurrent().navigate(ProfileView.class);
+        UserDTO currentUser = this.getCurrentUser();
+        if(currentUser.getStudent() != null){
+            UI.getCurrent().navigate(StudentProfileView.class);
+        } else if (currentUser.getInvestor() != null){
+            UI.getCurrent().navigate(InvestorProfileView.class);
+        }
     }
 
     //Navigiere zu EditProfileView
@@ -214,43 +263,4 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         UI.getCurrent().navigate(EditProfileView.class);
     }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        Class<? extends Component> target = (Class<? extends Component>) beforeEnterEvent.getNavigationTarget();
-
-        // Falls der User nicht eingeloggt ist UND NICHT zur RegistrationView oder StudentRegistrationView navigiert wird
-        if (this.getCurrentUser() == null &&
-                !target.equals(InvestorRegistrationView.class) &&
-                !target.equals(StudentRegistrationView.class)) {
-
-            beforeEnterEvent.rerouteTo(MainView.class);
-        }
-    }
-
-    @Override
-    protected void afterNavigation() {
-        super.afterNavigation();
-
-        // Falls der Benutzer nicht eingeloggt ist, dann wird er auf die Startseite gelenkt
-        if ( !checkIfUserIsLoggedIn() ) return;
-
-        // Der aktuell-selektierte Tab wird gehighlighted.
-        getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
-
-        // Setzen des aktuellen Names des Tabs
-        viewTitle.setText(getCurrentPageTitle());
-
-        // Setzen des Vornamens von dem aktuell eingeloggten Benutzer
-        helloUser.setText("Hallo! "  + this.getCurrentUser().getVorname() );
-
-        //Ändert den Button von Profil nach Profil bearbeiten, wenn man sich auf dem eigenen Profil befindet
-        Class<?> currentView = getContent().getClass();
-        if (currentView.equals(ProfileView.class)) {
-            profileButton.setText("Profil bearbeiten");
-            profileButton.getElement().addEventListener("click", e -> switchToEditProfile());
-        } else {
-            profileButton.setText("Profil");
-            profileButton.getElement().addEventListener("click", e -> switchToProfile());
-        }
-    }
 }

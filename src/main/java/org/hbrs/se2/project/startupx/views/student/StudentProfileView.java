@@ -1,4 +1,4 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.student;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -11,66 +11,91 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinSession;
 import org.hbrs.se2.project.startupx.control.*;
 import org.hbrs.se2.project.startupx.dtos.*;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.AppView;
+import org.hbrs.se2.project.startupx.views.MainView;
 
 import java.util.List;
 
-@Route(value = "student_profile", layout = AppView.class)
-@PageTitle("Mein Profil")
+@Route(value = Globals.Pages.STUDENT_PROFILE, layout = AppView.class)
+@PageTitle("Mein Profil - Student")
 @CssImport("./styles/views/entercar/enter-car-view.css")
-public class ProfileView extends Div {
-
+public class StudentProfileView extends Div implements BeforeEnterObserver {
 
     private UserDTO userDTO;
     private StudentDTO studentDTO;
 
     private final EditProfilControl editProfilControl;
+    private final AuthenticationControl authenticationControl;
     private final ManageStartupControl manageStartupControl;
     private final BewertungControl bewertungControl;
     private final JobApplicationControl jobApplicationControl;
     private final StellenausschreibungControl stellenausschreibungControl;
 
     private final VerticalLayout bewertungenLayout = new VerticalLayout();
-
     private final VerticalLayout bewerbungsLayout = new VerticalLayout();
 
-    public ProfileView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl,
-                       JobApplicationControl jobApplicationControl, EditProfilControl editProfilControl,
-                       StellenausschreibungControl stellenausschreibungControl) {
+    public StudentProfileView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl,
+                              JobApplicationControl jobApplicationControl, EditProfilControl editProfilControl,
+                              StellenausschreibungControl stellenausschreibungControl, AuthenticationControl authenticationControl) {
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
         this.editProfilControl = editProfilControl;
         this.jobApplicationControl = jobApplicationControl;
         this.stellenausschreibungControl = stellenausschreibungControl;
+        this.authenticationControl = authenticationControl;
         addClassName("profile-view");
-        loadCurrentUser();
-//        add(createProfileLayout());
-//        Grid studentGrid = new Grid();
-//        if (!this.studentDTO.getStartups().isEmpty()) {
-//            studentGrid = setUpGrid(studentDTO);
-//        }
-//        add(setUpBewertungenKarten());
-//        add(myBewerbungen());
-
-        HorizontalLayout reviewsAndApplicationsLayout = new HorizontalLayout();
-        reviewsAndApplicationsLayout.setSpacing(true);
-        reviewsAndApplicationsLayout.add(setUpBewertungenKarten(), myBewerbungen());
-
-        add(createProfileLayout(),
-//                studentGrid,
-                reviewsAndApplicationsLayout
-        );
     }
 
-    //Aktuelle Nutzerdaten laden
-    private void loadCurrentUser() {
-        userDTO = (UserDTO) VaadinSession.getCurrent().getAttribute(Globals.CURRENT_USER);
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        userDTO = authenticationControl.getCurrentUser();
         this.studentDTO = editProfilControl.getStudentDTObyUserId(userDTO.getId());
+        // Wenn KEIN Student => Zurück zur MainView
+        if (studentDTO == null) {
+            event.rerouteTo(MainView.class);
+        } else {
+            this.removeAll();
+            setUpUI();
+        }
+    }
+
+    private void setUpUI() {
+        HorizontalLayout reviewsAndApplicationsLayout = new HorizontalLayout(
+                setUpBewertungenCards(),
+                setUpBewerbungenCards()
+        );
+        reviewsAndApplicationsLayout.setSpacing(true);
+
+        if (!this.studentDTO.getStartups().isEmpty()) {
+            add(
+                    createProfileLayout(),
+                    setUpStartupGrid(),
+                    reviewsAndApplicationsLayout
+            );
+        } else {
+            add(
+                    createProfileLayout(),
+                    reviewsAndApplicationsLayout
+            );
+        }
+    }
+
+    //ImageLayout und Nutzerdaten-Layout werden zusammengefügt
+    private Component createProfileLayout() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setSpacing(true);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        layout.add(createProfileImage(), createUserInfoLayout());
+
+        return layout;
     }
 
     //Generisches Profilbild wird reingeladen, Größe angepasst
@@ -117,20 +142,9 @@ public class ProfileView extends Div {
         return infoLayout;
     }
 
-    //ImageLayout und Nutzerdaten-Layout werden zusammengefügt
-    private Component createProfileLayout() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setSpacing(true);
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        layout.add(createProfileImage(), createUserInfoLayout());
-
-        return layout;
-    }
-
-    private Grid setUpGrid(StudentDTO studentDTO) {
+    private Component setUpStartupGrid() {
         //Soll zukünftig alle StartUps listen
-        List<StartupDTO> startups = manageStartupControl.getStartups(studentDTO);
+        List<StartupDTO> startups = manageStartupControl.getStartups(this.studentDTO);
         Grid<StartupDTO> grid = new Grid<>(StartupDTO.class);
         grid.setItems(startups);
 
@@ -146,7 +160,7 @@ public class ProfileView extends Div {
         return grid;
     }
 
-    private Component setUpBewertungenKarten(){
+    private Component setUpBewertungenCards(){
         bewertungenLayout.removeAll();
 
         bewertungenLayout.add(new H3("Meine Bewertungen"));
@@ -203,7 +217,7 @@ public class ProfileView extends Div {
                     try {
                         bewertungControl.deleteBewertung(bewertung.getId());
                         Notification.show("Bewertung gelöscht.");
-                        setUpBewertungenKarten();
+                        setUpBewertungenCards();
                     } catch (Exception ex) {
                         Notification.show(ex.getMessage());
                     }
@@ -220,7 +234,7 @@ public class ProfileView extends Div {
         return bewertungenLayout;
     }
 
-    private Component myBewerbungen() {
+    private Component setUpBewerbungenCards() {
         bewerbungsLayout.removeAll();
 
         bewerbungsLayout.add(new H3("Meine Bewerbungen"));

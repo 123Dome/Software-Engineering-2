@@ -11,6 +11,7 @@ public class Globals {
         public static final String STUDENT_PROFILE = "student_profile";
 
         public static final String INVESTOR_DASHBOARD = "investor_dashboard";
+        public static final String INVESTOR_PROFILE = "investor_profile";
     }
 
     public static class Roles {

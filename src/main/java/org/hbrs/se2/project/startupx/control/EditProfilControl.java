@@ -3,10 +3,12 @@ package org.hbrs.se2.project.startupx.control;
 import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.control.exception.EditProfilException;
 import org.hbrs.se2.project.startupx.control.exception.StartUpException;
+import org.hbrs.se2.project.startupx.dtos.InvestorDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.*;
+import org.hbrs.se2.project.startupx.mapper.InvestorMapper;
 import org.hbrs.se2.project.startupx.mapper.StartupMapper;
 import org.hbrs.se2.project.startupx.mapper.StudentMapper;
 import org.hbrs.se2.project.startupx.mapper.UserMapper;
@@ -42,6 +44,8 @@ public class EditProfilControl {
 
     @Autowired
     ManageStartupControl manageStartupControl;
+    @Autowired
+    private InvestorRepository investorRepository;
 
     @Transactional
     public boolean updateUser(UserDTO newUserDTO) {
@@ -207,5 +211,13 @@ public class EditProfilControl {
         logger.info("Studentenprofil gelöscht: ID={}", studentDTO.getId());
         userRepository.deleteById(userDTO.getId());
         logger.info("User gelöscht: ID={}", userDTO.getId());
+    }
+
+    public InvestorDTO getInvestorDTObyUserId(Long userId) {
+        Investor existingInvestor = investorRepository.findByUser_Id(userId);
+        if (existingInvestor == null) {
+            throw new EditProfilException("Investor nicht gefunden.");
+        }
+        return InvestorMapper.mapToInvestorDto(existingInvestor);
     }
 }

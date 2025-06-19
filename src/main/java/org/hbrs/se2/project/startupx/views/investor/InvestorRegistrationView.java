@@ -1,4 +1,4 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.investor;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -23,6 +23,7 @@ import org.hbrs.se2.project.startupx.control.BrancheControl;
 import org.hbrs.se2.project.startupx.control.RegistrationControl;
 import org.hbrs.se2.project.startupx.dtos.*;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.AppView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

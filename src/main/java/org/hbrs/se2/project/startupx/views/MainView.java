@@ -12,6 +12,7 @@ import org.hbrs.se2.project.startupx.control.AuthenticationControl;
 import org.hbrs.se2.project.startupx.control.exception.LoginException;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.investor.InvestorRegistrationView;
 import org.hbrs.se2.project.startupx.views.student.StudentRegistrationView;
 import org.springframework.beans.factory.annotation.Autowired;
 
