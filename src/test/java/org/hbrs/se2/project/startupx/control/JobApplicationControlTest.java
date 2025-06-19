@@ -1,77 +1,84 @@
 package org.hbrs.se2.project.startupx.control;
 
-import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.dtos.BewerbungDTO;
-import org.hbrs.se2.project.startupx.entities.Bewerbung;
+import org.hbrs.se2.project.startupx.dtos.SkillDTO;
+import org.hbrs.se2.project.startupx.dtos.StellenausschreibungDTO;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.entities.Stellenausschreibung;
 import org.hbrs.se2.project.startupx.entities.Student;
-import org.hbrs.se2.project.startupx.repository.BewerbungRepository;
+import org.hbrs.se2.project.startupx.repository.SkillRepository;
 import org.hbrs.se2.project.startupx.repository.StellenausschreibungRepository;
 import org.hbrs.se2.project.startupx.repository.StudentRepository;
+import org.hbrs.se2.project.startupx.util.BewerbungsStatus;
+import org.hbrs.se2.project.startupx.util.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
 @Transactional
 class JobApplicationControlTest {
+
     @Autowired
-    JobApplicationControl control;
+    JobApplicationControl jobApplicationControl;
+
+    @Autowired
+    StellenausschreibungControl stellenausschreibungControl;
+
+    @Autowired
+    StellenausschreibungRepository stellenausschreibungRepository;
+
+    @Autowired
+    SkillRepository skillRepository;
 
     @Autowired
     private StudentRepository studentRepository;
 
-    @Autowired
-    BewerbungRepository bewerbungRepository;
+    BewerbungDTO bewerbungDTO;             // Hat alles
 
-    //Set.Up Bewerbung
-    BewerbungDTO short_bewerbung;       // Zu Kurz
-    BewerbungDTO bewerbung;             // Hat alles
+    Long skillId;
 
-    Optional<Student> wrapper_student;
-    Student student;
-
-    Optional<Stellenausschreibung> wrapper_ausschreibung;
-    Stellenausschreibung auschreibung;
-
-    @Autowired
-    private StellenausschreibungRepository stellenausschreibungRepository;
+    List<Stellenausschreibung> stellenausschreibungList;
+    Stellenausschreibung stellenausschreibung;
+    StellenausschreibungDTO stellenausschreibungDTO;
 
     @BeforeEach
     void setUp() {
-        short_bewerbung = new BewerbungDTO();
-        bewerbung = new BewerbungDTO();
 
+        skillId = skillRepository.findById(1L).get().getId();
 
-        //Fehlerhafte DTO-Werte zuweisen
-        short_bewerbung.setBewerbungsschreiben("kurz");
+        stellenausschreibungDTO = StellenausschreibungDTO.builder()
+                .id(1L).bewerbungen(null).beschreibung("TestAusschreibung").titel("Titel").skills(Collections.singleton(skillId)).startup(10L).status(Status.OFFEN).build();
 
-        //Richtige Vollwertige Bewerbung
-        wrapper_student = studentRepository.findById(2L);
-        if(wrapper_student.isPresent()) {
-            student = wrapper_student.get();
-        }
-
-        wrapper_ausschreibung = stellenausschreibungRepository.findById(1L);
-        if(wrapper_ausschreibung.isPresent()) {
-            auschreibung = wrapper_ausschreibung.get();
-        }
-
-        bewerbung.setStudent(student.getId());
-        bewerbung.setStellenausschreibungen(auschreibung.getId());
-        bewerbung.setBewerbungsschreiben("Kenntnise in Java und C++");
-
-       // Bewerbung b = new Bewerbung(bewerbung.getId(), student, auschreibung, bewerbung.getBewerbungsschreiben());
-       // bewerbungRepository.save(b);
     }
 
     @Test
     void applyForJob() {
-        assertFalse(control.applyForJob(short_bewerbung));      // Liefert False da die Bewerbung unter 5 Zeichen enthält
-        assertTrue(control.applyForJob(bewerbung));             // Muss True-liefern
+        stellenausschreibungControl.createStellenausschreibung(stellenausschreibungDTO);
+
+        stellenausschreibungList = stellenausschreibungRepository.findByStartup_IdAndStatus(10L,Status.OFFEN);
+
+        for(Stellenausschreibung s : stellenausschreibungList) {
+            if(s.getBeschreibung().equals("TestAusschreibung")) {
+                stellenausschreibung = s;
+            }
+        }
+
+        bewerbungDTO = BewerbungDTO.builder().id(1L).stellenausschreibungen(stellenausschreibung.getId()).status(BewerbungsStatus.OFFEN).student(2L).bewerbungsschreiben("JunitTest").build();
+
+        assertTrue(jobApplicationControl.applyForJob(bewerbungDTO));
+
+        List<BewerbungDTO> bewerbungBeiStellenanzeige = jobApplicationControl.getApplicationByStellenausschreibung(stellenausschreibung.getId());
+
+        assertEquals(1,bewerbungBeiStellenanzeige.size());
     }
 }
