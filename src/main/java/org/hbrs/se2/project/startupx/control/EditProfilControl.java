@@ -44,8 +44,17 @@ public class EditProfilControl {
 
     @Autowired
     ManageStartupControl manageStartupControl;
+
     @Autowired
     private InvestorRepository investorRepository;
+
+    public UserDTO getUserDTO(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new EditProfilException("User nicht gefunden.");
+        }
+        return UserMapper.mapToUserDto(user);
+    }
 
     @Transactional
     public boolean updateUser(UserDTO newUserDTO) {
@@ -162,14 +171,6 @@ public class EditProfilControl {
         return StudentMapper.mapToStudentDto(existingStudent);
     }
 
-    public UserDTO getUserDTO(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            throw new EditProfilException("User nicht gefunden.");
-        }
-        return UserMapper.mapToUserDto(user);
-    }
-
     @Transactional
     public void deleteStudent(UserDTO userDTO, StudentDTO studentDTO) {
         /*
@@ -219,5 +220,17 @@ public class EditProfilControl {
             throw new EditProfilException("Investor nicht gefunden.");
         }
         return InvestorMapper.mapToInvestorDto(existingInvestor);
+    }
+
+    @Transactional
+    public void deleteInvestor(UserDTO userDTO) {
+        Investor investor = investorRepository.findById(userDTO.getInvestor()).orElse(null);
+        if (investor == null) {
+            throw new EditProfilException("Investor nicht gefunden.");
+        }
+        investorRepository.deleteById(investor.getId());
+        logger.info("Investorenprofil gelöscht: ID={}", investor.getId());
+        userRepository.deleteById(userDTO.getId());
+        logger.info("User gelöscht: ID={}", userDTO.getId());
     }
 }

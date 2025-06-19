@@ -14,7 +14,6 @@ import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 import org.hbrs.se2.project.startupx.views.investor.InvestorRegistrationView;
 import org.hbrs.se2.project.startupx.views.student.StudentRegistrationView;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Route(value = Globals.Pages.MAIN_VIEW)
@@ -22,12 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Login")
 public class MainView extends VerticalLayout implements BeforeEnterObserver {
 
-    @Autowired
-    private AuthenticationControl authenticationControl;
+    private final AuthenticationControl authenticationControl;
 
     public MainView(AuthenticationControl authenticationControl) {
         this.authenticationControl = authenticationControl;
-        setSizeFull();
     }
 
     @Override
@@ -49,6 +46,8 @@ public class MainView extends VerticalLayout implements BeforeEnterObserver {
     // Gibt LoginForm und die Buttons zum Registrieren zurück, falls Benutzer nicht angemeldet
     private Component setUpLoginPage(){
         VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+        layout.setAlignItems(Alignment.CENTER);
 
         LoginForm loginForm = new LoginForm();
         Button registerStudentButton = new Button("Student registrieren");

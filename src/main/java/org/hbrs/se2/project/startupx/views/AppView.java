@@ -83,7 +83,7 @@ public class AppView extends AppLayout implements BeforeEnterObserver {
         //Ändert den Button von Profil nach Profil bearbeiten, wenn man sich auf dem eigenen Profil befindet
         Class<?> currentView = getContent().getClass();
         UserDTO currentUser = getCurrentUser();
-        if (currentView.equals(StudentProfileView.class)) {
+        if (currentView.equals(StudentProfileView.class) || currentView.equals(InvestorProfileView.class)) {
             profileButton.setText("Profil bearbeiten");
             profileButton.getElement().addEventListener("click", e -> switchToEditProfile());
         } else {

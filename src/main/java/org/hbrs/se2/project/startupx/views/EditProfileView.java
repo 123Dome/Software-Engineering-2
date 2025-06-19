@@ -1,7 +1,6 @@
 package org.hbrs.se2.project.startupx.views;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -23,6 +22,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.control.AuthenticationControl;
 import org.hbrs.se2.project.startupx.control.EditProfilControl;
 import org.hbrs.se2.project.startupx.control.StudiengangControl;
 import org.hbrs.se2.project.startupx.dtos.SkillDTO;
@@ -30,28 +30,28 @@ import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.StudiengangDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Route(value = "EditProfile", layout = AppView.class)
+@Route(value = Globals.Pages.EDIT_PROFILE_VIEW, layout = AppView.class)
 @PageTitle("Profil bearbeiten")
 @CssImport("./styles/views/entercar/enter-car-view.css")
 public class EditProfileView extends Div {
 
-    @Autowired
-    private EditProfilControl editProfilControl;
+    private final EditProfilControl editProfilControl;
+    private final StudiengangControl studiengangControl;
+    private final AuthenticationControl authenticationControl;
 
-    @Autowired
-    private StudiengangControl studiengangControl;
-
+    // Für Student und Investor
     private final TextField nutzername = new TextField("Benutzername");
     private final TextField email = new TextField("Email");
     private final TextField vorname = new TextField("Vorname");
     private final TextField nachname = new TextField("Nachname");
     private final DatePicker geburtsdatum = new DatePicker("Geburtsdatum");
+
+    // Für Student
     private final TextArea steckbrief = new TextArea("Steckbrief");
     private final ComboBox<StudiengangDTO> studiengang = new ComboBox<>("Studiengang");
     private final MultiSelectComboBox<SkillDTO> skills = new MultiSelectComboBox<>("Skills");
@@ -59,83 +59,25 @@ public class EditProfileView extends Div {
     private final Binder<UserDTO> userDTOBinder = new Binder<>(UserDTO.class);
     private final Binder<StudentDTO> studentDTOBinder = new Binder<>(StudentDTO.class);
 
-    //private TextField matrikelnr = new TextField("Matrikelnummer");
-
     //TODO: Daten des Users müssen abgerufen werden und editierbar sein, danach zurückgeschrieben werden
-    public EditProfileView(EditProfilControl editProfilControl, StudiengangControl studiengangControl) {
+    public EditProfileView(EditProfilControl editProfilControl, StudiengangControl studiengangControl, AuthenticationControl authenticationControl) {
         this.editProfilControl = editProfilControl;
         this.studiengangControl = studiengangControl;
+        this.authenticationControl = authenticationControl;
         addClassName("edit-profile-view");
 
-        UserDTO userDTO = (UserDTO) UI.getCurrent().getSession().getAttribute(Globals.CURRENT_USER);
-        StudentDTO studentDTO = editProfilControl.getStudentDTO(userDTO.getStudent());
+        UserDTO userDTO = authenticationControl.getCurrentUser();
+        bindUserFields(userDTO);
 
-        configureStudiengangComboBox(studentDTO);
+        // Falls der User Student ist Studentenfelder hinzufügen
+        StudentDTO studentDTO = null;
+        boolean isStudent = userDTO.getStudent() != null;
+        if (isStudent) {
+            studentDTO = editProfilControl.getStudentDTO(userDTO.getStudent());
+            configureStudiengangComboBox(studentDTO);
+            bindStudentFields(studentDTO);
+        }
 
-        userDTOBinder.setBean(userDTO);
-        userDTOBinder.forField(nutzername)
-                .asRequired("Benutzername darf nicht leer sein")
-                .bind(UserDTO::getNutzername, UserDTO::setNutzername);
-        userDTOBinder.forField(email)
-                .asRequired("Email darf nicht leer sein")
-                .withValidator(email -> email.contains("@"), "E-Mail muss gültig sein")
-                .bind(UserDTO::getEmail, UserDTO::setEmail);
-        userDTOBinder.forField(vorname)
-                .asRequired("Vorname darf nicht leer sein")
-                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
-                .bind(UserDTO::getVorname, UserDTO::setVorname);
-        userDTOBinder.forField(nachname)
-                .asRequired("Nachname darf nicht leer sein")
-                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
-                .bind(UserDTO::getNachname, UserDTO::setNachname);
-        userDTOBinder.forField(geburtsdatum)
-                .asRequired("Geburtsdatum darf nicht leer sein")
-                .bind(UserDTO::getGeburtsdatum, UserDTO::setGeburtsdatum);
-
-
-        studentDTOBinder.forField(steckbrief)
-                .asRequired("Steckbrief darf nicht leer sein")
-                .bind(StudentDTO::getSteckbrief, StudentDTO::setSteckbrief);
-        studentDTOBinder.forField(studiengang)
-                .asRequired("Studiengang darf nicht leer sein")
-                .withConverter(
-                        sgDto -> sgDto != null ? sgDto.getId() : null,
-                        id -> id != null ? studiengangControl.getById(id) : null
-                )
-                .bind(StudentDTO::getStudiengang, StudentDTO::setStudiengang);
-
-        userDTOBinder.setBean(userDTO);
-        studentDTOBinder.setBean(studentDTO);
-
-        List<SkillDTO> allSkills = studiengangControl.findAllSkills();
-
-        skills.setItemLabelGenerator(SkillDTO::getSkillName);
-        skills.setItems(allSkills);
-
-        studentDTOBinder.forField(skills)
-                .asRequired("Wähle mindestens 1 Skill aus")
-                .withConverter(
-                        (Set<SkillDTO> selectedSkills) -> {
-                            if (selectedSkills == null || selectedSkills.isEmpty()) {
-                                return Set.of();
-                            }
-                            return selectedSkills.stream()
-                                    .map(SkillDTO::getId)
-                                    .collect(Collectors.toSet());
-                        },
-                        (Set<Long> skillIds) -> {
-                            if (skillIds == null || skillIds.isEmpty()) {
-                                return Set.of();
-                            }
-                            return allSkills.stream()
-                                    .filter(skill -> skillIds.contains(skill.getId()))
-                                    .collect(Collectors.toSet());
-                        }
-                )
-                .bind(StudentDTO::getSkills, StudentDTO::setSkills);
-
-        skills.setHeight("auto");
-        skills.setWidth("auto");
 
         VerticalLayout container = new VerticalLayout();
         container.setPadding(true);
@@ -144,8 +86,8 @@ public class EditProfileView extends Div {
         container.setAlignItems(FlexComponent.Alignment.START);
 
         container.add(createTitle());
-        container.add(createFormLayout());
-        container.add(createButtonRow(userDTO, studentDTO));
+        container.add(createFormLayout(isStudent));
+        container.add(createButtonRow(userDTO, studentDTO, isStudent));
 
         add(container);
     }
@@ -156,21 +98,13 @@ public class EditProfileView extends Div {
         return title;
     }
 
-    private void configureStudiengangComboBox(StudentDTO studentDTO) {
-        List<StudiengangDTO> alleSG = studiengangControl.getAll();
-        studiengang.setItemLabelGenerator(StudiengangDTO::getStudiengang);
-        studiengang.setItems(alleSG);
-        studiengang.setValue(
-                alleSG.stream()
-                        .filter(sg -> sg.getId().equals(studentDTO.getStudiengang()))
-                        .findFirst()
-                        .orElse(null)
-        );
-    }
 
-    private Component createFormLayout() {
+    private Component createFormLayout(boolean isStudent) {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum, skills, studiengang, steckbrief);
+        formLayout.add(nutzername, email, vorname, nachname, geburtsdatum);
+        if(isStudent){
+            formLayout.add(skills, studiengang, steckbrief);
+        }
         formLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("500px", 2)
@@ -179,11 +113,17 @@ public class EditProfileView extends Div {
         return formLayout;
     }
 
-    private Component createButtonRow(UserDTO userDTO, StudentDTO studentDTO) {
+    private Component createButtonRow(UserDTO userDTO, StudentDTO studentDTO, boolean isStudent) {
         Button save = new Button("Änderungen speichern", e -> {
+            if(isStudent){
                 if (editProfilControl.updateStudent(userDTO, studentDTO)) {
-                    Notification.show("Profil aktualisiert");
+                    Notification.show("Profil gespeichert");
                 }
+            } else {
+                if(editProfilControl.updateUser(userDTO)){
+                    Notification.show("Profil gespeichert");
+                }
+            }
         });
 
         Button changePassword = new Button("Passwort ändern");
@@ -192,7 +132,7 @@ public class EditProfileView extends Div {
 
         Button deleteProfile = new Button("Profil löschen");
         deleteProfile.setId("deleteProfileButton");
-        Dialog deleteProfileConfirmationDialog = createDeleteProfileConfirmationDialog(userDTO, studentDTO);
+        Dialog deleteProfileConfirmationDialog = createDeleteProfileConfirmationDialog(userDTO, studentDTO, isStudent);
         deleteProfile.addClickListener(e -> {
             deleteProfileConfirmationDialog.open();
         });
@@ -254,21 +194,24 @@ public class EditProfileView extends Div {
                 password.matches(".*[^a-zA-Z0-9].*");
     }
 
-    private Dialog createDeleteProfileConfirmationDialog(UserDTO userDTO, StudentDTO studentDTO) {
+    private Dialog createDeleteProfileConfirmationDialog(UserDTO userDTO, StudentDTO studentDTO, boolean isStudent) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Profile löschen");
 
         Button bestaetigen = new Button("Bestätigen");
         bestaetigen.setId("deleteProfileBestaetigenButton");
         bestaetigen.addClickListener(e -> {
-            // delete profile and return to login page
-            editProfilControl.deleteStudent(userDTO, studentDTO);
+            if(isStudent){
+                editProfilControl.deleteStudent(userDTO, studentDTO);
+            } else {
+                editProfilControl.deleteInvestor(userDTO);
+            }
             Notification.show("Profil erfolgreich gelöscht");
             dialog.close();
             // navigate to login page and close session
             UI ui = getUI().get();
             ui.getSession().close();
-            ui.getPage().setLocation("/");
+            ui.getPage().setLocation(Globals.Pages.LOGIN_VIEW);
         });
         Button cancel = new Button("Abbrechen", event -> dialog.close());
         cancel.setId("deleteProfileCancelButton");
@@ -277,4 +220,81 @@ public class EditProfileView extends Div {
         return dialog;
     }
 
+    private void configureStudiengangComboBox(StudentDTO studentDTO) {
+        List<StudiengangDTO> alleSG = studiengangControl.getAll();
+        studiengang.setItemLabelGenerator(StudiengangDTO::getStudiengang);
+        studiengang.setItems(alleSG);
+        studiengang.setValue(
+                alleSG.stream()
+                        .filter(sg -> sg.getId().equals(studentDTO.getStudiengang()))
+                        .findFirst()
+                        .orElse(null)
+        );
+    }
+
+    private void bindUserFields(UserDTO userDTO) {
+        userDTOBinder.setBean(userDTO);
+        userDTOBinder.forField(nutzername)
+                .asRequired("Benutzername darf nicht leer sein")
+                .bind(UserDTO::getNutzername, UserDTO::setNutzername);
+        userDTOBinder.forField(email)
+                .asRequired("Email darf nicht leer sein")
+                .withValidator(email -> email.contains("@"), "E-Mail muss gültig sein")
+                .bind(UserDTO::getEmail, UserDTO::setEmail);
+        userDTOBinder.forField(vorname)
+                .asRequired("Vorname darf nicht leer sein")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
+                .bind(UserDTO::getVorname, UserDTO::setVorname);
+        userDTOBinder.forField(nachname)
+                .asRequired("Nachname darf nicht leer sein")
+                .withValidator(name -> name.matches("[a-zA-ZäöüÄÖÜß\\s-]+"), "Nur Buchstaben erlaubt")
+                .bind(UserDTO::getNachname, UserDTO::setNachname);
+        userDTOBinder.forField(geburtsdatum)
+                .asRequired("Geburtsdatum darf nicht leer sein")
+                .bind(UserDTO::getGeburtsdatum, UserDTO::setGeburtsdatum);
+    }
+
+    private void bindStudentFields(StudentDTO studentDTO) {
+        studentDTOBinder.setBean(studentDTO);
+        studentDTOBinder.forField(steckbrief)
+                .asRequired("Steckbrief darf nicht leer sein")
+                .bind(StudentDTO::getSteckbrief, StudentDTO::setSteckbrief);
+        studentDTOBinder.forField(studiengang)
+                .asRequired("Studiengang darf nicht leer sein")
+                .withConverter(
+                        sgDto -> sgDto != null ? sgDto.getId() : null,
+                        id -> id != null ? studiengangControl.getById(id) : null
+                )
+                .bind(StudentDTO::getStudiengang, StudentDTO::setStudiengang);
+
+        List<SkillDTO> allSkills = studiengangControl.findAllSkills();
+
+        skills.setItemLabelGenerator(SkillDTO::getSkillName);
+        skills.setItems(allSkills);
+
+        studentDTOBinder.forField(skills)
+                .asRequired("Wähle mindestens 1 Skill aus")
+                .withConverter(
+                        (Set<SkillDTO> selectedSkills) -> {
+                            if (selectedSkills == null || selectedSkills.isEmpty()) {
+                                return Set.of();
+                            }
+                            return selectedSkills.stream()
+                                    .map(SkillDTO::getId)
+                                    .collect(Collectors.toSet());
+                        },
+                        (Set<Long> skillIds) -> {
+                            if (skillIds == null || skillIds.isEmpty()) {
+                                return Set.of();
+                            }
+                            return allSkills.stream()
+                                    .filter(skill -> skillIds.contains(skill.getId()))
+                                    .collect(Collectors.toSet());
+                        }
+                )
+                .bind(StudentDTO::getSkills, StudentDTO::setSkills);
+
+        skills.setHeight("auto");
+        skills.setWidth("auto");
+    }
 }
