@@ -4,10 +4,7 @@ import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.entities.*;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,6 +19,7 @@ public class StartupMapper {
         Set<Long> studentIDs = new LinkedHashSet<>();
         List<Long> stellenausschreibungIDs = new ArrayList<>();
         List<Long> mitarbeiterIDs = new ArrayList<>();
+        Set<Long> unterstuetzungsangeboteIDs = new LinkedHashSet<>();
 
         if (startup.getBewertungen() != null) {
             bewertungIDs = startup.getBewertungen().stream()
@@ -47,6 +45,12 @@ public class StartupMapper {
                     .toList();
         }
 
+        if (startup.getUnterstuetzungsangebote() != null) {
+            unterstuetzungsangeboteIDs = startup.getUnterstuetzungsangebote().stream()
+                    .map(Unterstuetzungsangebot::getId)
+                    .collect(Collectors.toSet());
+        }
+
         return StartupDTO.builder()
                 .id(startup.getId())
                 .name(startup.getName())
@@ -58,10 +62,11 @@ public class StartupMapper {
                 .studentenListe(studentIDs)
                 .bewertungen(bewertungIDs)
                 .mitarbeiterList(mitarbeiterIDs)
+                .unterstuetzungsangebote(unterstuetzungsangeboteIDs)
                 .build();
     }
 
-    public static Startup mapToStartup(StartupDTO startupDTO, Set<Student> studentList, Branche branche, List<Student> mitarbeiterList) {
+    public static Startup mapToStartup(StartupDTO startupDTO, Set<Student> studentList, Branche branche, List<Student> mitarbeiterList, Set<Unterstuetzungsangebot> unterstuetzungsangebote) {
 
         return Startup.builder()
                 .name(startupDTO.getName())
@@ -71,6 +76,7 @@ public class StartupMapper {
                 .anzahlMitarbeiter(startupDTO.getAnzahlMitarbeiter())
                 .studentenListe(studentList)
                 .mitarbeiterList(mitarbeiterList)
+                .unterstuetzungsangebote(unterstuetzungsangebote)
                 .build();
     }
 }

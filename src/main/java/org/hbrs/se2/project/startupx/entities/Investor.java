@@ -6,7 +6,9 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "investor", schema = "startupx")
@@ -38,6 +40,9 @@ public class Investor {
     @NotNull
     @Column(name = "budget", nullable = false)
     private Long budget;
+
+    @OneToMany(mappedBy = "investor")
+    private Set<Unterstuetzungsangebot> unterstuetzungsangebote = new LinkedHashSet<>();
 
     @Override
     public String toString() {

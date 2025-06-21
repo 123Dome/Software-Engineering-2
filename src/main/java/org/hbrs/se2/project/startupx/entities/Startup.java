@@ -9,10 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "startup", schema = "startupx")
@@ -59,6 +56,8 @@ public class Startup {
     @OneToMany(mappedBy = "startup")
     private List<Student> mitarbeiterList;
 
+    @OneToMany(mappedBy = "startup")
+    private Set<Unterstuetzungsangebot> unterstuetzungsangebote = new LinkedHashSet<>();
 
     @ManyToMany
     @JoinTable(

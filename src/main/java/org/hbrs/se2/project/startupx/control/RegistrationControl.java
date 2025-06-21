@@ -146,7 +146,7 @@ public class RegistrationControl {
             throw new RegistrationException(errors);
         }
 
-        Investor newInvestor = InvestorMapper.mapToInvestor(investorDTO, newUser, branche);
+        Investor newInvestor = InvestorMapper.mapToInvestor(investorDTO, newUser, branche, new LinkedHashSet<>());
 
         investorRepository.save(newInvestor);
         logger.info("Registrierung erfolgreich: {}", newInvestor);
