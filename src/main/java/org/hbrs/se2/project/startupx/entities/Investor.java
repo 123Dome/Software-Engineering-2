@@ -41,7 +41,7 @@ public class Investor {
     @Column(name = "budget", nullable = false)
     private Long budget;
 
-    @OneToMany(mappedBy = "investor")
+    @OneToMany(mappedBy = "investor", fetch = FetchType.EAGER)
     private Set<Unterstuetzungsangebot> unterstuetzungsangebote = new LinkedHashSet<>();
 
     @Override

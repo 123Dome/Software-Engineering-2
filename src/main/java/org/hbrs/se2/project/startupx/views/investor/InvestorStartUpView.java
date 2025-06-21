@@ -13,6 +13,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.components.BewertungComponent;
 import org.hbrs.se2.project.startupx.control.AuthenticationControl;
 import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
@@ -26,16 +27,23 @@ import org.hbrs.se2.project.startupx.views.AppView;
 @PageTitle("StartUp Details")
 public class InvestorStartUpView extends Div implements BeforeEnterObserver {
 
-    private final AuthenticationControl authenticationControl;
-    private final BewertungControl bewertungControl;
     private StartupDTO startupDTO;
 
+    private final AuthenticationControl authenticationControl;
+    private final BewertungControl bewertungControl;
     private final ManageStartupControl manageStartupControl;
 
-    public InvestorStartUpView(ManageStartupControl manageStartupControl, AuthenticationControl authenticationControl, BewertungControl bewertungControl) {
+    private final BewertungComponent bewertungComponent;
+
+    public InvestorStartUpView(
+            ManageStartupControl manageStartupControl,
+            AuthenticationControl authenticationControl,
+            BewertungControl bewertungControl
+    ) {
         this.manageStartupControl = manageStartupControl;
         this.authenticationControl = authenticationControl;
         this.bewertungControl = bewertungControl;
+        this.bewertungComponent = new BewertungComponent(bewertungControl);
     }
 
     @Override
@@ -59,7 +67,11 @@ public class InvestorStartUpView extends Div implements BeforeEnterObserver {
 
         layout.add(createStartupDetails());
         layout.add(createSendUnterstuetzungsangebotButton());
-        layout.add(BewertungenUtil.createAverageStars(bewertungControl, this.startupDTO.getId()));
+        layout.add(bewertungComponent.createBewertungenCards(
+                bewertungControl.getAlleBewertungZuStartup(startupDTO.getId()),
+                authenticationControl.getCurrentUser(),
+                () -> {}
+        ));
 
         return layout;
     }
@@ -76,6 +88,8 @@ public class InvestorStartUpView extends Div implements BeforeEnterObserver {
         layout.add(new Paragraph("Branche: " + manageStartupControl.getBrancheNameById(startupDTO.getBranche())));
         layout.add(new Paragraph("Gründungsdatum: " + startupDTO.getGruendungsdatum()));
         layout.add(new Paragraph("Mitarbeiteranzahl: " + startupDTO.getAnzahlMitarbeiter()));
+        double average = bewertungControl.getDurchschnittlicheBewertungZuStartup(startupDTO.getId());
+        layout.add(new Paragraph("Ø Bewertung: " + BewertungenUtil.createAverageStars(average)));
 
         return layout;
     }

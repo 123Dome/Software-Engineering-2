@@ -13,6 +13,7 @@ import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.util.BewertungenUtil;
 import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.util.List;
@@ -70,10 +71,7 @@ public class DashboardView extends VerticalLayout {
             card.add(logo, name, description, date);
 
             double average = bewertungControl.getDurchschnittlicheBewertungZuStartup(s.getId());
-            if (average != 0.0) {
-                Span rating = new Span(String.format("%.1f", average) + " ⭐");
-                card.add(rating);
-            }
+            card.add(new Span(BewertungenUtil.createAverageStars(average)));
 
             // Navigation zum StartUp, abhängig ob Student oder Investor
             card.addClickListener(click -> {
