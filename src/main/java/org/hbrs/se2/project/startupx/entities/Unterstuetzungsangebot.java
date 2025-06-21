@@ -35,7 +35,7 @@ public class Unterstuetzungsangebot {
 
     @NotNull
     @Column(name = "betrag", nullable = false)
-    private Long betrag;
+    private Double betrag;
 
     @Override
     public String toString() {
