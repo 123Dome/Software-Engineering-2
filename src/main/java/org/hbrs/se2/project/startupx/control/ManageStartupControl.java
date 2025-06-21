@@ -8,6 +8,7 @@ import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.entities.Branche;
 import org.hbrs.se2.project.startupx.entities.Startup;
 import org.hbrs.se2.project.startupx.entities.Student;
+import org.hbrs.se2.project.startupx.entities.Unterstuetzungsangebot;
 import org.hbrs.se2.project.startupx.mapper.BrancheMapper;
 import org.hbrs.se2.project.startupx.mapper.StartupMapper;
 import org.hbrs.se2.project.startupx.repository.BrancheRepository;
@@ -62,8 +63,9 @@ public class ManageStartupControl {
         Branche branche = getBrancheById(startupDTO.getBranche());
 
         List<Student> mitarbeiterList = new ArrayList<>();
+        Set<Unterstuetzungsangebot> unterstuetzungsangebote = new LinkedHashSet<>();
 
-        Startup startup = StartupMapper.mapToStartup(startupDTO, studentList, branche, mitarbeiterList);
+        Startup startup = StartupMapper.mapToStartup(startupDTO, studentList, branche, mitarbeiterList, unterstuetzungsangebote);
 
         Startup savedStartup = startupRepository.save(startup);
 

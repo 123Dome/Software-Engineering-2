@@ -79,7 +79,7 @@ public class RegistrationControl {
         Investor investor = null;
 
         User newUser = UserMapper.mapToUser(userDTO, defaultRollen, bewertungList, student, investor);
-        newUser.getRollen().add(defaultRolle);
+        newUser.setRollen(defaultRollen);
 
         return userRepository.save(newUser);
     }
@@ -146,7 +146,7 @@ public class RegistrationControl {
             throw new RegistrationException(errors);
         }
 
-        Investor newInvestor = InvestorMapper.mapToInvestor(investorDTO, newUser, branche);
+        Investor newInvestor = InvestorMapper.mapToInvestor(investorDTO, newUser, branche, new LinkedHashSet<>());
 
         investorRepository.save(newInvestor);
         logger.info("Registrierung erfolgreich: {}", newInvestor);
