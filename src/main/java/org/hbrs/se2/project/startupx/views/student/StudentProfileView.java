@@ -4,10 +4,8 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,6 +13,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.components.BewertungComponent;
 import org.hbrs.se2.project.startupx.control.*;
 import org.hbrs.se2.project.startupx.dtos.*;
 import org.hbrs.se2.project.startupx.util.Globals;
@@ -38,8 +37,9 @@ public class StudentProfileView extends Div implements BeforeEnterObserver {
     private final JobApplicationControl jobApplicationControl;
     private final StellenausschreibungControl stellenausschreibungControl;
 
-    private final VerticalLayout bewertungenLayout = new VerticalLayout();
     private final VerticalLayout bewerbungsLayout = new VerticalLayout();
+
+    private final BewertungComponent bewertungComponent;
 
     public StudentProfileView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl,
                               JobApplicationControl jobApplicationControl, EditProfilControl editProfilControl,
@@ -50,6 +50,7 @@ public class StudentProfileView extends Div implements BeforeEnterObserver {
         this.jobApplicationControl = jobApplicationControl;
         this.stellenausschreibungControl = stellenausschreibungControl;
         this.authenticationControl = authenticationControl;
+        this.bewertungComponent = new BewertungComponent(bewertungControl);
         addClassName("profile-view");
     }
 
@@ -67,10 +68,13 @@ public class StudentProfileView extends Div implements BeforeEnterObserver {
     }
 
     private void setUpUI() {
-        HorizontalLayout reviewsAndApplicationsLayout = new HorizontalLayout(
-                setUpBewertungenCards(),
-                setUpBewerbungenCards()
-        );
+        HorizontalLayout reviewsAndApplicationsLayout = new HorizontalLayout();
+        reviewsAndApplicationsLayout.add(bewertungComponent.createBewertungenCards(
+                bewertungControl.getAlleBewertungZuUser(userDTO.getId()),
+                userDTO,
+                this::setUpUI
+        ));
+        reviewsAndApplicationsLayout.add(setUpBewerbungenCards());
         reviewsAndApplicationsLayout.setSpacing(true);
 
         if (!this.studentDTO.getStartups().isEmpty()) {
@@ -152,86 +156,12 @@ public class StudentProfileView extends Div implements BeforeEnterObserver {
             StartupDTO selected = event.getValue();
             if (selected != null) {
                 getUI().ifPresent(ui ->
-                        ui.navigate("startup/" + selected.getId())
+                        ui.navigate( Globals.Pages.STUDENT_STARTUP_VIEW +"/" + selected.getId())
                 );
             }
         });
 
         return grid;
-    }
-
-    private Component setUpBewertungenCards(){
-        bewertungenLayout.removeAll();
-
-        bewertungenLayout.add(new H3("Meine Bewertungen"));
-
-        List<BewertungDTO> bewertungen = bewertungControl.getAlleBewertungZuUser(userDTO.getId());
-
-        if (bewertungen.isEmpty()) {
-            bewertungenLayout.add(new Paragraph("Keine Bewertungen vorhanden"));
-            return bewertungenLayout;
-        }
-
-        for(BewertungDTO bewertung : bewertungen) {
-            Div card = new Div();
-            card.addClassName("bewertungen-karte");
-            card.setWidth("400px");
-            card.getStyle().set("border", "1px solid #ccc");
-            card.getStyle().set("border-radius", "8px");
-            card.getStyle().set("padding", "16px");
-            card.getStyle().set("box-shadow", "2px 2px 6px rgba(0,0,0,0.1)");
-
-            // Startup zur Bewertung
-            String startUpName = manageStartupControl.findByID(bewertung.getStartup()).getName();
-            card.add(new H4("Startup: " + startUpName));
-
-            // Sterne
-            HorizontalLayout sterneLayout = new HorizontalLayout();
-            for(int i = 0; i < 5; i++){
-                Span stern = new Span(i <= bewertung.getBewertung() ? "★" : "☆");
-                stern.getStyle().set("font-size", "20px");
-                sterneLayout.add(stern);
-            }
-            card.add(sterneLayout);
-
-            // Kommentar (optional)
-            if(!bewertung.getKommentar().isEmpty()) {
-                Paragraph kommentar = new Paragraph(bewertung.getKommentar());
-                kommentar.getStyle().set("font-style", "italic");
-                kommentar.getStyle().set("margin-top", "8px");
-                card.add(kommentar);
-            }
-
-            // Datum
-            Paragraph datum = new Paragraph("Datum: " + bewertung.getErstellungsdatum());
-            datum.getStyle().set("font-size", "0.9em");
-            datum.getStyle().set("color", "#666");
-            card.add(datum);
-
-            // Löschen-Button
-            Button bewertungLöschenButton = new Button("Löschen", e -> {
-                // Bestätigungsdialog
-                Dialog löschenBestätigenDialog = new Dialog();
-                löschenBestätigenDialog.add(new Paragraph("Wollen Sie die Bewertung wirklich löschen?"));
-                Button löschenBestätigenButton = new Button("Ja", event -> {
-                    try {
-                        bewertungControl.deleteBewertung(bewertung.getId());
-                        Notification.show("Bewertung gelöscht.");
-                        setUpBewertungenCards();
-                    } catch (Exception ex) {
-                        Notification.show(ex.getMessage());
-                    }
-                    löschenBestätigenDialog.close();
-                });
-                Button löschenAbbrechenButton = new Button("Abbrechen", event -> löschenBestätigenDialog.close());
-                löschenBestätigenDialog.getFooter().add(löschenBestätigenButton, löschenAbbrechenButton);
-                löschenBestätigenDialog.open();
-            });
-            card.add(bewertungLöschenButton);
-            bewertungenLayout.add(card);
-        }
-
-        return bewertungenLayout;
     }
 
     private Component setUpBewerbungenCards() {
