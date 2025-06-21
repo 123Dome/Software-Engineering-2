@@ -8,9 +8,11 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.control.AuthenticationControl;
 import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
+import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.util.List;
@@ -21,7 +23,7 @@ import java.util.List;
 public class DashboardView extends VerticalLayout {
 
     //Neue Startseite
-    public DashboardView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
+    public DashboardView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl, AuthenticationControl authenticationControl) {
         setPadding(true);
         setSpacing(true);
 
@@ -73,10 +75,20 @@ public class DashboardView extends VerticalLayout {
                 card.add(rating);
             }
 
-            // Navigation zum StartUp
-            card.addClickListener(click ->
-                    getUI().ifPresent(ui -> ui.navigate("startup/" + s.getId()))
-            );
+            // Navigation zum StartUp, abhängig ob Student oder Investor
+            card.addClickListener(click -> {
+                String route;
+                UserDTO userDTO = authenticationControl.getCurrentUser();
+                if(userDTO.getStudent() != null) {
+                    route = Globals.Pages.STUDENT_STARTUP_VIEW + "/" + s.getId();
+                } else if (userDTO.getInvestor() != null) {
+                    route = Globals.Pages.INVESTOR_STARTUP_VIEW + "/" + s.getId();
+                } else {
+                    route = Globals.Pages.DASHBOARD_VIEW;
+                }
+
+                getUI().ifPresent(ui -> ui.navigate(route));
+            });
 
             gallery.add(card);
         }

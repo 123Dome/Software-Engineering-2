@@ -9,13 +9,16 @@ public class Globals {
         public static final String DASHBOARD_VIEW = "dashboard";
         public static final String EDIT_PROFILE_VIEW = "edit_profile";
 
-        public static final String STUDENT_PROFILE_VIEW = "student_profile";
-        public static final String STUDENT_REGISTRATION_VIEW = "student_registration";
+        public static final String STUDENT_PROFILE_VIEW = "student/profile";
+        public static final String STUDENT_REGISTRATION_VIEW = "student/registration";
+        public static final String STUDENT_STARTUP_VIEW = "student/startup";
+
         public static final String CREATE_START_UP_VIEW = "create_start_up";
         public static final String APPLY_FOR_JOB_VIEW = "apply_for_job";
 
-        public static final String INVESTOR_PROFILE_VIEW = "investor_profile";
-        public static final String INVESTOR_REGISTRATION_VIEW = "investor_registration";
+        public static final String INVESTOR_PROFILE_VIEW = "investor/profile";
+        public static final String INVESTOR_REGISTRATION_VIEW = "investor/registration";
+        public static final String INVESTOR_STARTUP_VIEW = "investor/startup";
     }
 
     public static class Roles {

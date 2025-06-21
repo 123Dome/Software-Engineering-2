@@ -1,4 +1,4 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.student;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -17,7 +17,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.*;
 import org.hbrs.se2.project.startupx.control.*;
 import org.hbrs.se2.project.startupx.dtos.*;
-import org.hbrs.se2.project.startupx.views.student.ApplyForJobView;
+import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.AppView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,9 +27,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Route(value = "startup/:id", layout = AppView.class)
+@Route(value = Globals.Pages.STUDENT_STARTUP_VIEW + "/:id", layout = AppView.class)
 @PageTitle("StartUp Details")
-public class StartUpView extends Div implements BeforeEnterObserver {
+public class StudentStartUpView extends Div implements BeforeEnterObserver {
 
     private final ManageStartupControl manageStartupControl;
     private final StellenausschreibungControl stellenausschreibungControl;
@@ -72,7 +73,7 @@ public class StartUpView extends Div implements BeforeEnterObserver {
     private final Image startupImage = new Image("images/startup_placeholder.png", "Startup-Logo");
 
 
-    public StartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl, BewertungControl bewertungControl, AuthenticationControl authenticationControl) {
+    public StudentStartUpView(ManageStartupControl manageStartupControl, StellenausschreibungControl stellenausschreibungControl, StudiengangControl studiengangControl, SkillControl skillControl, BewertungControl bewertungControl, AuthenticationControl authenticationControl) {
         this.studiengangControl = studiengangControl;
         this.stellenausschreibungControl = stellenausschreibungControl;
         this.manageStartupControl = manageStartupControl;

@@ -15,9 +15,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.control.AuthenticationControl;
 import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
+import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.util.List;
 
@@ -32,11 +34,13 @@ public class ShowAllStartUpsView extends Div{
 
     private final ManageStartupControl manageStartupControl;
     private final BewertungControl bewertungControl;
+    private final AuthenticationControl authenticationControl;
 
 
-    public ShowAllStartUpsView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl) {
+    public ShowAllStartUpsView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl, AuthenticationControl authenticationControl) {
         this.manageStartupControl = manageStartupControl;
         this.bewertungControl = bewertungControl;
+        this.authenticationControl = authenticationControl;
         add(createTitle());
         add(setUpSearchField());
         add(setUpGrid());
@@ -78,11 +82,20 @@ public class ShowAllStartUpsView extends Div{
         grid.asSingleSelect().addValueChangeListener(event -> {
             StartupDTO selected = event.getValue();
             if (selected != null) {
-                getUI().ifPresent(ui ->
-                        ui.navigate("startup/" + selected.getId())
-                );
+                String route;
+                var user = authenticationControl.getCurrentUser();
+                if (user.getStudent() != null) {
+                    route = Globals.Pages.STUDENT_STARTUP_VIEW + "/" + selected.getId();
+                } else if (user.getInvestor() != null) {
+                    route = Globals.Pages.INVESTOR_STARTUP_VIEW + "/" + selected.getId();
+                } else {
+                    route = Globals.Pages.DASHBOARD_VIEW;
+                }
+
+                getUI().ifPresent(ui -> ui.navigate(route));
             }
         });
+
 
         List<StartupDTO> startups = manageStartupControl.findAll();
         GridListDataView<StartupDTO> dataView = grid.setItems(startups);
