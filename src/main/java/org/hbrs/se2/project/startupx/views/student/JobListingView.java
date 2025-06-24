@@ -1,4 +1,4 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.student;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -12,8 +12,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.entities.Startup;
-import org.hbrs.se2.project.startupx.repository.StartupRepository;
+import org.hbrs.se2.project.startupx.views.AppView;
 
 import java.util.List;
 

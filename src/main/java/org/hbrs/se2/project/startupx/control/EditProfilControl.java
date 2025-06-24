@@ -3,10 +3,12 @@ package org.hbrs.se2.project.startupx.control;
 import jakarta.transaction.Transactional;
 import org.hbrs.se2.project.startupx.control.exception.EditProfilException;
 import org.hbrs.se2.project.startupx.control.exception.StartUpException;
+import org.hbrs.se2.project.startupx.dtos.InvestorDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.entities.*;
+import org.hbrs.se2.project.startupx.mapper.InvestorMapper;
 import org.hbrs.se2.project.startupx.mapper.StartupMapper;
 import org.hbrs.se2.project.startupx.mapper.StudentMapper;
 import org.hbrs.se2.project.startupx.mapper.UserMapper;
@@ -42,6 +44,17 @@ public class EditProfilControl {
 
     @Autowired
     ManageStartupControl manageStartupControl;
+
+    @Autowired
+    private InvestorRepository investorRepository;
+
+    public UserDTO getUserDTO(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new EditProfilException("User nicht gefunden.");
+        }
+        return UserMapper.mapToUserDto(user);
+    }
 
     @Transactional
     public boolean updateUser(UserDTO newUserDTO) {
@@ -158,14 +171,6 @@ public class EditProfilControl {
         return StudentMapper.mapToStudentDto(existingStudent);
     }
 
-    public UserDTO getUserDTO(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            throw new EditProfilException("User nicht gefunden.");
-        }
-        return UserMapper.mapToUserDto(user);
-    }
-
     @Transactional
     public void deleteStudent(UserDTO userDTO, StudentDTO studentDTO) {
         /*
@@ -205,6 +210,26 @@ public class EditProfilControl {
         }
         studentRepository.deleteById(studentDTO.getId());
         logger.info("Studentenprofil gelöscht: ID={}", studentDTO.getId());
+        userRepository.deleteById(userDTO.getId());
+        logger.info("User gelöscht: ID={}", userDTO.getId());
+    }
+
+    public InvestorDTO getInvestorDTObyUserId(Long userId) {
+        Investor existingInvestor = investorRepository.findByUser_Id(userId);
+        if (existingInvestor == null) {
+            throw new EditProfilException("Investor nicht gefunden.");
+        }
+        return InvestorMapper.mapToInvestorDto(existingInvestor);
+    }
+
+    @Transactional
+    public void deleteInvestor(UserDTO userDTO) {
+        Investor investor = investorRepository.findById(userDTO.getInvestor()).orElse(null);
+        if (investor == null) {
+            throw new EditProfilException("Investor nicht gefunden.");
+        }
+        investorRepository.deleteById(investor.getId());
+        logger.info("Investorenprofil gelöscht: ID={}", investor.getId());
         userRepository.deleteById(userDTO.getId());
         logger.info("User gelöscht: ID={}", userDTO.getId());
     }

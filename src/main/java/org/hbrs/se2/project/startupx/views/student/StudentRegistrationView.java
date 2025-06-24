@@ -1,10 +1,11 @@
-package org.hbrs.se2.project.startupx.views;
+package org.hbrs.se2.project.startupx.views.student;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -12,6 +13,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -19,18 +21,24 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.hbrs.se2.project.startupx.control.BrancheControl;
 import org.hbrs.se2.project.startupx.control.RegistrationControl;
-import org.hbrs.se2.project.startupx.dtos.*;
+import org.hbrs.se2.project.startupx.control.StudiengangControl;
+import org.hbrs.se2.project.startupx.dtos.SkillDTO;
+import org.hbrs.se2.project.startupx.dtos.StudiengangDTO;
+import org.hbrs.se2.project.startupx.dtos.StudentDTO;
+import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
+import org.hbrs.se2.project.startupx.views.AppView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-@Route(value = "registrationInvestor", layout = AppView.class)
-@PageTitle("RegistrationInvestor")
+@Route(value = Globals.Pages.STUDENT_REGISTRATION_VIEW, layout = AppView.class)
+@PageTitle("Registration Student")
 @CssImport("./styles/views/entercar/enter-car-view.css")
-public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung / Vererbung)
+public class StudentRegistrationView extends Div {
 
     // Felder UserDTO
     private final TextField nutzername = new TextField("Benutzername");
@@ -41,36 +49,34 @@ public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung 
     private final PasswordField passwort = new PasswordField("Passwort");
     private final PasswordField passwort_bestätigen = new PasswordField("Passwort bestätigen");
 
-    // Felder InvestorDTO
-    private final ComboBox<BrancheDTO> branche = new ComboBox<>("Branche");
-    private final IntegerField budget = new IntegerField("Budget");
+    // Felder StudentDTO
+    private final IntegerField matrikelnr = new IntegerField("Matrikelnummer");
+    private final ComboBox<StudiengangDTO> studiengang = new ComboBox<>("Studiengang");
+    private final MultiSelectComboBox<SkillDTO> skills = new MultiSelectComboBox<>("Skills");
 
     // Buttons
-    private final Button abbrechen = new Button ("Abbrechen");
+    private final Button abbrechen = new Button("Abbrechen");
     private final Button registrieren = new Button("Registrieren");
 
     private final Binder<UserDTO> userDTOBinder = new Binder<>(UserDTO.class);
-    private final Binder<InvestorDTO> investorDTOBinder = new Binder<>(InvestorDTO.class);
+    private final Binder<StudentDTO> studentDTOBinder = new Binder<>(StudentDTO.class);
 
     private UserDTO userDTO = new UserDTO();
-    private InvestorDTO investorDTO = new InvestorDTO();
+    private StudentDTO studentDTO = new StudentDTO();
 
     @Autowired
-    RegistrationControl registrationControl;
+    private RegistrationControl registrationControl;
 
     @Autowired
-    BrancheControl brancheControl;
+    private StudiengangControl studiengangControl;
 
-    public InvestorRegistrationView(BrancheControl brancheControl, RegistrationControl registrationControl) {
+    public StudentRegistrationView(StudiengangControl studiengangControl, RegistrationControl registrationControl) {
+        this.studiengangControl = studiengangControl;
+        this.registrationControl = registrationControl;
         addClassName("enter-car-view");
 
-        this.brancheControl = brancheControl;
-        this.registrationControl = registrationControl;
-
-        add(createTitle());
-        add(createFormLayout());
-        configureBrancheComboBox();
-        add(createButtonLayout());
+        configureStudiengangComboBox();
+        setComponentIds();
 
         userDTOBinder.setBean(userDTO);
         userDTOBinder.forField(nutzername)
@@ -91,6 +97,7 @@ public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung 
         userDTOBinder.forField(geburtsdatum)
                 .asRequired("Geburtsdatum darf nicht leer sein")
                 .bind(UserDTO::getGeburtsdatum, UserDTO::setGeburtsdatum);
+
         userDTOBinder.forField(passwort)
                 .asRequired("Passwort ist erforderlich")
                 .withValidator(pwd -> pwd.length() >= 8, "Mindestens 8 Zeichen")
@@ -99,38 +106,87 @@ public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung 
                 .withValidator(pwd -> pwd.matches(".*[^a-zA-Z0-9].*"), "Mindestens ein Sonderzeichen")
                 .bind(UserDTO::getPasswort, UserDTO::setPasswort);
 
-        investorDTOBinder.setBean(investorDTO);
-        investorDTOBinder.forField(branche)
-                .asRequired("Branche darf nicht leer sein")
+        studentDTOBinder.setBean(studentDTO);
+        studentDTOBinder.forField(matrikelnr)
+                .asRequired("Matrikelnummer darf nicht leer sein")
+                .withValidator(nr -> nr != null && nr > 0, "Nur positive Zahlen erlaubt")
+                .bind(StudentDTO::getMatrikelnr, StudentDTO::setMatrikelnr);
+
+        studentDTOBinder.forField(studiengang)
+                .asRequired("Studiengang darf nicht leer sein")
                 .withConverter(
                         dto -> dto != null ? dto.getId() : null,
-                        id -> id != null ? brancheControl.getById(id) : null
+                        id -> id != null ? studiengangControl.getById(id) : null
                 )
-                .bind(InvestorDTO::getBrancheId, InvestorDTO::setBrancheId);
-        investorDTOBinder.forField(budget)
-                .asRequired("Budget darf nicht leer sein")
+                .bind(StudentDTO::getStudiengang, StudentDTO::setStudiengang);
+
+        List<SkillDTO> allSkills = studiengangControl.findAllSkills();
+
+        skills.setItemLabelGenerator(SkillDTO::getSkillName);
+        skills.setItems(allSkills); // Alle Skills aus der DB laden
+
+        studentDTOBinder.forField(skills)
+                .asRequired("Wähle mindestens 1 Skill aus")
                 .withConverter(
-                        integer -> integer != null ? integer.longValue() : null,   // Integer → Long
-                        aLong -> aLong != null ? aLong.intValue() : null           // Long → Integer
+                        (Set<SkillDTO> selectedSkills) -> {
+                            if (selectedSkills == null || selectedSkills.isEmpty()) {
+                                return Set.of();
+                            }
+                            return selectedSkills.stream()
+                                    .map(SkillDTO::getId)
+                                    .collect(Collectors.toSet());
+                        },
+                        (Set<Long> skillIds) -> {
+                            if (skillIds == null || skillIds.isEmpty()) {
+                                return Set.of();
+                            }
+                            return allSkills.stream()
+                                    .filter(skill -> skillIds.contains(skill.getId()))
+                                    .collect(Collectors.toSet());
+                        }
                 )
-                .withValidator(b -> b != null && b > 0, "Nur positive Zahlen erlaubt")
-                .bind(InvestorDTO::getBudget, InvestorDTO::setBudget);
+                .bind(StudentDTO::getSkills, StudentDTO::setSkills);
 
+        skills.setHeight("auto");
+        skills.setWidth("auto");
 
+        add(createTitle());
+        add(createFormLayout());
+        add(createButtonLayout());
 
-
+        // Listener
         abbrechen.addClickListener(event -> {
-                clearForm();
-                UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
+            clearForm();
+            UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
         });
 
-        registrieren.addClickListener(event -> handleRegistration());
+        registrieren.addClickListener(e -> handleRegistration());
     }
 
-    private void configureBrancheComboBox() {
-        List<BrancheDTO> branchenListe = brancheControl.getAll();
-        branche.setItemLabelGenerator(BrancheDTO::getBezeichnung);
-        branche.setItems(branchenListe);
+    private void configureStudiengangComboBox() {
+        List<StudiengangDTO> studiengangListe = studiengangControl.getAll();
+        studiengang.setItemLabelGenerator(StudiengangDTO::getStudiengang);
+        studiengang.setItems(studiengangListe);
+    }
+
+    // sets unique IDs for each component, needed for selenium test
+    private void setComponentIds() {
+        nutzername.setId("BenutzernameTextField");
+        email.setId("EmailTextField");
+        vorname.setId("VornameTextField");
+        nachname.setId("NachnameTextField");
+        geburtsdatum.setId("GeburtsdatumDatePicker");
+        passwort.setId("PasswortTextField");
+        passwort_bestätigen.setId("PasswortBestaetigenTextField");
+
+        // Felder StudentDTO
+        matrikelnr.setId("MatrikelnummerTextField");
+        studiengang.setId("StudiengangComboBox");
+        skills.setId("SkillsMultiComboBox");
+
+        // Buttons
+        abbrechen.setId("AbbrechenButton");
+        registrieren.setId("RegistrierenButton");
     }
 
     private boolean checkForJorgeEasterEgg() {
@@ -156,13 +212,14 @@ public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung 
     }
 
     private Component createTitle() {
-        return new H3("Investor registration");
+        return new H3("Student registration");
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
+        formLayout.setId("registrationForm");
         formLayout.add(nutzername, email, vorname, nachname, geburtsdatum,
-                branche, budget, passwort, passwort_bestätigen);
+                matrikelnr, studiengang, skills, passwort, passwort_bestätigen);
         return formLayout;
     }
 
@@ -183,15 +240,18 @@ public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung 
             return;
         }
 
-        if (userDTOBinder.validate().isOk() && investorDTOBinder.validate().isOk()) {
+        if (userDTOBinder.validate().isOk() && studentDTOBinder.validate().isOk()) {
             userDTO.setPasswort(passwort.getValue());
             try {
-                registrationControl.registerInvestor(userDTO, investorDTO);
+                registrationControl.registerStudent(userDTO, studentDTO);
                 Notification.show("Nutzer registriert!");
                 clearForm();
                 UI.getCurrent().navigate(Globals.Pages.LOGIN_VIEW);
             } catch (Exception ex) {
-                Notification.show("Fehler: " + ex.getMessage());
+                Notification errormsg = new Notification("Fehler: " + ex.getMessage());
+                errormsg.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                errormsg.setDuration(5000);
+                errormsg.open();
             }
         } else {
             Notification.show("Überprüfe deine Eingaben");
@@ -200,12 +260,11 @@ public class InvestorRegistrationView extends Div { // 3. Form (Spezialisierung 
 
     private void clearForm() {
         userDTO = new UserDTO();
-        investorDTO = new InvestorDTO();
+        studentDTO = new StudentDTO();
         userDTOBinder.setBean(userDTO);
-        investorDTOBinder.setBean(investorDTO);
+        studentDTOBinder.setBean(studentDTO);
         passwort.clear();
         passwort_bestätigen.clear();
-        branche.clear();
-        budget.clear();
+        studiengang.clear();
     }
 }

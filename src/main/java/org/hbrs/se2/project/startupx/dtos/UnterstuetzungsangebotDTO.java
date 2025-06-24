@@ -11,5 +11,5 @@ public class UnterstuetzungsangebotDTO {
     private Long id;
     private Long investor;
     private Long startup;
-    private Long betrag;
+    private Double betrag;
 }

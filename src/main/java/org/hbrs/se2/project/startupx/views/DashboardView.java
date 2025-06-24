@@ -1,30 +1,30 @@
 package org.hbrs.se2.project.startupx.views;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.control.AuthenticationControl;
+import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.entities.Startup;
-import org.hbrs.se2.project.startupx.repository.StartupRepository;
+import org.hbrs.se2.project.startupx.dtos.UserDTO;
+import org.hbrs.se2.project.startupx.util.BewertungenUtil;
+import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.util.List;
 
 @CssImport("./styles/views/main/main-view.css")
-@Route(value = "main", layout = AppView.class)
+@Route(value = Globals.Pages.DASHBOARD_VIEW, layout = AppView.class)
 @JsModule("./styles/shared-styles.js")
-public class MainViewDashboard extends VerticalLayout {
+public class DashboardView extends VerticalLayout {
 
     //Neue Startseite
-    public MainViewDashboard(ManageStartupControl manageStartupControl) {
+    public DashboardView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl, AuthenticationControl authenticationControl) {
         setPadding(true);
         setSpacing(true);
 
@@ -70,10 +70,23 @@ public class MainViewDashboard extends VerticalLayout {
 
             card.add(logo, name, description, date);
 
-            // Navigation zum StartUp
-            card.addClickListener(click ->
-                    getUI().ifPresent(ui -> ui.navigate("startup/" + s.getId()))
-            );
+            double average = bewertungControl.getDurchschnittlicheBewertungZuStartup(s.getId());
+            card.add(new Span(BewertungenUtil.createAverageStars(average)));
+
+            // Navigation zum StartUp, abhängig ob Student oder Investor
+            card.addClickListener(click -> {
+                String route;
+                UserDTO userDTO = authenticationControl.getCurrentUser();
+                if(userDTO.getStudent() != null) {
+                    route = Globals.Pages.STUDENT_STARTUP_VIEW + "/" + s.getId();
+                } else if (userDTO.getInvestor() != null) {
+                    route = Globals.Pages.INVESTOR_STARTUP_VIEW + "/" + s.getId();
+                } else {
+                    route = Globals.Pages.DASHBOARD_VIEW;
+                }
+
+                getUI().ifPresent(ui -> ui.navigate(route));
+            });
 
             gallery.add(card);
         }

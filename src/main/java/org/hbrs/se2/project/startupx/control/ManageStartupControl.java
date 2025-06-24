@@ -5,15 +5,11 @@ import org.hbrs.se2.project.startupx.control.exception.StartUpException;
 import org.hbrs.se2.project.startupx.dtos.BrancheDTO;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
 import org.hbrs.se2.project.startupx.dtos.StudentDTO;
-import org.hbrs.se2.project.startupx.entities.Branche;
-import org.hbrs.se2.project.startupx.entities.Startup;
-import org.hbrs.se2.project.startupx.entities.Student;
-import org.hbrs.se2.project.startupx.entities.Unterstuetzungsangebot;
+import org.hbrs.se2.project.startupx.dtos.UnterstuetzungsangebotDTO;
+import org.hbrs.se2.project.startupx.entities.*;
 import org.hbrs.se2.project.startupx.mapper.BrancheMapper;
 import org.hbrs.se2.project.startupx.mapper.StartupMapper;
-import org.hbrs.se2.project.startupx.repository.BrancheRepository;
-import org.hbrs.se2.project.startupx.repository.StartupRepository;
-import org.hbrs.se2.project.startupx.repository.StudentRepository;
+import org.hbrs.se2.project.startupx.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +40,11 @@ public class ManageStartupControl {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private UnterstuetzungsangebotRepository unterstuetzungsangebotRepository;
+    @Autowired
+    private InvestorRepository investorRepository;
 
     @Transactional
     public StartupDTO createStartup(StartupDTO startupDTO) {
@@ -257,5 +258,21 @@ public class ManageStartupControl {
         studentRepository.save(student);
         startup.setAnzahlMitarbeiter(startup.getAnzahlMitarbeiter()-1);
         startupRepository.save(startup);
+    }
+
+    public void createUnterstuetzungsangebot(UnterstuetzungsangebotDTO offerDTO) {
+        Investor investor = investorRepository.findById(offerDTO.getInvestor()).
+                orElseThrow(() -> new StartUpException("Investor nicht gefunden"));
+        Startup startup = startupRepository.findById(offerDTO.getStartup()).
+                orElseThrow(() -> new StartUpException("Startup nicht gefunden!"));
+
+        Unterstuetzungsangebot offer = new Unterstuetzungsangebot();
+        offer.setInvestor(investor);
+        offer.setStartup(startup);
+        offer.setBetrag(offerDTO.getBetrag());
+
+        unterstuetzungsangebotRepository.save(offer);
+
+        logger.info("Unterstützungsangebot mit der ID: {} gespeichert.", offer.getId());
     }
 }

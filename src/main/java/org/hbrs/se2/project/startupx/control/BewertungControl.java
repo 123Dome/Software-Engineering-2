@@ -95,6 +95,19 @@ public class BewertungControl {
         }
     }
 
+    public double getDurchschnittlicheBewertungZuStartup(Long startupId) {
+        try{
+            List<Bewertung> bewertungen = bewertungRepository.findAllByStartupId(startupId);
+            return bewertungen.stream()
+                    .mapToDouble(Bewertung::getBewertung)
+                    .average()
+                    .orElse(0.0);
+        } catch (Exception e) {
+            logger.error("Fehler beim Berechnen der durchschnittlichen Bewertung für Startup-ID: {}", startupId, e);
+            throw new BewertungException("Durchschnittliche Bewertung konnte nicht berechnet werden.", e);
+        }
+    }
+
     public String getUserNameById(Long userId) {
         try {
             User user = userRepository.findById(userId).orElse(null);

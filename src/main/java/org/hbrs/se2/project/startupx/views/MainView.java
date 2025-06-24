@@ -1,89 +1,81 @@
 package org.hbrs.se2.project.startupx.views;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
-import org.hbrs.se2.project.startupx.control.LoginControl;
+import com.vaadin.flow.router.*;
+import org.hbrs.se2.project.startupx.control.AuthenticationControl;
 import org.hbrs.se2.project.startupx.control.exception.LoginException;
 import org.hbrs.se2.project.startupx.dtos.UserDTO;
 import org.hbrs.se2.project.startupx.util.Globals;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hbrs.se2.project.startupx.views.investor.InvestorRegistrationView;
+import org.hbrs.se2.project.startupx.views.student.StudentRegistrationView;
 
-/**
- * View zur Darstellung der Startseite. Diese zeigt dem Benutzer ein Login-Formular an.
- * ToDo: Integration einer Seite zur Registrierung von Benutzern
- */
-@Route(value = "" )
-@RouteAlias(value = "login")
+
+@Route(value = Globals.Pages.MAIN_VIEW)
+@RouteAlias(value = Globals.Pages.LOGIN_VIEW)
 @PageTitle("Login")
-public class MainView extends VerticalLayout {
+public class MainView extends VerticalLayout implements BeforeEnterObserver {
 
-    // Default: Einfügung des LoginControl-Objekts als Singleton (Spring-Annotation)
-    // Frage: Gibt es hier vielleicht Probleme ... ?
-    @Autowired
-    private LoginControl loginControl;
+    private final AuthenticationControl authenticationControl;
 
-    //Notification notification =new Notification("Registrierung von Studenten noch nicht fertig. Kommt noch :)");
+    public MainView(AuthenticationControl authenticationControl) {
+        this.authenticationControl = authenticationControl;
+    }
 
-    public MainView() {
-        setSizeFull();
-        LoginForm component = new LoginForm();
-        component.setId("loginForm");
+    @Override
+    public void beforeEnter(BeforeEnterEvent event){
+        UserDTO user = authenticationControl.getCurrentUser();
 
-        component.addLoginListener(e -> {
+        // Prüfen ob angemeldet => Prüfen ob Student/Investor
+        if(user == null){ // Niemand angemeldet => LoginForm
+            if (this.getChildren().findFirst().isEmpty()) {
+                this.add(setUpLoginPage());
+            }
+        } else if(user.getStudent() != null){ // Student angemeldet => Student Dashboard
+            event.rerouteTo(DashboardView.class);
+        } else if(user.getInvestor() != null){ // Investor angemeldet => Investor Dashboard TODO
+            event.rerouteTo(DashboardView.class);
+        }
+    }
 
+    // Gibt LoginForm und die Buttons zum Registrieren zurück, falls Benutzer nicht angemeldet
+    private Component setUpLoginPage(){
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+        layout.setAlignItems(Alignment.CENTER);
+
+        LoginForm loginForm = new LoginForm();
+        Button registerStudentButton = new Button("Student registrieren");
+        Button registerInvestorButton = new Button("Investor registrieren");
+
+        loginForm.addLoginListener(event -> {
             boolean isAuthenticated = false;
             try {
-                isAuthenticated = loginControl.authenticate( e.getUsername() , e.getPassword() );
-
-            } catch (LoginException loginException) {
-                Dialog dialog = new Dialog();
-                dialog.add( new Text( loginException.getMessage()) );
-                dialog.setWidth("400px");
-                dialog.setHeight("150px");
-                dialog.open();
+                isAuthenticated = authenticationControl.authenticate(event.getUsername(), event.getPassword());
+            } catch (LoginException e) {
+                new Dialog(new Text(e.getMessage())).open();
             }
-            if (isAuthenticated) {
-                grabAndSetUserIntoSession();
-                navigateToMainPage();
-
-            } else {
-                // Kann noch optimiert werden
-                component.setError(true);
+            if(isAuthenticated){
+                UI.getCurrent().navigate(DashboardView.class);
             }
         });
 
-        Button registerStudentButton = new Button("Zur Registrierung von Studenten", event ->
-            UI.getCurrent().navigate(StudentRegistrationView.class)
-        );
-        registerStudentButton.setId("registerStudentButton");
+        registerStudentButton.addClickListener(event -> {
+           UI.getCurrent().navigate(StudentRegistrationView.class);
+        });
 
-        Button registerInvestorButton = new Button("Zur Registrierung von Investor", event ->
-            UI.getCurrent().navigate(InvestorRegistrationView.class)
-        );
+        registerInvestorButton.addClickListener(event -> {
+            UI.getCurrent().navigate(InvestorRegistrationView.class);
+        });
 
-        add(component, registerStudentButton, registerInvestorButton);
+        layout.add(loginForm, registerStudentButton, registerInvestorButton);
 
-        this.setAlignItems( Alignment.CENTER );
+        return layout;
     }
 
-    private void grabAndSetUserIntoSession() {
-        UserDTO userDTO = loginControl.getCurrentUser();
-        UI.getCurrent().getSession().setAttribute( Globals.CURRENT_USER, userDTO );
-    }
-
-
-    private void navigateToMainPage() {
-        // Navigation zur Startseite, hier auf die Teil-Komponente Show-Cars.
-        // Die anzuzeigende Teil-Komponente kann man noch individualisieren, je nach Rolle,
-        // die ein Benutzer besitzt
-        UI.getCurrent().navigate(Globals.Pages.MAIN_VIEW);
-
-    }
 }

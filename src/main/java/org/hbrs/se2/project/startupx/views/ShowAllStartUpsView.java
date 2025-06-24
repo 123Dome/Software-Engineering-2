@@ -15,11 +15,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hbrs.se2.project.startupx.control.AuthenticationControl;
+import org.hbrs.se2.project.startupx.control.BewertungControl;
 import org.hbrs.se2.project.startupx.control.ManageStartupControl;
 import org.hbrs.se2.project.startupx.dtos.StartupDTO;
-import org.hbrs.se2.project.startupx.entities.Startup;
-import org.hbrs.se2.project.startupx.repository.StartupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hbrs.se2.project.startupx.util.Globals;
 
 import java.util.List;
 
@@ -33,10 +33,14 @@ public class ShowAllStartUpsView extends Div{
     private TextField searchField = new TextField();
 
     private final ManageStartupControl manageStartupControl;
+    private final BewertungControl bewertungControl;
+    private final AuthenticationControl authenticationControl;
 
 
-    public ShowAllStartUpsView(ManageStartupControl manageStartupControl) {
+    public ShowAllStartUpsView(ManageStartupControl manageStartupControl, BewertungControl bewertungControl, AuthenticationControl authenticationControl) {
         this.manageStartupControl = manageStartupControl;
+        this.bewertungControl = bewertungControl;
+        this.authenticationControl = authenticationControl;
         add(createTitle());
         add(setUpSearchField());
         add(setUpGrid());
@@ -66,15 +70,32 @@ public class ShowAllStartUpsView extends Div{
         grid.addColumn(StartupDTO::getAnzahlMitarbeiter).setHeader("Mitarbeiterzahl");
         grid.addColumn(dto -> manageStartupControl.getBrancheNameById(dto.getBranche()))
                 .setHeader("Branche");
+        grid.addColumn(dto -> {
+            double average = bewertungControl.getDurchschnittlicheBewertungZuStartup(dto.getId());
+            if (average > 0.0) {
+                return String.format("%.1f ⭐", average);
+            } else {
+                return ""; // Kein Text, wenn keine Bewertung
+            }
+        }).setHeader("Ø Bewertung");
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             StartupDTO selected = event.getValue();
             if (selected != null) {
-                getUI().ifPresent(ui ->
-                        ui.navigate("startup/" + selected.getId())
-                );
+                String route;
+                var user = authenticationControl.getCurrentUser();
+                if (user.getStudent() != null) {
+                    route = Globals.Pages.STUDENT_STARTUP_VIEW + "/" + selected.getId();
+                } else if (user.getInvestor() != null) {
+                    route = Globals.Pages.INVESTOR_STARTUP_VIEW + "/" + selected.getId();
+                } else {
+                    route = Globals.Pages.DASHBOARD_VIEW;
+                }
+
+                getUI().ifPresent(ui -> ui.navigate(route));
             }
         });
+
 
         List<StartupDTO> startups = manageStartupControl.findAll();
         GridListDataView<StartupDTO> dataView = grid.setItems(startups);
@@ -92,12 +113,14 @@ public class ShowAllStartUpsView extends Div{
             boolean matchesGruendungsdatum = startupDTO.getGruendungsdatum().toString().contains(searchTerm);
             boolean matchesAnzahlMitarbeiter = startupDTO.getAnzahlMitarbeiter().toString().equals(searchTerm);
             boolean matchesBranche = manageStartupControl.getBrancheNameById(startupDTO.getBranche()).contains(searchTerm);
+            boolean matchesBewertung = Double.toString(bewertungControl.getDurchschnittlicheBewertungZuStartup(startupDTO.getId())).contains(searchTerm);
 
             return matchesStartupName
                     || matchesBeschreibung
                     || matchesGruendungsdatum
                     || matchesAnzahlMitarbeiter
-                    || matchesBranche;
+                    || matchesBranche
+                    || matchesBewertung;
         });
 
         return grid;
